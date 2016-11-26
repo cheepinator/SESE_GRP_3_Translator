@@ -1,0 +1,12 @@
+version: '2'
+services:
+    sese_translator-postgresql:
+        container_name: sese_translator-postgresql
+        image: postgres:9.5.4
+        # volumes:
+        #     - ~/volumes/jhipster/sese_translator/postgresql/:/var/lib/postgresql/
+        environment:
+            - POSTGRES_USER=sese_translator
+            - POSTGRES_PASSWORD=
+        ports:
+            - 5432:5432

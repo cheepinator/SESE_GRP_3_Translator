@@ -1,0 +1,32 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "assignedUser",
+            "otherEntityName": "user",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "assignedProject",
+            "otherEntityName": "project",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "role",
+            "fieldType": "Projectrole",
+            "fieldValues": "RELEASE_MANAGER,TRANSLATOR,DEVELOPER",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "changelogDate": "20161126164221",
+    "entityTableName": "projectassignment",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "no"
+}

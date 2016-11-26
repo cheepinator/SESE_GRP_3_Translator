@@ -1,0 +1,35 @@
+
+<div>
+    <h2><span>Translation</span> {{vm.translation.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span>Translated Text</span></dt>
+        <dd>
+            <span>{{vm.translation.translatedText}}</span>
+        </dd>
+        <dt><span>Translator</span></dt>
+        <dd>
+            {{vm.translation.translatorId}}
+        </dd>
+        <dt><span>Language</span></dt>
+        <dd>
+            <a ui-sref="language-detail({id:vm.translation.languageId})">{{vm.translation.languageId}}</a>
+        </dd>
+        <dt><span>Definition</span></dt>
+        <dd>
+            <a ui-sref="definition-detail({id:vm.translation.definitionId})">{{vm.translation.definitionId}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button" ui-sref="translation-detail.edit({id:vm.translation.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm"> Edit</span>
+    </button>
+</div>

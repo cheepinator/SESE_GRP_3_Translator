@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         name="CM1"
+         updateCheck="false"
+         maxBytesLocalHeap="16M">
+
+    <!--
+      This is a default configuration, it is re-configured by the CacheConfiguration Spring Bean, using the
+      properties from the resources/config/*.yml files.
+    -->
+
+    <diskStore path="java.io.tmpdir"/>
+
+    <defaultCache
+            eternal="false"
+            overflowToDisk="false"
+            />
+
+    <cache name="com.sese.translator.domain.User"
+           timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Authority"
+           timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.User.authorities"
+           timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.PersistentToken"
+           timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.User.persistentTokens"
+           timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Project"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Project.releases"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Release"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Release.definitions"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Release.languages"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Definition"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Definition.translations"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Translation"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Language"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Language.releases"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <cache name="com.sese.translator.domain.Projectassignment"
+        timeToLiveSeconds="3600">
+    </cache>
+
+    <!-- jhipster-needle-ehcache-add-entry -->
+</ehcache>

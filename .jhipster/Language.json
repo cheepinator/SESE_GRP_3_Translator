@@ -1,0 +1,26 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "many-to-many",
+            "relationshipName": "releases",
+            "otherEntityName": "release",
+            "ownerSide": false,
+            "otherEntityRelationshipName": "languages"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "code",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "changelogDate": "20161126164220",
+    "entityTableName": "language",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "serviceImpl"
+}

@@ -1,0 +1,54 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "definitions",
+            "otherEntityName": "definition",
+            "otherEntityRelationshipName": "release"
+        },
+        {
+            "relationshipType": "many-to-many",
+            "otherEntityRelationshipName": "releases",
+            "relationshipName": "languages",
+            "otherEntityName": "language",
+            "otherEntityField": "id",
+            "ownerSide": true
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "project",
+            "otherEntityName": "project",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "description",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "versionTag",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "isCurrentRelease",
+            "fieldType": "Boolean",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "dueDate",
+            "fieldType": "ZonedDateTime"
+        }
+    ],
+    "changelogDate": "20161126164217",
+    "entityTableName": "release",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "serviceImpl"
+}

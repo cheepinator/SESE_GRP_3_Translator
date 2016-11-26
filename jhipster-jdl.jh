@@ -1,0 +1,64 @@
+entity Project {
+    name String required
+}
+enum Projectrole{
+	RELEASE_MANAGER,
+    TRANSLATOR,
+    DEVELOPER
+}
+
+entity Release{
+	description String,
+    versionTag String required,
+    isCurrentRelease Boolean required,
+    dueDate ZonedDateTime
+}
+
+entity Definition{
+code String required,
+originalText TextBlob required
+}
+
+entity Translation{
+translatedText TextBlob
+}
+
+entity Language{
+code String required
+}
+
+entity Projectassignment{
+	role Projectrole required
+}
+
+
+
+
+relationship ManyToMany {
+    Release{languages} to Language{releases}
+    
+}
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	
+	Project{releases} to Release{project},
+    Definition{translations} to Translation{definition},
+	Release{definitions} to Definition{release}
+}
+
+relationship ManyToOne {
+Project{owner} to User{ownedProjects},
+Translation{translator} to User{translations},
+Projectassignment{assignedUser} to User,
+Projectassignment{assignedProject} to Project,
+Translation{language} to Language
+}
+
+// Set pagination options
+paginate Definition, Translation with infinite-scroll
+
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl except Projectassignment, User

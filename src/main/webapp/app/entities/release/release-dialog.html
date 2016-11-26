@@ -1,0 +1,76 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myReleaseLabel">Create or edit a Release</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.release.id">
+            <label for="id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.release.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="field_description">Description</label>
+            <input type="text" class="form-control" name="description" id="field_description"
+                    ng-model="vm.release.description"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="field_versionTag">Version Tag</label>
+            <input type="text" class="form-control" name="versionTag" id="field_versionTag"
+                    ng-model="vm.release.versionTag"
+                    required />
+            <div ng-show="editForm.versionTag.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.versionTag.$error.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="field_isCurrentRelease">Is Current Release</label>
+            <input type="checkbox" class="form-control" name="isCurrentRelease" id="field_isCurrentRelease"
+                    ng-model="vm.release.isCurrentRelease"
+                     />
+            <div ng-show="editForm.isCurrentRelease.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.isCurrentRelease.$error.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="field_dueDate">Due Date</label>
+                <div class="input-group">
+                    <input id="field_dueDate" type="text" class="form-control" name="dueDate" datetime-picker="{{dateformat}}" ng-model="vm.release.dueDate" is-open="vm.datePickerOpenStatus.dueDate"
+                      />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="vm.openCalendar('dueDate')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
+        </div>
+
+        <div class="form-group">
+            <label for="field_languages">Languages</label>
+            <select class="form-control" id="field_languages" multiple name="languages" ng-model="vm.release.languages" ng-options="language as language.id for language in vm.languages track by language.id"></select>
+        </div>
+        <div class="form-group">
+            <label for="field_project">Project</label>
+            <select class="form-control" id="field_project" name="project" ng-model="vm.release.projectId" ng-options="project.id as project.id for project in vm.projects"            >
+                <option value=""></option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span>Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span>Save</span>
+        </button>
+    </div>
+</form>
