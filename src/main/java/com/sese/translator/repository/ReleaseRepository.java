@@ -19,4 +19,9 @@ public interface ReleaseRepository extends JpaRepository<Release,Long> {
     @Query("select release from Release release left join fetch release.languages where release.id =:id")
     Release findOneWithEagerRelationships(@Param("id") Long id);
 
+//    @Query("SELECT release FROM Release release where release.project_id = :id")
+//    Release findCurrentByProjectId(@Param("id") Long id);
+
+
+
 }

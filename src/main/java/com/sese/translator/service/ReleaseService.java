@@ -2,7 +2,6 @@ package com.sese.translator.service;
 
 import com.sese.translator.service.dto.ReleaseDTO;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,7 +19,7 @@ public interface ReleaseService {
 
     /**
      *  Get all the releases.
-     *  
+     *
      *  @return the list of entities
      */
     List<ReleaseDTO> findAll();
@@ -39,4 +38,7 @@ public interface ReleaseService {
      *  @param id the id of the entity
      */
     void delete(Long id);
+
+
+   // ReleaseDTO findCurrentByProjectId(Long id);
 }

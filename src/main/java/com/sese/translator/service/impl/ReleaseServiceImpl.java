@@ -1,14 +1,14 @@
 package com.sese.translator.service.impl;
 
-import com.sese.translator.service.ReleaseService;
 import com.sese.translator.domain.Release;
 import com.sese.translator.repository.ReleaseRepository;
+import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.service.mapper.ReleaseMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.LinkedList;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class ReleaseServiceImpl implements ReleaseService{
 
     private final Logger log = LoggerFactory.getLogger(ReleaseServiceImpl.class);
-    
+
     @Inject
     private ReleaseRepository releaseRepository;
 
@@ -46,10 +46,10 @@ public class ReleaseServiceImpl implements ReleaseService{
 
     /**
      *  Get all the releases.
-     *  
+     *
      *  @return the list of entities
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public List<ReleaseDTO> findAll() {
         log.debug("Request to get all Releases");
         List<ReleaseDTO> result = releaseRepository.findAllWithEagerRelationships().stream()
@@ -65,13 +65,25 @@ public class ReleaseServiceImpl implements ReleaseService{
      *  @param id the id of the entity
      *  @return the entity
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public ReleaseDTO findOne(Long id) {
         log.debug("Request to get Release : {}", id);
         Release release = releaseRepository.findOneWithEagerRelationships(id);
         ReleaseDTO releaseDTO = releaseMapper.releaseToReleaseDTO(release);
         return releaseDTO;
     }
+
+
+//    @Transactional(readOnly = true)
+//    public ReleaseDTO findCurrentByProjectId(Long id) {
+//        log.debug("Request to get current Release of Project : {}", id);
+//        Release release = releaseRepository.findCurrentByProjectId(id);
+//        ReleaseDTO releaseDTO = releaseMapper.releaseToReleaseDTO(release);
+//        return releaseDTO;
+//    }
+
+
+
 
     /**
      *  Delete the  release by id.

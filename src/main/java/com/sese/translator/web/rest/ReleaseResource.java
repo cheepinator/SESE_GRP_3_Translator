@@ -2,11 +2,10 @@ package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.sese.translator.service.ReleaseService;
-import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.service.dto.ReleaseDTO;
+import com.sese.translator.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +14,8 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Release.
@@ -28,7 +25,7 @@ import java.util.stream.Collectors;
 public class ReleaseResource {
 
     private final Logger log = LoggerFactory.getLogger(ReleaseResource.class);
-        
+
     @Inject
     private ReleaseService releaseService;
 
@@ -103,6 +100,25 @@ public class ReleaseResource {
                 HttpStatus.OK))
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
+
+    /**
+     * GET  /releases/project/:id : get the current release for project "id".
+     *
+     * @param id the id of the Project to retrieve the current release for
+     * @return the ResponseEntity with status 200 (OK) and with body the releaseDTO, or with status 404 (Not Found)
+     */
+//    @GetMapping("/releases/project/{id}")
+//    @Timed
+//    public ResponseEntity<ReleaseDTO> getCurrentReleaseByProjectId(@PathVariable Long id) {
+//        log.debug("Rest Request to get current Release of Project : {}", id);
+//        ReleaseDTO releaseDTO = releaseService.findCurrentByProjectId(id);
+//        return Optional.ofNullable(releaseDTO)
+//            .map(result -> new ResponseEntity<>(
+//                result,
+//                HttpStatus.OK))
+//            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+//    }
 
     /**
      * DELETE  /releases/:id : delete the "id" release.
