@@ -2,11 +2,10 @@ package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.sese.translator.service.ProjectService;
-import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.service.dto.ProjectDTO;
+import com.sese.translator.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +14,8 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Project.
@@ -28,7 +25,7 @@ import java.util.stream.Collectors;
 public class ProjectResource {
 
     private final Logger log = LoggerFactory.getLogger(ProjectResource.class);
-        
+
     @Inject
     private ProjectService projectService;
 
@@ -81,9 +78,10 @@ public class ProjectResource {
      */
     @GetMapping("/projects")
     @Timed
-    public List<ProjectDTO> getAllProjects() {
-        log.debug("REST request to get all Projects");
-        return projectService.findAll();
+    public List<ProjectDTO> getAllProjectsOfCurrentUser() {
+        log.debug("REST request to get all Projects of the current User");
+        //return projectService.findAll();
+        return projectService.findAllOfCurrentUser();
     }
 
     /**

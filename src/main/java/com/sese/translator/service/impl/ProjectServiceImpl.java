@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class ProjectServiceImpl implements ProjectService{
 
     private final Logger log = LoggerFactory.getLogger(ProjectServiceImpl.class);
-    
+
     @Inject
     private ProjectRepository projectRepository;
 
@@ -46,13 +46,13 @@ public class ProjectServiceImpl implements ProjectService{
 
     /**
      *  Get all the projects.
-     *  
+     *
      *  @return the list of entities
      */
-    @Transactional(readOnly = true) 
-    public List<ProjectDTO> findAll() {
-        log.debug("Request to get all Projects");
-        List<ProjectDTO> result = projectRepository.findAll().stream()
+    @Transactional(readOnly = true)
+    public List<ProjectDTO> findAllOfCurrentUser() {
+        log.debug("Request to get all Projects for current User");
+        List<ProjectDTO> result = projectRepository.findByOwnerIsCurrentUser().stream()
             .map(projectMapper::projectToProjectDTO)
             .collect(Collectors.toCollection(LinkedList::new));
 
@@ -65,7 +65,7 @@ public class ProjectServiceImpl implements ProjectService{
      *  @param id the id of the entity
      *  @return the entity
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public ProjectDTO findOne(Long id) {
         log.debug("Request to get Project : {}", id);
         Project project = projectRepository.findOne(id);

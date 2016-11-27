@@ -2,7 +2,6 @@ package com.sese.translator.service;
 
 import com.sese.translator.service.dto.ProjectDTO;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,10 +19,10 @@ public interface ProjectService {
 
     /**
      *  Get all the projects.
-     *  
+     *
      *  @return the list of entities
      */
-    List<ProjectDTO> findAll();
+    List<ProjectDTO> findAllOfCurrentUser();
 
     /**
      *  Get the "id" project.

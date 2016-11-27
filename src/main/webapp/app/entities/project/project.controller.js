@@ -30,12 +30,18 @@
 
         }
 
-        function getCurrentReleaseByProjectID(id) {
-            releases.forEach(function (entry) {
-                if(entry.project_id == id && entry.is_current_release){
-                    console.log(entry.id + "wurde geloggt") ;
+        $scope.getCurrentReleaseByProjectID = getCurrentReleaseByProjectID;
 
+        function getCurrentReleaseByProjectID(id) {
+            var currentReleases = this;
+            $scope.currentRelease = null;
+            vm.releases.forEach(function (entry) {
+                console.log("Aufgerufen mit id: "+id + " Entry PID "+entry.projectId+ " entryiscurrent: "+entry.isCurrentRelease +" Entry: "+entry)
+                if(entry.projectId == id && entry.isCurrentRelease){
+                    console.log(entry.description + " wurde geloggt") ;
+                    $scope.currentRelease = entry;
                 }
+
             })
         }
 

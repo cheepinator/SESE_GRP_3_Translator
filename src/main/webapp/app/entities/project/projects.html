@@ -21,7 +21,6 @@
                     <th><span>ID</span></th>
                     <th><span>Name</span></th>
                     <th><span>Nächstes Release</span></th>
-                    <th><span>Eigentümer</span></th>
                     <th><span>Sprache</span></th>
                     <th></th>
                 </tr>
@@ -32,13 +31,13 @@
                     <td>{{project.name}}</td>
 
                     <td>
-                        {{vm.releases[0].description}}
+                        {{getCurrentReleaseByProjectID(project.id) }}
+                        <a ui-sref="release-detail({id:currentRelease.id})">{{currentRelease.description}}</a>
                     </td>
                     <td>
-                        {{project.ownerId}}
-                    </td>
-                    <td>
-                        {{vm.languages[project.ownerId].code}}
+                        <span ng-repeat="languages in currentRelease.languages">
+                            <a class="form-control-static" ui-sref="language-detail({id: languages.id})">{{languages.code}}</a>{{$last ? '' : ', '}}
+                        </span>
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
