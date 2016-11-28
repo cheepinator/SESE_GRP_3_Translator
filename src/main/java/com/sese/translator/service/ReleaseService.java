@@ -32,6 +32,15 @@ public interface ReleaseService {
      */
     ReleaseDTO findOne(Long id);
 
+
+    /**
+     *  Count All Translations in the current Release
+     *
+     *  @param id the id of the entity
+     *  @return number of translations
+     */
+    Integer countTranslations(Long id);
+
     /**
      *  Delete the "id" release.
      *
@@ -40,5 +49,5 @@ public interface ReleaseService {
     void delete(Long id);
 
 
-   // ReleaseDTO findCurrentByProjectId(Long id);
+
 }

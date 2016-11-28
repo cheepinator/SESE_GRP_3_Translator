@@ -5,9 +5,9 @@
         .module('seseTranslatorApp')
         .controller('ProjectController', ProjectController);
 
-    ProjectController.$inject = ['$scope', '$state', 'Project', 'Language', 'Release'];
+    ProjectController.$inject = ['$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations'];
 
-    function ProjectController ($scope, $state, Project, Language, Release) {
+    function ProjectController ($scope, $state, Project, Language, Release, CountTranslations) {
         var vm = this;
 
         vm.projects = [];
@@ -33,7 +33,7 @@
         $scope.getCurrentReleaseByProjectID = getCurrentReleaseByProjectID;
 
         function getCurrentReleaseByProjectID(id) {
-            var currentReleases = this;
+
             $scope.currentRelease = null;
             vm.releases.forEach(function (entry) {
                 console.log("Aufgerufen mit id: "+id + " Entry PID "+entry.projectId+ " entryiscurrent: "+entry.isCurrentRelease +" Entry: "+entry)
@@ -44,6 +44,15 @@
 
             })
         }
+
+        $scope.getCountOfTranslationsByReleaseID = getCountOfTranslationsByReleaseID;
+
+        function getCountOfTranslationsByReleaseID(id) {
+            console.log("looking for id "+ id);
+            $scope.countOfTranslations =  CountTranslations.get(0);
+        }
+
+
 
     }
 

@@ -1,22 +1,19 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
-
 import com.sese.translator.domain.Project;
 import com.sese.translator.repository.ProjectRepository;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -131,19 +128,19 @@ public class ProjectResourceIntTest {
         assertThat(projects).hasSize(databaseSizeBeforeTest);
     }
 
-    @Test
-    @Transactional
-    public void getAllProjects() throws Exception {
-        // Initialize the database
-        projectRepository.saveAndFlush(project);
-
-        // Get all the projects
-        restProjectMockMvc.perform(get("/api/projects?sort=id,desc"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
-                .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
-    }
+//    @Test
+//    @Transactional
+//    public void getAllProjects() throws Exception {
+//        // Initialize the database
+//        projectRepository.saveAndFlush(project);
+//
+//        // Get all the projects
+//        restProjectMockMvc.perform(get("/api/projects?sort=id,desc"))
+//                .andExpect(status().isOk())
+//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+//                .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
+//                .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+//    }
 
     @Test
     @Transactional

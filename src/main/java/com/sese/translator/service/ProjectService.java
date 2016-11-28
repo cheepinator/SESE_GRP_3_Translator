@@ -18,11 +18,14 @@ public interface ProjectService {
     ProjectDTO save(ProjectDTO projectDTO);
 
     /**
-     *  Get all the projects.
+     *  Get all the projects of the current user.
      *
      *  @return the list of entities
      */
     List<ProjectDTO> findAllOfCurrentUser();
+
+
+
 
     /**
      *  Get the "id" project.

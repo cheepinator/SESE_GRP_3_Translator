@@ -2,12 +2,14 @@
     'use strict';
     angular
         .module('seseTranslatorApp')
-        .factory('Project', Project);
+        .factory('Project', Project)
+        .factory('CountTranslations',CountTranslations);
 
     Project.$inject = ['$resource'];
     Language.$inject = ['$resource'];
     Release.$inject = ['$resource'];
-    CurrentRelease.$inject = ['$resource'];
+    //CurrentRelease.$inject = ['$resource'];
+    CountTranslations.$inject = ['$resource'];
 
     function Project ($resource) {
         var resourceUrl =  'api/projects/:id';
@@ -63,8 +65,26 @@
         });
     }
 
-    function CurrentRelease ($resource) {
-        var resourceUrl =  'api/releases/project/:id';
+    // function CurrentRelease ($resource) {
+    //     var resourceUrl =  'api/releases/project/:id';
+    //
+    //     return $resource(resourceUrl, {}, {
+    //         'get': {
+    //             method: 'GET',
+    //             transformResponse: function (data) {
+    //                 if (data) {
+    //                     data = angular.fromJson(data);
+    //                 }
+    //                 return data;
+    //             }
+    //         }
+    //     });
+    // }
+
+
+
+    function CountTranslations ($resource) {
+        var resourceUrl =  'api/releases/counttranslations/:id';
 
         return $resource(resourceUrl, {}, {
             'get': {
@@ -78,4 +98,6 @@
             }
         });
     }
+
+
 })();

@@ -20,8 +20,9 @@
                 <tr>
                     <th><span>ID</span></th>
                     <th><span>Name</span></th>
-                    <th><span>Nächstes Release</span></th>
-                    <th><span>Sprache</span></th>
+                    <th><span>Nächste Release</span></th>
+                    <th><span>Fortschritt</span></th>
+                    <th><span>Sprachen</span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -33,6 +34,11 @@
                     <td>
                         {{getCurrentReleaseByProjectID(project.id) }}
                         <a ui-sref="release-detail({id:currentRelease.id})">{{currentRelease.description}}</a>
+                    </td>
+                    <td>
+                        <!--{{getCountOfTranslationsByReleaseID(currentRelease.id) }}
+                       {{countOfTranslations}}-->
+                        leer
                     </td>
                     <td>
                         <span ng-repeat="languages in currentRelease.languages">

@@ -22,6 +22,7 @@ public interface ReleaseRepository extends JpaRepository<Release,Long> {
 //    @Query("SELECT release FROM Release release where release.project_id = :id")
 //    Release findCurrentByProjectId(@Param("id") Long id);
 
-
+    @Query("select count(*) from Translation translation where translation.definition.release.id = :id ")
+    Integer countByReleaseId(@Param("id") Long id);
 
 }

@@ -73,6 +73,18 @@ public class ReleaseServiceImpl implements ReleaseService{
         return releaseDTO;
     }
 
+    /**
+     * Count All Translations in the current Release
+     *
+     * @param id the id of the entity
+     * @return number of translations
+     */
+    @Transactional(readOnly = true)
+    public Integer countTranslations(Long id) {
+        log.debug("Request count translations for Release : {}", id);
+        return releaseRepository.countByReleaseId(id);
+    }
+
 
 //    @Transactional(readOnly = true)
 //    public ReleaseDTO findCurrentByProjectId(Long id) {

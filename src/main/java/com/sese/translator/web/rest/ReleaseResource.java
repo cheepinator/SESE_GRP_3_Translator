@@ -6,6 +6,7 @@ import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -95,6 +96,26 @@ public class ReleaseResource {
         log.debug("REST request to get Release : {}", id);
         ReleaseDTO releaseDTO = releaseService.findOne(id);
         return Optional.ofNullable(releaseDTO)
+            .map(result -> new ResponseEntity<>(
+                result,
+                HttpStatus.OK))
+            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+
+    /**
+     * GET  /releases/counttranslations/:id : get the number of translations in the "id" release.
+     *
+     * @param id the id of the releaseDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the Number, or with status 404 (Not Found)
+     */
+    @GetMapping("/releases/counttranslations/{id}")
+    @Timed
+    public ResponseEntity<Pair<Integer,Integer>> getCountTranslationsForRelease(@PathVariable Long id) {
+        log.debug("REST request to get Count of Translations for Release : {}", id);
+        Integer count = releaseService.countTranslations(id);
+        Pair<Integer,Integer> pair = Pair.of(count,1); //TODO zweite abfrage für die anzahl der definitionen
+        return Optional.ofNullable(pair)
             .map(result -> new ResponseEntity<>(
                 result,
                 HttpStatus.OK))
