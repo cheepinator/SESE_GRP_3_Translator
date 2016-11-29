@@ -42,6 +42,8 @@ public class ProjectResource {
         log.debug("REST request to save Project : {}", projectDTO);
         if (projectDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("project", "idexists", "A new project cannot already have an ID")).body(null);
+        }else if(projectDTO.getOwnerId() != null){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("project", "ownerexists", "A new project cannot already have an Owner")).body(null);
         }
         ProjectDTO result = projectService.save(projectDTO);
         return ResponseEntity.created(new URI("/api/projects/" + result.getId()))

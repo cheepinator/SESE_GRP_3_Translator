@@ -5,9 +5,9 @@
         .module('seseTranslatorApp')
         .controller('ProjectDialogController', ProjectDialogController);
 
-    ProjectDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Project', 'Release', 'User'];
+    ProjectDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Principal', 'Project', 'Release', 'User'];
 
-    function ProjectDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Project, Release, User) {
+    function ProjectDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity,Principal, Project, Release, User) {
         var vm = this;
 
         vm.project = entity;
@@ -16,9 +16,18 @@
         vm.releases = Release.query();
         vm.users = User.query();
 
+        getAccount();
+
         $timeout(function (){
             angular.element('.form-group:eq(1)>input').focus();
         });
+
+        function getAccount() {
+            Principal.identity().then(function(account) {
+                vm.account = account;
+                vm.isAuthenticated = Principal.isAuthenticated;
+            });
+        }
 
         function clear () {
             $uibModalInstance.dismiss('cancel');
@@ -29,6 +38,7 @@
             if (vm.project.id !== null) {
                 Project.update(vm.project, onSaveSuccess, onSaveError);
             } else {
+                vm.project.owner = vm.account.id;
                 Project.save(vm.project, onSaveSuccess, onSaveError);
             }
         }

@@ -1,14 +1,17 @@
 package com.sese.translator.service.impl;
 
-import com.sese.translator.service.ProjectService;
 import com.sese.translator.domain.Project;
 import com.sese.translator.repository.ProjectRepository;
+import com.sese.translator.security.CustomUserDetails;
+import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.LinkedList;
@@ -37,7 +40,15 @@ public class ProjectServiceImpl implements ProjectService{
      * @return the persisted entity
      */
     public ProjectDTO save(ProjectDTO projectDTO) {
+
+
+
+
         log.debug("Request to save Project : {}", projectDTO);
+        if(projectDTO.getOwnerId() == null){
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            projectDTO.setOwnerId(((CustomUserDetails)auth.getPrincipal()).getId()); //get logged in username
+        }
         Project project = projectMapper.projectDTOToProject(projectDTO);
         project = projectRepository.save(project);
         ProjectDTO result = projectMapper.projectToProjectDTO(project);
