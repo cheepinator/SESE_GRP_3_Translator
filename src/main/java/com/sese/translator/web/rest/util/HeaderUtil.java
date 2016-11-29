@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 public final class HeaderUtil {
 
     private static final Logger log = LoggerFactory.getLogger(HeaderUtil.class);
+    public static final String X_SESE_TRANSLATOR_APP_ERROR = "X-seseTranslatorApp-error";
 
     private HeaderUtil() {
     }
@@ -36,7 +37,7 @@ public final class HeaderUtil {
     public static HttpHeaders createFailureAlert(String entityName, String errorKey, String defaultMessage) {
         log.error("Entity creation failed, {}", defaultMessage);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-seseTranslatorApp-error", defaultMessage);
+        headers.add(X_SESE_TRANSLATOR_APP_ERROR, defaultMessage);
         headers.add("X-seseTranslatorApp-params", entityName);
         return headers;
     }

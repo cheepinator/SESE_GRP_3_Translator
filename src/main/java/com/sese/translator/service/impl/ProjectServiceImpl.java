@@ -2,14 +2,16 @@ package com.sese.translator.service.impl;
 
 import com.sese.translator.domain.Project;
 import com.sese.translator.repository.ProjectRepository;
-import com.sese.translator.security.CustomUserDetails;
 import com.sese.translator.service.ProjectService;
+import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +25,15 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
-public class ProjectServiceImpl implements ProjectService{
+public class ProjectServiceImpl implements ProjectService {
 
     private final Logger log = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     @Inject
     private ProjectRepository projectRepository;
+
+    @Inject
+    private UserService userService;
 
     @Inject
     private ProjectMapper projectMapper;
@@ -40,16 +45,16 @@ public class ProjectServiceImpl implements ProjectService{
      * @return the persisted entity
      */
     public ProjectDTO save(ProjectDTO projectDTO) {
-
-
-
-
         log.debug("Request to save Project : {}", projectDTO);
-        if(projectDTO.getOwnerId() == null){
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            projectDTO.setOwnerId(((CustomUserDetails)auth.getPrincipal()).getId()); //get logged in username
-        }
         Project project = projectMapper.projectDTOToProject(projectDTO);
+        if (project.getOwner() == null) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = ((User) auth.getPrincipal()).getUsername();
+            com.sese.translator.domain.User user = userService.getUserWithAuthoritiesByLogin(username).orElseThrow(()
+                -> new UsernameNotFoundException("User " + username + " was not found in the database"));
+            project.setOwner(user);
+            log.debug("No user was set for project {}, set to '{}'", projectDTO, username);
+        }
         project = projectRepository.save(project);
         ProjectDTO result = projectMapper.projectToProjectDTO(project);
         return result;

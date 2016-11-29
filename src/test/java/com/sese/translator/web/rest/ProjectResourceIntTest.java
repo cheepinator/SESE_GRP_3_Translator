@@ -4,8 +4,10 @@ import com.sese.translator.SeseTranslatorApp;
 import com.sese.translator.domain.Project;
 import com.sese.translator.repository.ProjectRepository;
 import com.sese.translator.service.ProjectService;
+import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
+import com.sese.translator.web.rest.util.HeaderUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +28,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -48,6 +52,9 @@ public class ProjectResourceIntTest {
 
     @Inject
     private ProjectService projectService;
+
+    @Inject
+    private UserService userService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -87,12 +94,17 @@ public class ProjectResourceIntTest {
     @Before
     public void initTest() {
         project = createEntity(em);
+        userService.getUserWithAuthoritiesByLogin("user").ifPresent(user -> project.setOwner(user));
     }
 
+    @WithMockUser
     @Test
     @Transactional
     public void createProject() throws Exception {
         int databaseSizeBeforeCreate = projectRepository.findAll().size();
+
+        // delete owner of the project
+        project.setOwner(null);
 
         // Create the Project
         ProjectDTO projectDTO = projectMapper.projectToProjectDTO(project);
@@ -128,19 +140,58 @@ public class ProjectResourceIntTest {
         assertThat(projects).hasSize(databaseSizeBeforeTest);
     }
 
-//    @Test
-//    @Transactional
-//    public void getAllProjects() throws Exception {
-//        // Initialize the database
-//        projectRepository.saveAndFlush(project);
-//
-//        // Get all the projects
-//        restProjectMockMvc.perform(get("/api/projects?sort=id,desc"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-//                .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
-//                .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
-//    }
+    @Test
+    @Transactional
+    public void checkOwnerCantBeSet() throws Exception {
+        int databaseSizeBeforeTest = projectRepository.findAll().size();
+
+        // Create the Project, which fails.
+        ProjectDTO projectDTO = projectMapper.projectToProjectDTO(project);
+
+        restProjectMockMvc.perform(post("/api/projects")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
+                          .andExpect(status().isBadRequest())
+                          .andExpect(header().string(HeaderUtil.X_SESE_TRANSLATOR_APP_ERROR, "A new project cannot already have an Owner"));
+
+        List<Project> projects = projectRepository.findAll();
+        assertThat(projects).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    public void checkIdCantBeSet() throws Exception {
+        int databaseSizeBeforeTest = projectRepository.findAll().size();
+        // set id
+        project.setId(1L);
+
+        // Create the Project, which fails.
+        ProjectDTO projectDTO = projectMapper.projectToProjectDTO(project);
+
+        restProjectMockMvc.perform(post("/api/projects")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
+                          .andExpect(status().isBadRequest())
+                          .andExpect(header().string(HeaderUtil.X_SESE_TRANSLATOR_APP_ERROR, "A new project cannot already have an ID"));
+
+        List<Project> projects = projectRepository.findAll();
+        assertThat(projects).hasSize(databaseSizeBeforeTest);
+    }
+
+    @WithMockUser
+    @Test
+    @Transactional
+    public void getAllProjects() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+
+        // Get all the projects
+        restProjectMockMvc.perform(get("/api/projects?sort=id,desc"))
+                          .andExpect(status().isOk())
+                          .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                          .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
+                          .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+    }
 
     @Test
     @Transactional
@@ -164,6 +215,7 @@ public class ProjectResourceIntTest {
                 .andExpect(status().isNotFound());
     }
 
+    @WithMockUser
     @Test
     @Transactional
     public void updateProject() throws Exception {
@@ -173,14 +225,13 @@ public class ProjectResourceIntTest {
 
         // Update the project
         Project updatedProject = projectRepository.findOne(project.getId());
-        updatedProject
-                .name(UPDATED_NAME);
+        updatedProject.name(UPDATED_NAME);
         ProjectDTO projectDTO = projectMapper.projectToProjectDTO(updatedProject);
 
         restProjectMockMvc.perform(put("/api/projects")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
-                .andExpect(status().isOk());
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
+                          .andExpect(status().isOk());
 
         // Validate the Project in the database
         List<Project> projects = projectRepository.findAll();
