@@ -29,9 +29,11 @@ public class Projectassignment implements Serializable {
     @Column(name = "role", nullable = false)
     private Projectrole role;
 
+    @NotNull
     @ManyToOne
     private User assignedUser;
 
+    @NotNull
     @ManyToOne
     private Project assignedProject;
 

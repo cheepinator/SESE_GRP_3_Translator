@@ -1,5 +1,6 @@
 package com.sese.translator.service.dto;
 
+import javax.persistence.Transient;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -18,11 +19,12 @@ public class ProjectassignmentDTO implements Serializable {
     @NotNull
     private Projectrole role;
 
-
+    @NotNull
     private Long assignedUserId;
-    
+
+    @NotNull
     private Long assignedProjectId;
-    
+
     public Long getId() {
         return id;
     }

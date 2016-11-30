@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class ProjectassignmentResource {
 
     private final Logger log = LoggerFactory.getLogger(ProjectassignmentResource.class);
-        
+
     @Inject
     private ProjectassignmentRepository projectassignmentRepository;
 
@@ -85,7 +85,7 @@ public class ProjectassignmentResource {
     }
 
     /**
-     * GET  /projectassignments : get all the projectassignments.
+     * GET  /projectassignments : get all the projectassignments from the users own Projects.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of projectassignments in body
      */
@@ -93,7 +93,7 @@ public class ProjectassignmentResource {
     @Timed
     public List<ProjectassignmentDTO> getAllProjectassignments() {
         log.debug("REST request to get all Projectassignments");
-        List<Projectassignment> projectassignments = projectassignmentRepository.findAll();
+        List<Projectassignment> projectassignments = projectassignmentRepository.findByAssignedProjectBelongToCurrentUser();
         return projectassignmentMapper.projectassignmentsToProjectassignmentDTOs(projectassignments);
     }
 

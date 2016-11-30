@@ -2,8 +2,13 @@ package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
 
+import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Projectassignment;
+import com.sese.translator.domain.User;
+import com.sese.translator.repository.ProjectRepository;
 import com.sese.translator.repository.ProjectassignmentRepository;
+import com.sese.translator.repository.UserRepository;
+import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectassignmentDTO;
 import com.sese.translator.service.mapper.ProjectassignmentMapper;
 
@@ -16,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,6 +51,9 @@ public class ProjectassignmentResourceIntTest {
 
     @Inject
     private ProjectassignmentRepository projectassignmentRepository;
+
+    @Inject
+    private UserService userService;
 
     @Inject
     private ProjectassignmentMapper projectassignmentMapper;
@@ -80,14 +89,26 @@ public class ProjectassignmentResourceIntTest {
      * if they test an entity which requires the current entity.
      */
     public static Projectassignment createEntity(EntityManager em) {
+        User u = new User();
+        u.setLogin("sfsd");
+        u.setPassword("ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+        u.setActivated(true);
+
+        Project p = new Project().name("test");
+
+        em.persist(u);
+        em.persist(p);
+        em.flush();
+
         Projectassignment projectassignment = new Projectassignment()
-                .role(DEFAULT_ROLE);
+                .role(DEFAULT_ROLE).assignedProject(p).assignedUser(u);
         return projectassignment;
     }
 
     @Before
     public void initTest() {
         projectassignment = createEntity(em);
+        userService.getUserWithAuthoritiesByLogin("user").ifPresent(user -> projectassignment.getAssignedProject().setOwner(user));
     }
 
     @Test
@@ -131,6 +152,7 @@ public class ProjectassignmentResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser
     public void getAllProjectassignments() throws Exception {
         // Initialize the database
         projectassignmentRepository.saveAndFlush(projectassignment);

@@ -15,4 +15,7 @@ public interface ProjectassignmentRepository extends JpaRepository<Projectassign
     @Query("select projectassignment from Projectassignment projectassignment where projectassignment.assignedUser.login = ?#{principal.username}")
     List<Projectassignment> findByAssignedUserIsCurrentUser();
 
+    @Query("SELECT pa FROM Projectassignment pa WHERE pa.assignedProject.owner.login = ?#{principal.username}")
+    List<Projectassignment> findByAssignedProjectBelongToCurrentUser();
+
 }
