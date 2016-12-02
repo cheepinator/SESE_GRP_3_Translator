@@ -38,6 +38,11 @@
                     templateUrl: 'app/entities/project/project-detail.html',
                     controller: 'ProjectDetailController',
                     controllerAs: 'vm'
+                },
+                'definitions@project-detail': {
+                    templateUrl: 'app/entities/project/project.definitions.html',
+                    controller: 'ProjectDefinitionController',
+                    controllerAs: 'vm'
                 }
             },
             resolve: {

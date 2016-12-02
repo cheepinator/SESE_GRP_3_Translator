@@ -1,21 +1,18 @@
 package com.sese.translator.service.impl;
 
-import com.sese.translator.service.DefinitionService;
 import com.sese.translator.domain.Definition;
 import com.sese.translator.repository.DefinitionRepository;
+import com.sese.translator.service.DefinitionService;
 import com.sese.translator.service.dto.DefinitionDTO;
 import com.sese.translator.service.mapper.DefinitionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing Definition.
@@ -25,7 +22,7 @@ import java.util.stream.Collectors;
 public class DefinitionServiceImpl implements DefinitionService{
 
     private final Logger log = LoggerFactory.getLogger(DefinitionServiceImpl.class);
-    
+
     @Inject
     private DefinitionRepository definitionRepository;
 
@@ -48,14 +45,28 @@ public class DefinitionServiceImpl implements DefinitionService{
 
     /**
      *  Get all the definitions.
-     *  
+     *
      *  @param pageable the pagination information
      *  @return the list of entities
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public Page<DefinitionDTO> findAll(Pageable pageable) {
         log.debug("Request to get all Definitions");
         Page<Definition> result = definitionRepository.findAll(pageable);
+        return result.map(definition -> definitionMapper.definitionToDefinitionDTO(definition));
+    }
+
+    /**
+     *  Get all the definitions.
+     *
+     *  @param pageable the pagination information
+     *  @return the list of entities
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<DefinitionDTO> findAllForProject(Long projectId, Pageable pageable) {
+        log.debug("Request to get all Definitions for project id {}", projectId);
+        Page<Definition> result = definitionRepository.findByProjectId(projectId, pageable);
         return result.map(definition -> definitionMapper.definitionToDefinitionDTO(definition));
     }
 
@@ -65,7 +76,7 @@ public class DefinitionServiceImpl implements DefinitionService{
      *  @param id the id of the entity
      *  @return the entity
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public DefinitionDTO findOne(Long id) {
         log.debug("Request to get Definition : {}", id);
         Definition definition = definitionRepository.findOne(id);

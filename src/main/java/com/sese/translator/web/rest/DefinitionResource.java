@@ -2,9 +2,9 @@ package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.sese.translator.service.DefinitionService;
+import com.sese.translator.service.dto.DefinitionDTO;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
-import com.sese.translator.service.dto.DefinitionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -18,10 +18,8 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Definition.
@@ -31,7 +29,7 @@ import java.util.stream.Collectors;
 public class DefinitionResource {
 
     private final Logger log = LoggerFactory.getLogger(DefinitionResource.class);
-        
+
     @Inject
     private DefinitionService definitionService;
 
@@ -91,6 +89,23 @@ public class DefinitionResource {
         log.debug("REST request to get a page of Definitions");
         Page<DefinitionDTO> page = definitionService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/definitions");
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
+
+    /**
+     * GET  /definitions : get all the definitions.
+     *
+     * @param pageable the pagination information
+     * @return the ResponseEntity with status 200 (OK) and the list of definitions in body
+     * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+     */
+    @GetMapping("project/{projectId}/definitions")
+    @Timed
+    public ResponseEntity<List<DefinitionDTO>> getAllDefinitionsForProject(@PathVariable Long projectId, Pageable pageable)
+        throws URISyntaxException {
+        log.debug("REST request to get a page of Definitions for project {}", projectId);
+        Page<DefinitionDTO> page = definitionService.findAllForProject(projectId, pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/project/" + projectId + "/definitions");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
