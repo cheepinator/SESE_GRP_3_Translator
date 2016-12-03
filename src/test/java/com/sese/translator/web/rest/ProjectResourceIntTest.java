@@ -2,8 +2,11 @@ package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
 import com.sese.translator.domain.Project;
+import com.sese.translator.domain.Release;
 import com.sese.translator.repository.ProjectRepository;
+import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.service.ProjectService;
+import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
@@ -48,10 +51,16 @@ public class ProjectResourceIntTest {
     private ProjectRepository projectRepository;
 
     @Inject
+    private ReleaseRepository releaseRepository;
+
+    @Inject
     private ProjectMapper projectMapper;
 
     @Inject
     private ProjectService projectService;
+
+    @Inject
+    private ReleaseService releaseService;
 
     @Inject
     private UserService userService;
@@ -74,6 +83,7 @@ public class ProjectResourceIntTest {
         MockitoAnnotations.initMocks(this);
         ProjectResource projectResource = new ProjectResource();
         ReflectionTestUtils.setField(projectResource, "projectService", projectService);
+        ReflectionTestUtils.setField(projectResource, "releaseService", releaseService);
         this.restProjectMockMvc = MockMvcBuilders.standaloneSetup(projectResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -102,6 +112,7 @@ public class ProjectResourceIntTest {
     @Transactional
     public void createProject() throws Exception {
         int databaseSizeBeforeCreate = projectRepository.findAll().size();
+        int releasesBeforeCreate = releaseRepository.findAll().size();
 
         // delete owner of the project
         project.setOwner(null);
@@ -119,6 +130,15 @@ public class ProjectResourceIntTest {
         assertThat(projects).hasSize(databaseSizeBeforeCreate + 1);
         Project testProject = projects.get(projects.size() - 1);
         assertThat(testProject.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testProject.getOwner().getLogin()).isEqualTo("user"); // 'user' is the default mocked username
+
+        // Assert a default release was created for the project
+        List<Release> releases = releaseRepository.findAll();
+        assertThat(releases).hasSize(releasesBeforeCreate + 1);
+        Release defaultRelease = releases.get(releases.size() - 1);
+        assertThat(defaultRelease.getProject()).isEqualTo(testProject);
+        assertThat(defaultRelease.getVersionTag()).isEqualTo(Release.DEFAULT_TAG);
+        assertThat(defaultRelease.getDueDate()).isNull();
     }
 
     @Test

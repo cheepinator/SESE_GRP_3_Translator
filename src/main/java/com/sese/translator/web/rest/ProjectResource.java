@@ -3,34 +3,28 @@ package com.sese.translator.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.sese.translator.domain.Projectassignment;
 import com.sese.translator.domain.User;
-import com.sese.translator.domain.enumeration.Projectrole;
 import com.sese.translator.repository.ProjectassignmentRepository;
 import com.sese.translator.service.ProjectService;
+import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ProjectassignmentMapper;
 import com.sese.translator.web.rest.util.HeaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.inject.Inject;
-import javax.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for managing Project.
@@ -55,6 +49,8 @@ public class ProjectResource {
     @Inject
     private ProjectassignmentMapper projectassignmentMapper;
 
+    @Inject
+    private ReleaseService releaseService;
 
     /**
      * POST  /projects : Create a new project.
@@ -75,6 +71,8 @@ public class ProjectResource {
                 HeaderUtil.createFailureAlert("project", "ownerexists", "A new project cannot already have an Owner")).body(null);
         }
         ProjectDTO result = projectService.save(projectDTO);
+        // create default release
+        releaseService.createDefaultRelease(result);
         return ResponseEntity.created(new URI("/api/projects/" + result.getId()))
                              .headers(HeaderUtil.createEntityCreationAlert("project", result.getId().toString()))
                              .body(result);

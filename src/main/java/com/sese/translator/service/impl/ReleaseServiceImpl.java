@@ -1,9 +1,12 @@
 package com.sese.translator.service.impl;
 
+import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Release;
 import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.service.ReleaseService;
+import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.dto.ReleaseDTO;
+import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ReleaseMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,9 @@ public class ReleaseServiceImpl implements ReleaseService{
     @Inject
     private ReleaseMapper releaseMapper;
 
+    @Inject
+    private ProjectMapper projectMapper;
+
     /**
      * Save a release.
      *
@@ -41,6 +47,17 @@ public class ReleaseServiceImpl implements ReleaseService{
         Release release = releaseMapper.releaseDTOToRelease(releaseDTO);
         release = releaseRepository.save(release);
         ReleaseDTO result = releaseMapper.releaseToReleaseDTO(release);
+        return result;
+    }
+
+    @Override
+    public ReleaseDTO createDefaultRelease(ProjectDTO projectDTO) {
+        log.debug("Creating default release for Project: {}", projectDTO);
+        Project project = projectMapper.projectDTOToProject(projectDTO);
+        Release release = new Release().versionTag(Release.DEFAULT_TAG).project(project).isCurrentRelease(false);
+        release = releaseRepository.save(release);
+        ReleaseDTO result = releaseMapper.releaseToReleaseDTO(release);
+        log.debug("Default release: {}", result);
         return result;
     }
 

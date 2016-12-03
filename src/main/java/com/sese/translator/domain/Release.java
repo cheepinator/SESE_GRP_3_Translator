@@ -20,6 +20,8 @@ import java.util.Objects;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Release implements Serializable {
 
+    public static final String DEFAULT_TAG = "no release";
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -48,8 +50,8 @@ public class Release implements Serializable {
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "release_languages",
-               joinColumns = @JoinColumn(name="releases_id", referencedColumnName="ID"),
-               inverseJoinColumns = @JoinColumn(name="languages_id", referencedColumnName="ID"))
+        joinColumns = @JoinColumn(name = "releases_id", referencedColumnName = "ID"),
+        inverseJoinColumns = @JoinColumn(name = "languages_id", referencedColumnName = "ID"))
     private Set<Language> languages = new HashSet<>();
 
     @ManyToOne
@@ -187,7 +189,7 @@ public class Release implements Serializable {
             return false;
         }
         Release release = (Release) o;
-        if(release.id == null || id == null) {
+        if (release.id == null || id == null) {
             return false;
         }
         return Objects.equals(id, release.id);

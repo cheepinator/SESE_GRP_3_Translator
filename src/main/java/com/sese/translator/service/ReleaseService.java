@@ -1,5 +1,6 @@
 package com.sese.translator.service;
 
+import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.dto.ReleaseDTO;
 
 import java.util.List;
@@ -16,6 +17,8 @@ public interface ReleaseService {
      * @return the persisted entity
      */
     ReleaseDTO save(ReleaseDTO releaseDTO);
+
+    ReleaseDTO createDefaultRelease(ProjectDTO projectDTO);
 
     /**
      *  Get all the releases.
