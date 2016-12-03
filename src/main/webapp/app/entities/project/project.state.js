@@ -28,7 +28,7 @@
         })
         .state('project-detail', {
             parent: 'entity',
-            url: '/project/{id}',
+            url: '/project/{projectId}',
             data: {
                 authorities: ['ROLE_USER'],
                 pageTitle: 'Project'
@@ -40,14 +40,14 @@
                     controllerAs: 'vm'
                 },
                 'definitions@project-detail': {
-                    templateUrl: 'app/entities/project/project.definitions.html',
+                    templateUrl: 'app/entities/project/definition/definitions.html',
                     controller: 'ProjectDefinitionController',
                     controllerAs: 'vm'
                 }
             },
             resolve: {
-                entity: ['$stateParams', 'Project', function($stateParams, Project) {
-                    return Project.get({id : $stateParams.id}).$promise;
+                project: ['$stateParams', 'Project', function($stateParams, Project) {
+                    return Project.get({id : $stateParams.projectId}).$promise;
                 }],
                 previousState: ["$state", function ($state) {
                     var currentStateData = {
@@ -55,6 +55,10 @@
                         params: $state.params,
                         url: $state.href($state.current.name, $state.params)
                     };
+                    // fix for issue of sub pages overriding the correct previous sate in modal dialogs via 'reload' current page
+                    if (currentStateData.name.startsWith('project-detail')) {
+                        currentStateData.name = 'project'
+                    }
                     return currentStateData;
                 }]
             }
@@ -73,8 +77,8 @@
                     backdrop: 'static',
                     size: 'lg',
                     resolve: {
-                        entity: ['Project', function(Project) {
-                            return Project.get({id : $stateParams.id}).$promise;
+                        project: ['Project', function(Project) {
+                            return Project.get({id : $stateParams.projectId}).$promise;
                         }]
                     }
                 }).result.then(function() {
@@ -98,7 +102,7 @@
                     backdrop: 'static',
                     size: 'lg',
                     resolve: {
-                        entity: function () {
+                        project: function () {
                             return {
                                 name: null,
                                 id: null
@@ -114,7 +118,7 @@
         })
         .state('project.edit', {
             parent: 'project',
-            url: '/{id}/edit',
+            url: '/{projectId}/edit',
             data: {
                 authorities: ['ROLE_USER']
             },
@@ -126,8 +130,8 @@
                     backdrop: 'static',
                     size: 'lg',
                     resolve: {
-                        entity: ['Project', function(Project) {
-                            return Project.get({id : $stateParams.id}).$promise;
+                        project: ['Project', function(Project) {
+                            return Project.get({id : $stateParams.projectId}).$promise;
                         }]
                     }
                 }).result.then(function() {
@@ -139,7 +143,7 @@
         })
         .state('project.delete', {
             parent: 'project',
-            url: '/{id}/delete',
+            url: '/{projectId}/delete',
             data: {
                 authorities: ['ROLE_USER']
             },
@@ -150,8 +154,8 @@
                     controllerAs: 'vm',
                     size: 'md',
                     resolve: {
-                        entity: ['Project', function(Project) {
-                            return Project.get({id : $stateParams.id}).$promise;
+                        project: ['Project', function(Project) {
+                            return Project.get({id : $stateParams.projectId}).$promise;
                         }]
                     }
                 }).result.then(function() {

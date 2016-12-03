@@ -5,12 +5,12 @@
         .module('seseTranslatorApp')
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
-    ProjectDefinitionController.$inject = ['$scope', '$state', 'entity', 'DataUtils', 'ProjectDefinition', 'ParseLinks', 'AlertService'];
+    ProjectDefinitionController.$inject = ['$scope', '$state', 'project', 'DataUtils', 'ProjectDefinition', 'ParseLinks', 'AlertService'];
 
-    function ProjectDefinitionController ($scope, $state, entity, DataUtils, ProjectDefinition, ParseLinks, AlertService) {
+    function ProjectDefinitionController ($scope, $state, project, DataUtils, ProjectDefinition, ParseLinks, AlertService) {
         var vm = this;
 
-        vm.project = entity;
+        vm.project = project;
         vm.definitions = [];
         vm.loadPage = loadPage;
         vm.page = 0;

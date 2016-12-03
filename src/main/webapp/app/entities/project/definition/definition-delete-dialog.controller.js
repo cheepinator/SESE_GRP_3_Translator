@@ -3,14 +3,14 @@
 
     angular
         .module('seseTranslatorApp')
-        .controller('ProjectDeleteController',ProjectDeleteController);
+        .controller('ProjectDefinitionDeleteController',ProjectDefinitionDeleteController);
 
-    ProjectDeleteController.$inject = ['$uibModalInstance', 'project', 'Project'];
+    ProjectDefinitionDeleteController.$inject = ['$uibModalInstance', 'definition', 'Definition'];
 
-    function ProjectDeleteController($uibModalInstance, project, Project) {
+    function ProjectDefinitionDeleteController($uibModalInstance, definition, Definition) {
         var vm = this;
 
-        vm.project = project;
+        vm.definition = definition;
         vm.clear = clear;
         vm.confirmDelete = confirmDelete;
 
@@ -19,7 +19,7 @@
         }
 
         function confirmDelete (id) {
-            Project.delete({id: id},
+            Definition.delete({id: id},
                 function () {
                     $uibModalInstance.close(true);
                 });

@@ -1,0 +1,28 @@
+
+<div>
+    <h2><a ui-sref="project">Projects</a> / <a ui-sref="project-detail({projectId:vm.project.id})">{{vm.project.name}}</a> / {{vm.definition.code}}
+        <a ui-sref="release-detail({id:vm.definition.releaseId})"><span class="badge">{{vm.release.versionTag}}</span></a></h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span>Code</span></dt>
+        <dd>
+            <span>{{vm.definition.code}}</span>
+        </dd>
+        <dt><span>Original Text</span></dt>
+        <dd>
+            <span>{{vm.definition.originalText}}</span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button" ui-sref="project-detail.definition-detail.edit({definitionId:vm.definition.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm"> Edit</span>
+    </button>
+</div>

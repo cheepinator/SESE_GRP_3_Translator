@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-4 no-padding-left">
-                <button class="btn btn-primary" ui-sref="definition.new" >
+                <button class="btn btn-primary" ui-sref="project-detail.new-definition" >
                     <span class="glyphicon glyphicon-plus"></span>
                     <span >
                         Create new Definition
@@ -20,34 +20,34 @@
                     <th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="code"><span>Code</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="originalText"><span>Original Text</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="releaseId"><span>Release</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="release.id"><span>Release</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
                 </tr>
             </thead>
             <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
                 <tr ng-repeat="definition in vm.definitions track by definition.id">
-                    <td><a ui-sref="definition-detail({id:definition.id})">{{definition.id}}</a></td>
-                    <td>{{definition.code}}</td>
+                    <td>{{definition.id}}</td>
+                    <td><a ui-sref="project-detail.definition-detail({definitionId:definition.id})">{{definition.code}}</a></td>
                     <td>{{definition.originalText}}</td>
                     <td>
-                        <a ui-sref="release-detail({id:definition.releaseId})">{{definition.releaseId}}</a>
+                        <a ui-sref="release-detail({id:definition.releaseId})"><span class="badge">{{definition.releaseId}}</span></a>
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
                             <button type="submit"
-                                    ui-sref="definition-detail({id:definition.id})"
+                                    ui-sref="project-detail.definition-detail({definitionId:definition.id})"
                                     class="btn btn-info btn-sm">
                                 <span class="glyphicon glyphicon-eye-open"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
                             <button type="submit"
-                                    ui-sref="definition.edit({id:definition.id})"
+                                    ui-sref="project-detail.edit-definition({definitionId:definition.id})"
                                     class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
                             <button type="submit"
-                                    ui-sref="definition.delete({id:definition.id})"
+                                    ui-sref="project-detail.delete-definition({definitionId:definition.id})"
                                     class="btn btn-danger btn-sm">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                                 <span class="hidden-xs hidden-sm"></span>

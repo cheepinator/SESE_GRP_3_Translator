@@ -5,12 +5,12 @@
         .module('seseTranslatorApp')
         .controller('ProjectDialogController', ProjectDialogController);
 
-    ProjectDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Principal', 'Project', 'Release', 'User'];
+    ProjectDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'project', 'Principal', 'Project', 'Release', 'User'];
 
-    function ProjectDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity,Principal, Project, Release, User) {
+    function ProjectDialogController ($timeout, $scope, $stateParams, $uibModalInstance, project,Principal, Project, Release, User) {
         var vm = this;
 
-        vm.project = entity;
+        vm.project = project;
         vm.clear = clear;
         vm.save = save;
         vm.releases = Release.query();
