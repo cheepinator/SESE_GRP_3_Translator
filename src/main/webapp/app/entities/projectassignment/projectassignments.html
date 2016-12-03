@@ -33,7 +33,8 @@
                         {{projectassignment.assignedUserId}}
                     </td>
                     <td>
-                        <a ui-sref="project-detail({id:projectassignment.assignedProjectId})">{{projectassignment.assignedProjectId}}</a>
+                        {{getAssignedProjectProjectID(projectassignment.assignedProjectId)}}
+                        <a ui-sref="project-detail({id:projectassignment.assignedProjectId})">{{projectassignment.assignedProjectId}} - {{assignedProject.name}}</a>
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
