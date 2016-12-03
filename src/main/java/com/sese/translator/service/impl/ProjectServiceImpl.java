@@ -2,10 +2,18 @@ package com.sese.translator.service.impl;
 
 import com.sese.translator.domain.Project;
 import com.sese.translator.repository.ProjectRepository;
+import com.sese.translator.repository.ProjectassignmentRepository;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectDTO;
+import com.sese.translator.service.dto.ProjectassignmentDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
+import com.sese.translator.service.mapper.ProjectassignmentMapper;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -14,11 +22,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing Project.
@@ -33,10 +36,16 @@ public class ProjectServiceImpl implements ProjectService {
     private ProjectRepository projectRepository;
 
     @Inject
+    private ProjectassignmentRepository projectassignmentRepository;
+
+    @Inject
     private UserService userService;
 
     @Inject
     private ProjectMapper projectMapper;
+
+    @Inject
+    private ProjectassignmentMapper projectassignmentMapper;
 
     /**
      * Save a project.
@@ -68,11 +77,20 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public List<ProjectDTO> findAllOfCurrentUser() {
         log.debug("Request to get all Projects for current User");
-        List<ProjectDTO> result = projectRepository.findByOwnerIsCurrentUser().stream()
-            .map(projectMapper::projectToProjectDTO)
-            .collect(Collectors.toCollection(LinkedList::new));
+        HashSet<ProjectDTO> result = projectRepository.findByOwnerIsCurrentUser().stream()
+                                                      .map(projectMapper::projectToProjectDTO)
+                                                      .collect(Collectors.toCollection(HashSet::new));
 
-        return result;
+        HashSet<ProjectassignmentDTO> resultProjectassignment = projectassignmentRepository.findByAssignedUserIsCurrentUser().stream()
+                                                                                           .map(
+                                                                                               projectassignmentMapper::projectassignmentToProjectassignmentDTO)
+                                                                                           .collect(Collectors.toCollection(HashSet::new));
+
+        for (ProjectassignmentDTO projectassignmentDTO : resultProjectassignment) {
+            result.add(findOne(projectassignmentDTO.getAssignedProjectId()));
+        }
+
+        return new ArrayList<ProjectDTO>(result);
     }
 
     /**
