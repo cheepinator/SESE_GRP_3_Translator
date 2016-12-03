@@ -15,12 +15,12 @@ describe('Controller Tests', function() {
             MockProject = jasmine.createSpy('MockProject');
             MockRelease = jasmine.createSpy('MockRelease');
             MockUser = jasmine.createSpy('MockUser');
-            
+
 
             var locals = {
                 '$scope': $scope,
                 '$rootScope': $rootScope,
-                'entity': MockEntity,
+                'project': MockEntity,
                 'previousState': MockPreviousState,
                 'Project': MockProject,
                 'Release': MockRelease,
