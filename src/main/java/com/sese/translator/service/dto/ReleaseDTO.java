@@ -1,11 +1,11 @@
 package com.sese.translator.service.dto;
 
-import java.time.ZonedDateTime;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -28,8 +28,9 @@ public class ReleaseDTO implements Serializable {
 
     private Set<LanguageDTO> languages = new HashSet<>();
 
+    @NotNull
     private Long projectId;
-    
+
     public Long getId() {
         return id;
     }

@@ -6,6 +6,7 @@ import com.sese.translator.domain.User;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * Spring Data JPA repository for the Projectassignment entity.
@@ -22,4 +23,6 @@ public interface ProjectassignmentRepository extends JpaRepository<Projectassign
     List<Projectassignment> findByAssignedProject(Project assignedProject);
 
     List<Projectassignment> findByAssignedUser(User user);
+
+    List<Projectassignment> deleteByAssignedProjectId(@Param("id") Long projectId);
 }

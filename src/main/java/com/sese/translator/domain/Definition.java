@@ -1,10 +1,13 @@
 package com.sese.translator.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.*;
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -37,6 +40,7 @@ public class Definition implements Serializable {
     @OneToMany(mappedBy = "definition")
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @Cascade(CascadeType.DELETE)
     private Set<Translation> translations = new HashSet<>();
 
     @ManyToOne

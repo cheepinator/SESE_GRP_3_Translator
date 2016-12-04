@@ -1,22 +1,20 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
-
+import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Release;
 import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.service.mapper.ReleaseMapper;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,13 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -97,11 +96,14 @@ public class ReleaseResourceIntTest {
      * if they test an entity which requires the current entity.
      */
     public static Release createEntity(EntityManager em) {
+        Project testProject = new Project().name("TestProject");
+        em.persist(testProject);
         Release release = new Release()
-                .description(DEFAULT_DESCRIPTION)
-                .versionTag(DEFAULT_VERSION_TAG)
-                .isCurrentRelease(DEFAULT_IS_CURRENT_RELEASE)
-                .dueDate(DEFAULT_DUE_DATE);
+            .description(DEFAULT_DESCRIPTION)
+            .versionTag(DEFAULT_VERSION_TAG)
+            .isCurrentRelease(DEFAULT_IS_CURRENT_RELEASE)
+            .dueDate(DEFAULT_DUE_DATE)
+            .project(testProject);
         return release;
     }
 

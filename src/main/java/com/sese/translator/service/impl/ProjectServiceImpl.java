@@ -116,6 +116,7 @@ public class ProjectServiceImpl implements ProjectService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Project : {}", id);
+        projectassignmentRepository.deleteByAssignedProjectId(id);
         projectRepository.delete(id);
     }
 }

@@ -1,10 +1,13 @@
 package com.sese.translator.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.*;
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -45,6 +48,7 @@ public class Release implements Serializable {
     @OneToMany(mappedBy = "release")
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @Cascade(CascadeType.DELETE)
     private Set<Definition> definitions = new HashSet<>();
 
     @ManyToMany
@@ -54,6 +58,7 @@ public class Release implements Serializable {
         inverseJoinColumns = @JoinColumn(name = "languages_id", referencedColumnName = "ID"))
     private Set<Language> languages = new HashSet<>();
 
+    @NotNull
     @ManyToOne
     private Project project;
 
