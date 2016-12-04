@@ -46,7 +46,7 @@
                 data: {
                     authorities: ['ROLE_USER']
                 },
-                onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
+                onEnter: ['$stateParams', '$state', '$uibModal', 'definition', function ($stateParams, $state, $uibModal, definition) {
                     $uibModal.open({
                         templateUrl: 'app/entities/project/definition/definition-dialog.html',
                         controller: 'ProjectDefinitionDialogController',
@@ -54,9 +54,12 @@
                         backdrop: 'static',
                         size: 'lg',
                         resolve: {
-                            definition: ['Definition', function(Definition) {
-                                return Definition.get({id : $stateParams.definitionId}).$promise;
-                            }]
+                            definition: function () {
+                                return definition;
+                            },
+                            defaultRelease: function () {
+                                return {};
+                            }
                         }
                     }).result.then(function() {
                         $state.go('^', {}, { reload: false });
@@ -71,7 +74,7 @@
                 data: {
                     authorities: ['ROLE_USER']
                 },
-                onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
+                onEnter: ['$stateParams', '$state', '$uibModal', 'DefaultRelease', function ($stateParams, $state, $uibModal, DefaultRelease) {
                     $uibModal.open({
                         templateUrl: 'app/entities/project/definition/definition-dialog.html',
                         controller: 'ProjectDefinitionDialogController',
@@ -85,6 +88,9 @@
                                     originalText: null,
                                     id: null
                                 };
+                            },
+                            defaultRelease: function () {
+                                return DefaultRelease.get({projectId : $stateParams.projectId}).$promise;
                             }
                         }
                     }).result.then(function() {
@@ -110,7 +116,10 @@
                         resolve: {
                             definition: ['Definition', function(Definition) {
                                 return Definition.get({id : $stateParams.definitionId}).$promise;
-                            }]
+                            }],
+                            defaultRelease: function () {
+                                return {};
+                            }
                         }
                     }).result.then(function() {
                         $state.go('project-detail', null, { reload: 'project-detail' });

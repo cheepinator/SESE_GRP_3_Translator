@@ -57,7 +57,7 @@ public class DefinitionServiceImpl implements DefinitionService{
     }
 
     /**
-     *  Get all the definitions.
+     *  Get all the definitions for the given project.
      *
      *  @param pageable the pagination information
      *  @return the list of entities

@@ -36,9 +36,9 @@
 
             $scope.currentRelease = null;
             vm.releases.forEach(function (entry) {
-                console.log("Aufgerufen mit id: "+id + " Entry PID "+entry.projectId+ " entryiscurrent: "+entry.isCurrentRelease +" Entry: "+entry)
+                // console.log("Aufgerufen mit id: "+id + " Entry PID "+entry.projectId+ " entryiscurrent: "+entry.isCurrentRelease +" Entry: "+entry)
                 if(entry.projectId == id && entry.isCurrentRelease){
-                    console.log(entry.description + " wurde geloggt") ;
+                    // console.log(entry.description + " wurde geloggt") ;
                     $scope.currentRelease = entry;
                 }
 

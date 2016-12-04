@@ -4,6 +4,7 @@ import com.sese.translator.domain.Release;
 
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -24,5 +25,8 @@ public interface ReleaseRepository extends JpaRepository<Release,Long> {
 
     @Query("select count(*) from Translation translation where translation.definition.release.id = :id ")
     Integer countByReleaseId(@Param("id") Long id);
+
+    @Query("select release from Release release where release.versionTag = :#{T(com.sese.translator.domain.Release).DEFAULT_TAG} and release.project.id = :id")
+    Release findDefaultForProject(@Param("id") Long id);
 
 }

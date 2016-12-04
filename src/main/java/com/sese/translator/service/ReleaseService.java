@@ -20,6 +20,8 @@ public interface ReleaseService {
 
     ReleaseDTO createDefaultRelease(ProjectDTO projectDTO);
 
+    ReleaseDTO getDefaultReleaseForProject(Long projectId);
+
     /**
      *  Get all the releases.
      *

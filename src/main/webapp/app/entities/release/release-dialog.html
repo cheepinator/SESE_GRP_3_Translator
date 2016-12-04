@@ -60,9 +60,15 @@
         </div>
         <div class="form-group">
             <label for="field_project">Project</label>
-            <select class="form-control" id="field_project" name="project" ng-model="vm.release.projectId" ng-options="project.id as project.id for project in vm.projects"            >
+            <select class="form-control" id="field_project" name="project" ng-model="vm.release.projectId" ng-options="project.id as project.id for project in vm.projects" required>
                 <option value=""></option>
             </select>
+            <div ng-show="editForm.project.$invalid">
+                <p class="help-block"
+                   ng-show="editForm.project.$error.required">
+                    This field is required.
+                </p>
+            </div>
         </div>
     </div>
     <div class="modal-footer">

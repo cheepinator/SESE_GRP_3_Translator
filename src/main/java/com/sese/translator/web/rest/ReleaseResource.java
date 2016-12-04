@@ -85,6 +85,22 @@ public class ReleaseResource {
     }
 
     /**
+     * GET  /project/{projectId}/releases/default : get the default release for the project
+     *
+     * @param projectId the id of the project the default release shall be returned
+     * @return the ResponseEntity with status 200 (OK) and the default release in the body
+     */
+    @GetMapping("/project/{projectId}/releases/default")
+    @Timed
+    public ResponseEntity<ReleaseDTO> getDefaultRelease(@PathVariable Long projectId) {
+        log.debug("REST request to get the default release for project {}", projectId);
+        ReleaseDTO defaultReleaseForProject = releaseService.getDefaultReleaseForProject(projectId);
+        return Optional.ofNullable(defaultReleaseForProject)
+                       .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                       .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    /**
      * GET  /releases/:id : get the "id" release.
      *
      * @param id the id of the releaseDTO to retrieve

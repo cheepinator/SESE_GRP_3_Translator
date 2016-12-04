@@ -5,9 +5,11 @@
         .module('seseTranslatorApp')
         .controller('ProjectDefinitionDialogController', ProjectDefinitionDialogController);
 
-    ProjectDefinitionDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'DataUtils', 'definition', 'Definition', 'Translation', 'Release'];
+    ProjectDefinitionDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'DataUtils',
+        'definition', 'defaultRelease', 'Definition', 'Translation', 'Release'];
 
-    function ProjectDefinitionDialogController ($timeout, $scope, $stateParams, $uibModalInstance, DataUtils, definition, Definition, Translation, Release) {
+    function ProjectDefinitionDialogController ($timeout, $scope, $stateParams, $uibModalInstance, DataUtils, definition,
+                                                defaultRelease, Definition, Translation, Release) {
         var vm = this;
 
         vm.definition = definition;
@@ -17,6 +19,10 @@
         vm.save = save;
         vm.translations = Translation.query();
         vm.releases = Release.query();
+        vm.defaultRelease = defaultRelease;
+        if (vm.definition.id == null) {
+            vm.definition.releaseId = vm.defaultRelease.id;
+        }
 
         $timeout(function (){
             angular.element('.form-group:eq(1)>input').focus();

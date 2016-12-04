@@ -61,6 +61,14 @@ public class ReleaseServiceImpl implements ReleaseService{
         return result;
     }
 
+    @Override
+    public ReleaseDTO getDefaultReleaseForProject(Long projectId) {
+        Release defaultForProject = releaseRepository.findDefaultForProject(projectId);
+        ReleaseDTO releaseDTO = releaseMapper.releaseToReleaseDTO(defaultForProject);
+        log.debug("Returning default release for project {}: {}", projectId, releaseDTO);
+        return releaseDTO;
+    }
+
     /**
      *  Get all the releases.
      *

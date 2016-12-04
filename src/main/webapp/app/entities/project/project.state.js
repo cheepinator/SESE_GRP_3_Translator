@@ -49,6 +49,9 @@
                 project: ['$stateParams', 'Project', function($stateParams, Project) {
                     return Project.get({id : $stateParams.projectId}).$promise;
                 }],
+                defaultRelease: ['$stateParams', 'DefaultRelease', function($stateParams, DefaultRelease) {
+                    return DefaultRelease.get({projectId : $stateParams.projectId}).$promise;
+                }],
                 previousState: ["$state", function ($state) {
                     var currentStateData = {
                         name: $state.current.name || 'project',
