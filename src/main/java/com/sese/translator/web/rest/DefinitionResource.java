@@ -73,8 +73,12 @@ public class DefinitionResource {
         if (definitionDTO.getId() == null) {
             return createDefinition(definitionDTO);
         }
+        DefinitionDTO previousDefinition = definitionService.findOne(definitionDTO.getId());
         DefinitionDTO result = definitionService.save(definitionDTO);
-        translationService.markAllTranslationsForDefinitionAsUpdateNeeded(result.getId());
+        if (!previousDefinition.getOriginalText().equals(result.getOriginalText())) {
+            log.debug("Original text for updated definition {} has changed, mark all translations as 'update needed'", definitionDTO.getId());
+            translationService.markAllTranslationsForDefinitionAsUpdateNeeded(result.getId());
+        }
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("definition", definitionDTO.getId().toString()))
             .body(result);
