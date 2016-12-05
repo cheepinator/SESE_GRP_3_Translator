@@ -5,9 +5,9 @@
         .module('seseTranslatorApp')
         .controller('ProjectassignmentController', ProjectassignmentController);
 
-    ProjectassignmentController.$inject = ['$scope', '$state', 'project', 'Projectassignment', 'Project'];
+    ProjectassignmentController.$inject = ['$scope', '$state', 'project', 'Projectassignment', 'Project', 'ProjectassignmentProject'];
 
-    function ProjectassignmentController ($scope, $state, project, Projectassignment, Project) {
+    function ProjectassignmentController ($scope, $state, project, Projectassignment, Project, ProjectassignmentProject) {
         var vm = this;
 
         vm.projectassignments = [];
@@ -17,7 +17,7 @@
         loadAll();
 
         function loadAll() {
-            Projectassignment.query(function(result) {
+            ProjectassignmentProject.query({projectId: vm.project.id},function(result) {
                 vm.projectassignments = result;
             });
 

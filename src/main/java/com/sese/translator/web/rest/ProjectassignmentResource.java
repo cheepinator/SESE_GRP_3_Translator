@@ -85,6 +85,19 @@ public class ProjectassignmentResource {
     }
 
     /**
+     * GET  /projectassignments/:id : get all the projectassignments with a specific project id.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the list of projectassignments in body
+     */
+    @GetMapping("project/{projectId}/projectassignments")
+    @Timed
+    public List<ProjectassignmentDTO> getAllProjectassignmentsByProjectId(@PathVariable Long projectId) {
+        log.debug("REST request to get all Projectassignments by ProjectID");
+        List<Projectassignment> projectassignments = projectassignmentRepository.findByAssignedProjectId(projectId);
+        return projectassignmentMapper.projectassignmentsToProjectassignmentDTOs(projectassignments);
+    }
+
+    /**
      * GET  /projectassignments : get all the projectassignments from the users own Projects.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of projectassignments in body
