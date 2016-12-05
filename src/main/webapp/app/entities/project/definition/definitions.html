@@ -20,6 +20,7 @@
                     <th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="code"><span>Code</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="originalText"><span>Original Text</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th><span>Available in</span></span></th>
                     <th jh-sort-by="release.id"><span>Release</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
                 </tr>
@@ -29,6 +30,12 @@
                     <td>{{definition.id}}</td>
                     <td><a ui-sref="project-detail.definition-detail({definitionId:definition.id})">{{definition.code}}</a></td>
                     <td>{{definition.originalText}}</td>
+                    <td>
+                        <span ng-repeat="translation in definition.translations track by translation.id">
+                            <span class="label" ng-class="translation.updateNeeded ? 'label-warning' : 'label-success'">
+                                {{::vm.getLanguageCode(definition, translation.languageId)}}</span>
+                        </span>
+                    </td>
                     <td>
                         <a ui-sref="release-detail({id:definition.releaseId})">
                             <span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(definition.release)}}">

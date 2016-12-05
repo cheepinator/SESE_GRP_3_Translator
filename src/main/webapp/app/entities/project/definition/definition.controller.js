@@ -27,6 +27,7 @@
         vm.byteSize = DataUtils.byteSize;
 
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
+        vm.getLanguageCode = getLanguageCode;
 
         loadAll();
 
@@ -61,6 +62,18 @@
             function onError(error) {
                 AlertService.error(error.data.message);
             }
+        }
+
+        function getLanguageCode(definition, languageId) {
+            if (definition.release) {
+                var language = definition.release.languages.find(function (language) {
+                    return language.id == languageId;
+                });
+                if (language) {
+                    return language.code;
+                }
+            }
+            return "";
         }
 
         function reset () {
