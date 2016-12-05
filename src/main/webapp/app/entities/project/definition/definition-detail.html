@@ -1,7 +1,7 @@
 
 <div>
     <h2><a ui-sref="project">Projects</a> / <a ui-sref="project-detail({projectId:vm.project.id})">{{vm.project.name}}</a> / {{vm.definition.code}}
-        <a ui-sref="release-detail({id:vm.definition.releaseId})"><span class="badge" uib-tooltip="Due: {{vm.release.dueDate | date:'mediumDate'}}">
+        <a ui-sref="release-detail({id:vm.definition.releaseId})"><span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(vm.release)}}">
             {{vm.release.versionTag}}</span></a></h2>
     <hr>
     <jhi-alert-error></jhi-alert-error>

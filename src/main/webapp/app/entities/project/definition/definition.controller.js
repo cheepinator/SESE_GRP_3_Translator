@@ -6,10 +6,10 @@
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
     ProjectDefinitionController.$inject = ['$scope', '$state', 'project', 'projectReleases', 'DataUtils',
-        'ProjectDefinition', 'ParseLinks', 'AlertService'];
+        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips'];
 
     function ProjectDefinitionController ($scope, $state, project, projectReleases, DataUtils, ProjectDefinition,
-                                          ParseLinks, AlertService) {
+                                          ParseLinks, AlertService, ReleaseTooltips) {
         var vm = this;
 
         vm.project = project;
@@ -25,6 +25,8 @@
         vm.reverse = true;
         vm.openFile = DataUtils.openFile;
         vm.byteSize = DataUtils.byteSize;
+
+        vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
 
         loadAll();
 

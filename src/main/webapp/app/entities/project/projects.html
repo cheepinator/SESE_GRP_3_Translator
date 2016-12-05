@@ -33,7 +33,9 @@
 
                     <td>
                         {{getCurrentReleaseByProjectID(project.id)}}
-                        <a ui-sref="release-detail({id:currentRelease.id})">{{getReleaseLabel(currentRelease)}}</a>
+                        <a ui-sref="release-detail({id:currentRelease.id})">
+                            <span class="badge" uib-tooltip="{{vm.getReleaseTooltip(currentRelease)}}">{{currentRelease.versionTag}}</span>
+                        </a>
                     </td>
                     <td>
                         <!--{{getCountOfTranslationsByReleaseID(currentRelease.id) }}

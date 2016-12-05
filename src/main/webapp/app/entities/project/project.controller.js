@@ -5,9 +5,10 @@
         .module('seseTranslatorApp')
         .controller('ProjectController', ProjectController);
 
-    ProjectController.$inject = ['$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter'];
+    ProjectController.$inject = ['$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter',
+    'ReleaseTooltips'];
 
-    function ProjectController ($scope, $state, Project, Language, Release, CountTranslations, dateFilter) {
+    function ProjectController ($scope, $state, Project, Language, Release, CountTranslations, dateFilter, ReleaseTooltips) {
         var vm = this;
 
         vm.projects = [];
@@ -29,6 +30,8 @@
             });
 
         }
+
+        vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
 
         $scope.getReleaseLabel = getReleaseLabel;
 

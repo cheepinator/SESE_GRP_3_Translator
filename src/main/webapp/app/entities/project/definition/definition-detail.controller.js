@@ -6,10 +6,11 @@
         .controller('ProjectDefinitionDetailController', ProjectDefinitionDetailController);
 
     ProjectDefinitionDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'DataUtils',
-        'project', 'definition', 'release', 'translations', 'Definition', 'Translation', 'Release'];
+        'project', 'definition', 'release', 'translations', 'Definition', 'Translation', 'Release', 'ReleaseTooltips'];
 
     function ProjectDefinitionDetailController($scope, $rootScope, $stateParams, previousState, DataUtils, project,
-                                               definition, release, translations, Definition, Translation, Release) {
+                                               definition, release, translations, Definition, Translation, Release,
+                                               ReleaseTooltips) {
         var vm = this;
 
         vm.project = project;
@@ -29,6 +30,8 @@
                 return translation.languageId == languageId;
             });
         }
+
+        vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
 
         var unsubscribe = $rootScope.$on('seseTranslatorApp:definitionUpdate', function (event, result) {
             vm.definition = result;
