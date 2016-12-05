@@ -5,15 +5,24 @@
     <hr>
     <jhi-alert-error></jhi-alert-error>
     <dl class="dl-horizontal jh-entity-details">
-        <dt><span>Code</span></dt>
-        <dd>
-            <span>{{vm.definition.code}}</span>
-        </dd>
         <dt><span>Original Text</span></dt>
         <dd>
             <span>{{vm.definition.originalText}}</span>
         </dd>
     </dl>
+
+    <h3>Translations</h3>
+
+    <div ng-repeat="translation in vm.translations track by translation.id">
+        <dl class="dl-horizontal">
+            <dt><span>{{translation.languageId}}</span></dt>
+            <dd><span>{{translation.translatedText}}</span></dd>
+        </dl>
+    </div>
+
+    <div ng-show="vm.translations.length == 0">
+        <p class="text-center">No Translations found</p>
+    </div>
 
     <button type="submit"
             ui-sref="{{ vm.previousState }}"

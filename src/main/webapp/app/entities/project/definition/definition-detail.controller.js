@@ -6,15 +6,16 @@
         .controller('ProjectDefinitionDetailController', ProjectDefinitionDetailController);
 
     ProjectDefinitionDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'DataUtils',
-        'project', 'definition', 'release', 'Definition', 'Translation', 'Release'];
+        'project', 'definition', 'release', 'translations', 'Definition', 'Translation', 'Release'];
 
     function ProjectDefinitionDetailController($scope, $rootScope, $stateParams, previousState, DataUtils, project,
-                                               definition, release, Definition, Translation, Release) {
+                                               definition, release, translations, Definition, Translation, Release) {
         var vm = this;
 
         vm.project = project;
         vm.definition = definition;
         vm.release = release;
+        vm.translations = translations;
         vm.previousState = previousState.name;
         vm.byteSize = DataUtils.byteSize;
 

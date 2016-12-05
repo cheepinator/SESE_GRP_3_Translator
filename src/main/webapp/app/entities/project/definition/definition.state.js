@@ -30,6 +30,9 @@
                     release: ['$stateParams', 'definition', 'Release', function($stateParams, definition, Release) {
                         return Release.get({id : definition.releaseId}).$promise;
                     }],
+                    translations: ['$stateParams', 'DefinitionTranslation', function($stateParams, DefinitionTranslation) {
+                        return DefinitionTranslation.query({definitionId : $stateParams.definitionId}).$promise;
+                    }],
                     previousState: ["$state", function ($state) {
                         var currentStateData = {
                             name: $state.current.name || 'project-detail',

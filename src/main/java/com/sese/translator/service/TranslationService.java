@@ -3,8 +3,8 @@ package com.sese.translator.service;
 import com.sese.translator.service.dto.TranslationDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,7 +22,7 @@ public interface TranslationService {
 
     /**
      *  Get all the translations.
-     *  
+     *
      *  @param pageable the pagination information
      *  @return the list of entities
      */
@@ -35,6 +35,9 @@ public interface TranslationService {
      *  @return the entity
      */
     TranslationDTO findOne(Long id);
+
+    @Transactional(readOnly = true)
+    List<TranslationDTO> findForDefinition(Long id);
 
     /**
      *  Delete the "id" translation.
