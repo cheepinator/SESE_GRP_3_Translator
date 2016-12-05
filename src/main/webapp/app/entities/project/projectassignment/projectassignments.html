@@ -1,0 +1,65 @@
+<div>
+    <h2><a ui-sref="project">Projects</a> / <a ui-sref="project-detail({projectId:vm.project.id})">{{vm.project.name}}</a> / roles</h2>
+    <jhi-alert></jhi-alert>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4 no-padding-left">
+                <button class="btn btn-primary" ui-sref="project-detail.projectassignment.new({projectId:vm.project.id})" >
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span>
+                        Create new Projectassignment
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+                <tr>
+                    <th><span>ID</span></th>
+                    <th><span>Role</span></th>
+                    <th><span>Assigned User</span></th>
+                    <th><span>Assigned Project!!!!!!!! kommtweg</span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="projectassignment in vm.projectassignments track by projectassignment.id">
+                    <td><a ui-sref="projectassignment-detail({id:projectassignment.id})">{{projectassignment.id}}</a></td>
+                    <td>{{projectassignment.role}}</td>
+                    <td>
+                        {{projectassignment.assignedUserId}}
+                    </td>
+                    <td>
+                        {{getAssignedProjectProjectID(projectassignment.assignedProjectId)}}
+                        <a ui-sref="project-detail({id:projectassignment.assignedProjectId})">{{projectassignment.assignedProjectId}} - {{assignedProject.name}}</a>
+                    </td>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit"
+                                    ui-sref="projectassignment-detail({id:projectassignment.id})"
+                                    class="btn btn-info btn-sm">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="projectassignment.edit({id:projectassignment.id})"
+                                    class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="projectassignment.delete({id:projectassignment.id})"
+                                    class="btn btn-danger btn-sm">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
