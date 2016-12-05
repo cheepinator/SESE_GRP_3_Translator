@@ -30,7 +30,8 @@
 
         <div class="form-group">
             <label for="field_assignedUser">Assigned User</label>
-            <select class="form-control" id="field_assignedUser" name="assignedUser" ng-model="vm.projectassignment.assignedUserId" ng-options="user.id as user.id for user in vm.users"            >
+            <select class="form-control" id="field_assignedUser" name="assignedUser" ng-model="vm.projectassignment.assignedUserId"
+                    ng-options="user.id as user.id + ' - ' + user.login + ' - ' + user.firstName  + ' - ' + user.lastName for user in vm.users">
                 <option value=""></option>
             </select>
         </div>
