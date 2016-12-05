@@ -1,34 +1,32 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
-
 import com.sese.translator.domain.Definition;
 import com.sese.translator.repository.DefinitionRepository;
 import com.sese.translator.service.DefinitionService;
+import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.DefinitionDTO;
 import com.sese.translator.service.mapper.DefinitionMapper;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Base64Utils;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -57,6 +55,9 @@ public class DefinitionResourceIntTest {
     private DefinitionService definitionService;
 
     @Inject
+    private TranslationService translationService;
+
+    @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Inject
@@ -74,6 +75,7 @@ public class DefinitionResourceIntTest {
         MockitoAnnotations.initMocks(this);
         DefinitionResource definitionResource = new DefinitionResource();
         ReflectionTestUtils.setField(definitionResource, "definitionService", definitionService);
+        ReflectionTestUtils.setField(definitionResource, "translationService", translationService);
         this.restDefinitionMockMvc = MockMvcBuilders.standaloneSetup(definitionResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
