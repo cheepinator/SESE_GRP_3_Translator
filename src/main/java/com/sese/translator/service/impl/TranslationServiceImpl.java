@@ -85,6 +85,15 @@ public class TranslationServiceImpl implements TranslationService{
         return translationMapper.translationsToTranslationDTOs(byDefinitionId);
     }
 
+    @Override
+    @Transactional
+    public void markAllTranslationsForDefinitionAsUpdateNeeded(Long definitionId) {
+        log.debug("Mark all translations for definition with id {} as 'update needed'", definitionId);
+        List<Translation> translations = translationRepository.findByDefinitionId(definitionId);
+        translations.forEach(translation -> translation.setUpdateNeeded(true));
+        translationRepository.save(translations);
+    }
+
     /**
      *  Delete the  translation by id.
      *

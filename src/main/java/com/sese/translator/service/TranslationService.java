@@ -39,6 +39,8 @@ public interface TranslationService {
     @Transactional(readOnly = true)
     List<TranslationDTO> findForDefinition(Long id);
 
+    void markAllTranslationsForDefinitionAsUpdateNeeded(Long definitionId);
+
     /**
      *  Delete the "id" translation.
      *

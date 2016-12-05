@@ -2,6 +2,7 @@ package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.sese.translator.service.DefinitionService;
+import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.DefinitionDTO;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
@@ -32,6 +33,9 @@ public class DefinitionResource {
 
     @Inject
     private DefinitionService definitionService;
+
+    @Inject
+    private TranslationService translationService;
 
     /**
      * POST  /definitions : Create a new definition.
@@ -70,6 +74,7 @@ public class DefinitionResource {
             return createDefinition(definitionDTO);
         }
         DefinitionDTO result = definitionService.save(definitionDTO);
+        translationService.markAllTranslationsForDefinitionAsUpdateNeeded(result.getId());
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("definition", definitionDTO.getId().toString()))
             .body(result);
