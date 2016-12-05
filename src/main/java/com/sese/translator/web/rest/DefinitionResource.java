@@ -98,19 +98,19 @@ public class DefinitionResource {
     }
 
     /**
-     * GET  /definitions : get all the definitions.
+     * GET  /project/{projectId}/definitions : get all the definitions for a project
      *
      * @param pageable the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of definitions in body
      * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
      */
-    @GetMapping("project/{projectId}/definitions")
+    @GetMapping("/projects/{projectId}/definitions")
     @Timed
     public ResponseEntity<List<DefinitionDTO>> getAllDefinitionsForProject(@PathVariable Long projectId, Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get a page of Definitions for project {}", projectId);
         Page<DefinitionDTO> page = definitionService.findAllForProject(projectId, pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/project/" + projectId + "/definitions");
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/projects/" + projectId + "/definitions");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 

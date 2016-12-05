@@ -17,7 +17,7 @@
     <div ng-repeat="language in vm.release.languages track by language.id">
         <dl class="dl-horizontal">
             <dt><span>{{language.code}}</span></dt>
-            {{vm.getTranslation(language.id)}}
+            {{::vm.getTranslation(language.id)}}
             <dd><span>{{translation ? translation.translatedText : '-'}}</span>
                 <span ng-show="translation.updateNeeded" class="label label-warning"><br>Update needed</span></dd>
         </dl>

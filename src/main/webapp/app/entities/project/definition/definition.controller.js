@@ -6,15 +6,16 @@
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
     ProjectDefinitionController.$inject = ['$scope', '$state', 'project', 'projectReleases', 'DataUtils',
-        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips'];
+        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations'];
 
     function ProjectDefinitionController ($scope, $state, project, projectReleases, DataUtils, ProjectDefinition,
-                                          ParseLinks, AlertService, ReleaseTooltips) {
+                                          ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations) {
         var vm = this;
 
         vm.project = project;
         vm.releases = projectReleases;
         vm.definitions = [];
+        vm.translations = [];
         vm.loadPage = loadPage;
         vm.page = 0;
         vm.links = {
@@ -28,6 +29,7 @@
 
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
         vm.getLanguageCode = getLanguageCode;
+        vm.getTranslations = getTranslations;
 
         loadAll();
 
@@ -62,6 +64,16 @@
             function onError(error) {
                 AlertService.error(error.data.message);
             }
+
+
+            ProjectTranslations.query({projectId: vm.project.id}, onTranslationsSuccess, onError);
+
+            function onTranslationsSuccess(data, headers) {
+                for (var i = 0; i < data.length; i++) {
+                    vm.translations.push(data[i]);
+                }
+            }
+
         }
 
         function getLanguageCode(definition, languageId) {
@@ -76,9 +88,16 @@
             return "";
         }
 
+        function getTranslations(definition) {
+            return vm.translations.filter(function (translation) {
+                return translation.definitionId == definition.id;
+            });
+        }
+
         function reset () {
             vm.page = 0;
             vm.definitions = [];
+            vm.translations = [];
             loadAll();
         }
 

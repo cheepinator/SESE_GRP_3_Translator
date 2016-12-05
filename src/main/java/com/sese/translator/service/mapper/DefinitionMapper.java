@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Mapper for the entity Definition and its DTO DefinitionDTO.
  */
-@Mapper(componentModel = "spring", uses = {TranslationMapper.class})
+@Mapper(componentModel = "spring", uses = {})
 public interface DefinitionMapper {
 
     @Mapping(source = "release.id", target = "releaseId")
@@ -17,7 +17,7 @@ public interface DefinitionMapper {
 
     List<DefinitionDTO> definitionsToDefinitionDTOs(List<Definition> definitions);
 
-//    @Mapping(target = "translations", ignore = true)
+    @Mapping(target = "translations", ignore = true)
     @Mapping(source = "releaseId", target = "release")
     Definition definitionDTOToDefinition(DefinitionDTO definitionDTO);
 

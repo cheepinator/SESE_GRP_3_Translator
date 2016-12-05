@@ -72,7 +72,7 @@ public class TranslationServiceImpl implements TranslationService{
     }
 
     /**
-     *  Get one translation by id.
+     *  Get all translations for the given definition id
      *
      *  @param id the id of the entity
      *  @return the entity
@@ -83,6 +83,20 @@ public class TranslationServiceImpl implements TranslationService{
         log.debug("Request to get Translations for definition with id: {}", id);
         List<Translation> byDefinitionId = translationRepository.findByDefinitionId(id);
         return translationMapper.translationsToTranslationDTOs(byDefinitionId);
+    }
+
+    /**
+     *  Get all translations for the given project id
+     *
+     *  @param id the id of the entity
+     *  @return the entity
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<TranslationDTO> findForProject(Long id) {
+        log.debug("Request to get Translations for project with id: {}", id);
+        List<Translation> byProjectId = translationRepository.findByProjectId(id);
+        return translationMapper.translationsToTranslationDTOs(byProjectId);
     }
 
     @Override

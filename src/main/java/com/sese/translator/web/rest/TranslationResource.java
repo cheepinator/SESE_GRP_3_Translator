@@ -125,6 +125,20 @@ public class TranslationResource {
     }
 
     /**
+     * GET  /projects/{projectId}/translations : get all translations for the project
+     *
+     * @param projectId the id of the project to get all translations for to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the definitionDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/projects/{projectId}/translations")
+    @Timed
+    public ResponseEntity<List<TranslationDTO>> getAllTranslationsForProject(@PathVariable Long projectId) {
+        log.debug("REST request to get all Translations for project with id: {}", projectId);
+        List<TranslationDTO> forDefinition = translationService.findForProject(projectId);
+        return new ResponseEntity<>(forDefinition, HttpStatus.OK);
+    }
+
+    /**
      * DELETE  /translations/:id : delete the "id" translation.
      *
      * @param id the id of the translationDTO to delete

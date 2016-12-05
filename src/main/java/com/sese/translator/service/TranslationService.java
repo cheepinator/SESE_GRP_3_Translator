@@ -3,7 +3,6 @@ package com.sese.translator.service;
 import com.sese.translator.service.dto.TranslationDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,8 +35,9 @@ public interface TranslationService {
      */
     TranslationDTO findOne(Long id);
 
-    @Transactional(readOnly = true)
     List<TranslationDTO> findForDefinition(Long id);
+
+    List<TranslationDTO> findForProject(Long id);
 
     void markAllTranslationsForDefinitionAsUpdateNeeded(Long definitionId);
 

@@ -3,9 +3,7 @@ package com.sese.translator.service.dto;
 import javax.persistence.Lob;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 
 /**
@@ -21,8 +19,6 @@ public class DefinitionDTO implements Serializable {
     @NotNull
     @Lob
     private String originalText;
-
-    private Set<TranslationDTO> translations = new HashSet<>();
 
     private Long releaseId;
 
@@ -54,14 +50,6 @@ public class DefinitionDTO implements Serializable {
 
     public void setReleaseId(Long releaseId) {
         this.releaseId = releaseId;
-    }
-
-    public Set<TranslationDTO> getTranslations() {
-        return translations;
-    }
-
-    public void setTranslations(Set<TranslationDTO> translations) {
-        this.translations = translations;
     }
 
     @Override

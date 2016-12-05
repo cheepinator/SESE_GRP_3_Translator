@@ -9,7 +9,7 @@
     DefinitionTranslation.$inject = ['$resource'];
 
     function ProjectDefinition ($resource) {
-        var resourceUrl =  'api/project/:projectId/definitions/';
+        var resourceUrl =  'api/projects/:projectId/definitions/';
 
         return $resource(resourceUrl, {}, {
             'query': {method: 'GET', isArray: true},

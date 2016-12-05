@@ -5,7 +5,8 @@
         .factory('Project', Project)
         .factory('CountTranslations',CountTranslations)
         .factory('DefaultRelease', DefaultRelease)
-        .factory('ProjectReleases', ProjectReleases);
+        .factory('ProjectReleases', ProjectReleases)
+        .factory('ProjectTranslations', ProjectTranslations);
 
     Project.$inject = ['$resource'];
     Language.$inject = ['$resource'];
@@ -14,6 +15,7 @@
     CountTranslations.$inject = ['$resource'];
     DefaultRelease.$inject = ['$resource'];
     ProjectReleases.$inject = ['$resource'];
+    ProjectTranslations.$inject = ['$resource'];
 
     function Project ($resource) {
         var resourceUrl =  'api/projects/:id';
@@ -105,7 +107,7 @@
 
 
     function DefaultRelease($resource) {
-        var resourceUrl =  'api/project/:projectId/releases/default';
+        var resourceUrl =  'api/projects/:projectId/releases/default';
 
         return $resource(resourceUrl, {}, {
             'get': {
@@ -121,7 +123,24 @@
     }
 
     function ProjectReleases ($resource) {
-        var resourceUrl =  'api/project/:projectId/releases/';
+        var resourceUrl =  'api/projects/:projectId/releases/';
+
+        return $resource(resourceUrl, {}, {
+            'query': { method: 'GET', isArray: true},
+            'get': {
+                method: 'GET',
+                transformResponse: function (data) {
+                    if (data) {
+                        data = angular.fromJson(data);
+                    }
+                    return data;
+                }
+            }
+        });
+    }
+
+    function ProjectTranslations ($resource) {
+        var resourceUrl =  'api/projects/:projectId/translations/';
 
         return $resource(resourceUrl, {}, {
             'query': { method: 'GET', isArray: true},
