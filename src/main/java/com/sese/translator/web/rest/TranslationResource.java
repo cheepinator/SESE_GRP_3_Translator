@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -41,7 +42,7 @@ public class TranslationResource {
      */
     @PostMapping("/translations")
     @Timed
-    public ResponseEntity<TranslationDTO> createTranslation(@RequestBody TranslationDTO translationDTO) throws URISyntaxException {
+    public ResponseEntity<TranslationDTO> createTranslation(@Valid @RequestBody TranslationDTO translationDTO) throws URISyntaxException {
         log.debug("REST request to save Translation : {}", translationDTO);
         if (translationDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("translation", "idexists", "A new translation cannot already have an ID")).body(null);
@@ -63,7 +64,7 @@ public class TranslationResource {
      */
     @PutMapping("/translations")
     @Timed
-    public ResponseEntity<TranslationDTO> updateTranslation(@RequestBody TranslationDTO translationDTO) throws URISyntaxException {
+    public ResponseEntity<TranslationDTO> updateTranslation(@Valid @RequestBody TranslationDTO translationDTO) throws URISyntaxException {
         log.debug("REST request to update Translation : {}", translationDTO);
         if (translationDTO.getId() == null) {
             return createTranslation(translationDTO);

@@ -67,7 +67,7 @@ class TranslationGatlingTest extends Simulation {
             .exec(http("Create new translation")
             .post("/api/translations")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "translatedText":null}""")).asJSON
+            .body(StringBody("""{"id":null, "translatedText":null, "updateNeeded":null}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_translation_url"))).exitHereIfFailed
             .pause(10)

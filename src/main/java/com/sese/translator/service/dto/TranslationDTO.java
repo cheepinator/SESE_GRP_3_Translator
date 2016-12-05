@@ -1,5 +1,6 @@
 package com.sese.translator.service.dto;
 
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +17,9 @@ public class TranslationDTO implements Serializable {
 
     @Lob
     private String translatedText;
+
+    @NotNull
+    private Boolean updateNeeded;
 
 
     private Long translatorId;
@@ -37,6 +41,13 @@ public class TranslationDTO implements Serializable {
 
     public void setTranslatedText(String translatedText) {
         this.translatedText = translatedText;
+    }
+    public Boolean getUpdateNeeded() {
+        return updateNeeded;
+    }
+
+    public void setUpdateNeeded(Boolean updateNeeded) {
+        this.updateNeeded = updateNeeded;
     }
 
     public Long getTranslatorId() {
@@ -89,6 +100,7 @@ public class TranslationDTO implements Serializable {
         return "TranslationDTO{" +
             "id=" + id +
             ", translatedText='" + translatedText + "'" +
+            ", updateNeeded='" + updateNeeded + "'" +
             '}';
     }
 }

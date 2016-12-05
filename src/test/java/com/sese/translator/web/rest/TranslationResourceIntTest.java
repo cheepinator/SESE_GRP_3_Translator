@@ -1,34 +1,31 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
-
 import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.TranslationDTO;
 import com.sese.translator.service.mapper.TranslationMapper;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Base64Utils;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -43,6 +40,9 @@ public class TranslationResourceIntTest {
 
     private static final String DEFAULT_TRANSLATED_TEXT = "AAAAAAAAAA";
     private static final String UPDATED_TRANSLATED_TEXT = "BBBBBBBBBB";
+
+    private static final Boolean DEFAULT_UPDATE_NEEDED = false;
+    private static final Boolean UPDATED_UPDATE_NEEDED = true;
 
     @Inject
     private TranslationRepository translationRepository;
@@ -84,7 +84,8 @@ public class TranslationResourceIntTest {
      */
     public static Translation createEntity(EntityManager em) {
         Translation translation = new Translation()
-                .translatedText(DEFAULT_TRANSLATED_TEXT);
+                .translatedText(DEFAULT_TRANSLATED_TEXT)
+                .updateNeeded(DEFAULT_UPDATE_NEEDED);
         return translation;
     }
 
@@ -111,6 +112,26 @@ public class TranslationResourceIntTest {
         assertThat(translations).hasSize(databaseSizeBeforeCreate + 1);
         Translation testTranslation = translations.get(translations.size() - 1);
         assertThat(testTranslation.getTranslatedText()).isEqualTo(DEFAULT_TRANSLATED_TEXT);
+        assertThat(testTranslation.isUpdateNeeded()).isEqualTo(DEFAULT_UPDATE_NEEDED);
+    }
+
+    @Test
+    @Transactional
+    public void checkUpdateNeededIsRequired() throws Exception {
+        int databaseSizeBeforeTest = translationRepository.findAll().size();
+        // set the field null
+        translation.setUpdateNeeded(null);
+
+        // Create the Translation, which fails.
+        TranslationDTO translationDTO = translationMapper.translationToTranslationDTO(translation);
+
+        restTranslationMockMvc.perform(post("/api/translations")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(translationDTO)))
+                .andExpect(status().isBadRequest());
+
+        List<Translation> translations = translationRepository.findAll();
+        assertThat(translations).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
@@ -124,7 +145,8 @@ public class TranslationResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(translation.getId().intValue())))
-                .andExpect(jsonPath("$.[*].translatedText").value(hasItem(DEFAULT_TRANSLATED_TEXT.toString())));
+                .andExpect(jsonPath("$.[*].translatedText").value(hasItem(DEFAULT_TRANSLATED_TEXT.toString())))
+                .andExpect(jsonPath("$.[*].updateNeeded").value(hasItem(DEFAULT_UPDATE_NEEDED.booleanValue())));
     }
 
     @Test
@@ -138,7 +160,8 @@ public class TranslationResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(translation.getId().intValue()))
-            .andExpect(jsonPath("$.translatedText").value(DEFAULT_TRANSLATED_TEXT.toString()));
+            .andExpect(jsonPath("$.translatedText").value(DEFAULT_TRANSLATED_TEXT.toString()))
+            .andExpect(jsonPath("$.updateNeeded").value(DEFAULT_UPDATE_NEEDED.booleanValue()));
     }
 
     @Test
@@ -159,7 +182,8 @@ public class TranslationResourceIntTest {
         // Update the translation
         Translation updatedTranslation = translationRepository.findOne(translation.getId());
         updatedTranslation
-                .translatedText(UPDATED_TRANSLATED_TEXT);
+                .translatedText(UPDATED_TRANSLATED_TEXT)
+                .updateNeeded(UPDATED_UPDATE_NEEDED);
         TranslationDTO translationDTO = translationMapper.translationToTranslationDTO(updatedTranslation);
 
         restTranslationMockMvc.perform(put("/api/translations")
@@ -172,6 +196,7 @@ public class TranslationResourceIntTest {
         assertThat(translations).hasSize(databaseSizeBeforeUpdate);
         Translation testTranslation = translations.get(translations.size() - 1);
         assertThat(testTranslation.getTranslatedText()).isEqualTo(UPDATED_TRANSLATED_TEXT);
+        assertThat(testTranslation.isUpdateNeeded()).isEqualTo(UPDATED_UPDATE_NEEDED);
     }
 
     @Test

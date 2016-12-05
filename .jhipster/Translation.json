@@ -25,11 +25,18 @@
             "fieldName": "translatedText",
             "fieldType": "byte[]",
             "fieldTypeBlobContent": "text"
+        },
+        {
+            "fieldName": "updateNeeded",
+            "fieldType": "Boolean",
+            "fieldValidateRules": [
+                "required"
+            ]
         }
     ],
     "changelogDate": "20161126164219",
-    "entityTableName": "translation",
     "dto": "mapstruct",
-    "pagination": "infinite-scroll",
-    "service": "serviceImpl"
+    "service": "serviceImpl",
+    "entityTableName": "translation",
+    "pagination": "infinite-scroll"
 }

@@ -96,6 +96,7 @@
                         entity: function () {
                             return {
                                 translatedText: null,
+                                updateNeeded: false,
                                 id: null
                             };
                         }

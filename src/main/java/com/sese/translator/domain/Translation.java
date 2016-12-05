@@ -4,6 +4,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -24,6 +25,10 @@ public class Translation implements Serializable {
     @Lob
     @Column(name = "translated_text")
     private String translatedText;
+
+    @NotNull
+    @Column(name = "update_needed", nullable = false)
+    private Boolean updateNeeded;
 
     @ManyToOne
     private User translator;
@@ -53,6 +58,19 @@ public class Translation implements Serializable {
 
     public void setTranslatedText(String translatedText) {
         this.translatedText = translatedText;
+    }
+
+    public Boolean isUpdateNeeded() {
+        return updateNeeded;
+    }
+
+    public Translation updateNeeded(Boolean updateNeeded) {
+        this.updateNeeded = updateNeeded;
+        return this;
+    }
+
+    public void setUpdateNeeded(Boolean updateNeeded) {
+        this.updateNeeded = updateNeeded;
     }
 
     public User getTranslator() {
@@ -119,6 +137,7 @@ public class Translation implements Serializable {
         return "Translation{" +
             "id=" + id +
             ", translatedText='" + translatedText + "'" +
+            ", updateNeeded='" + updateNeeded + "'" +
             '}';
     }
 }

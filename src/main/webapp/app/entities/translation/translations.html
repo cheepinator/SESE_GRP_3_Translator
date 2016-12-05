@@ -20,6 +20,7 @@
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
                     <th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="translatedText"><span>Translated Text</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="updateNeeded"><span>Update Needed</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="translatorId"><span>Translator</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="languageId"><span>Language</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="definitionId"><span>Definition</span> <span class="glyphicon glyphicon-sort"></span></th>
@@ -30,6 +31,7 @@
                 <tr ng-repeat="translation in vm.translations track by translation.id">
                     <td><a ui-sref="translation-detail({id:translation.id})">{{translation.id}}</a></td>
                     <td>{{translation.translatedText}}</td>
+                    <td>{{translation.updateNeeded}}</td>
                     <td>
                         {{translation.translatorId}}
                     </td>
