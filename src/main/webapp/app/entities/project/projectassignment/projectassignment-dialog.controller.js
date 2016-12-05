@@ -5,9 +5,9 @@
         .module('seseTranslatorApp')
         .controller('ProjectassignmentDialogController', ProjectassignmentDialogController);
 
-    ProjectassignmentDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Projectassignment', 'User', 'Project'];
+    ProjectassignmentDialogController.$inject = ['$timeout', '$scope', '$stateParams', 'project', '$uibModalInstance', 'entity', 'Projectassignment', 'User', 'Project'];
 
-    function ProjectassignmentDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Projectassignment, User, Project) {
+    function ProjectassignmentDialogController ($timeout, $scope, $stateParams, project, $uibModalInstance, entity, Projectassignment, User, Project) {
         var vm = this;
 
         vm.projectassignment = entity;
@@ -15,6 +15,8 @@
         vm.save = save;
         vm.users = User.query();
         vm.projects = Project.query();
+        vm.project = project;
+        vm.projectassignment.assignedProjectId = vm.project.id;
 
         $timeout(function (){
             angular.element('.form-group:eq(1)>input').focus();

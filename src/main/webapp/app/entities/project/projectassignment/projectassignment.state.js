@@ -40,6 +40,9 @@
                     backdrop: 'static',
                     size: 'lg',
                     resolve: {
+                        project: ['$stateParams', 'Project', function($stateParams, Project) {
+                            return Project.get({id : $stateParams.projectId}).$promise;
+                        }],
                         entity: function () {
                             return {
                                 role: null,
@@ -72,7 +75,7 @@
                         }]
                     }
                 }).result.then(function() {
-                    $state.go('projectassignment', null, { reload: 'projectassignment' });
+                    $state.go('project-detail.projectassignment', null, { reload: 'project-detail.projectassignment' });
                 }, function() {
                     $state.go('^');
                 });
