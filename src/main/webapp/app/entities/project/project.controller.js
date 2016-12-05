@@ -34,12 +34,14 @@
 
         function getReleaseLabel(release) {
             var result = "";
-            if (release.versionTag) {
-                result += release.versionTag;
-            }
-            if (release.dueDate) {
-                const formattedDate = dateFilter(release.dueDate, 'mediumDate');
-                result += ": " + formattedDate;
+            if (release) {
+                if (release.versionTag) {
+                    result += release.versionTag;
+                }
+                if (release.dueDate) {
+                    var formattedDate = dateFilter(release.dueDate, 'mediumDate');
+                    result += ": " + formattedDate;
+                }
             }
             return result;
         }
