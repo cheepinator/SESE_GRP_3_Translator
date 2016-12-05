@@ -29,4 +29,7 @@ public interface ReleaseRepository extends JpaRepository<Release,Long> {
     @Query("select release from Release release where release.versionTag = :#{T(com.sese.translator.domain.Release).DEFAULT_TAG} and release.project.id = :id")
     Release findDefaultForProject(@Param("id") Long id);
 
+    @Query("select distinct release from Release release left join fetch release.languages where release.project.id = :projectId")
+    List<Release> findByProjectIdWithEagerRelationships(@Param("projectId") Long projectId);
+
 }

@@ -52,6 +52,9 @@
                 defaultRelease: ['$stateParams', 'DefaultRelease', function($stateParams, DefaultRelease) {
                     return DefaultRelease.get({projectId : $stateParams.projectId}).$promise;
                 }],
+                projectReleases: ['$stateParams', 'ProjectReleases', function ($stateParams, ProjectReleases) {
+                    return ProjectReleases.query({projectId: $stateParams.projectId}).$promise;
+                }],
                 previousState: ["$state", function ($state) {
                     var currentStateData = {
                         name: $state.current.name || 'project',

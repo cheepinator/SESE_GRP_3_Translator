@@ -29,6 +29,8 @@ public interface ReleaseService {
      */
     List<ReleaseDTO> findAll();
 
+    List<ReleaseDTO> findAllForProject(Long projectId);
+
     /**
      *  Get the "id" release.
      *

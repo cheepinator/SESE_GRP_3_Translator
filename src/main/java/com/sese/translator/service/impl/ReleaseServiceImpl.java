@@ -85,6 +85,20 @@ public class ReleaseServiceImpl implements ReleaseService{
     }
 
     /**
+     * Get all the releases for the given project id.
+     *
+     * @return the list of entities for the project
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReleaseDTO> findAllForProject(Long projectId) {
+        log.debug("Request to get all Releases for Project with id: {}", projectId);
+        return releaseRepository.findByProjectIdWithEagerRelationships(projectId).stream()
+                                .map(releaseMapper::releaseToReleaseDTO)
+                                .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    /**
      *  Get one release by id.
      *
      *  @param id the id of the entity

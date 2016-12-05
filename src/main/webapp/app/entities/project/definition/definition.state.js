@@ -49,7 +49,8 @@
                 data: {
                     authorities: ['ROLE_USER']
                 },
-                onEnter: ['$stateParams', '$state', '$uibModal', 'definition', function ($stateParams, $state, $uibModal, definition) {
+                onEnter: ['$stateParams', '$state', '$uibModal', 'definition', 'projectReleases',
+                    function ($stateParams, $state, $uibModal, definition, projectReleases) {
                     $uibModal.open({
                         templateUrl: 'app/entities/project/definition/definition-dialog.html',
                         controller: 'ProjectDefinitionDialogController',
@@ -62,6 +63,9 @@
                             },
                             defaultRelease: function () {
                                 return {};
+                            },
+                            projectReleases: function () {
+                                return projectReleases;
                             }
                         }
                     }).result.then(function() {
@@ -77,7 +81,8 @@
                 data: {
                     authorities: ['ROLE_USER']
                 },
-                onEnter: ['$stateParams', '$state', '$uibModal', 'DefaultRelease', function ($stateParams, $state, $uibModal, DefaultRelease) {
+                onEnter: ['$stateParams', '$state', '$uibModal', 'defaultRelease', 'projectReleases',
+                    function ($stateParams, $state, $uibModal, defaultRelease, projectReleases) {
                     $uibModal.open({
                         templateUrl: 'app/entities/project/definition/definition-dialog.html',
                         controller: 'ProjectDefinitionDialogController',
@@ -93,7 +98,10 @@
                                 };
                             },
                             defaultRelease: function () {
-                                return DefaultRelease.get({projectId : $stateParams.projectId}).$promise;
+                                return defaultRelease;
+                            },
+                            projectReleases: function () {
+                                return projectReleases;
                             }
                         }
                     }).result.then(function() {
@@ -109,7 +117,7 @@
                 data: {
                     authorities: ['ROLE_USER']
                 },
-                onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
+                onEnter: ['$stateParams', '$state', '$uibModal', 'projectReleases', function($stateParams, $state, $uibModal, projectReleases) {
                     $uibModal.open({
                         templateUrl: 'app/entities/project/definition/definition-dialog.html',
                         controller: 'ProjectDefinitionDialogController',
@@ -122,6 +130,9 @@
                             }],
                             defaultRelease: function () {
                                 return {};
+                            },
+                            projectReleases: function () {
+                                return projectReleases;
                             }
                         }
                     }).result.then(function() {

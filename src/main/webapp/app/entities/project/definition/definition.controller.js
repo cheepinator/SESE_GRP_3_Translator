@@ -5,12 +5,15 @@
         .module('seseTranslatorApp')
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
-    ProjectDefinitionController.$inject = ['$scope', '$state', 'project', 'DataUtils', 'ProjectDefinition', 'ParseLinks', 'AlertService'];
+    ProjectDefinitionController.$inject = ['$scope', '$state', 'project', 'projectReleases', 'DataUtils',
+        'ProjectDefinition', 'ParseLinks', 'AlertService'];
 
-    function ProjectDefinitionController ($scope, $state, project, DataUtils, ProjectDefinition, ParseLinks, AlertService) {
+    function ProjectDefinitionController ($scope, $state, project, projectReleases, DataUtils, ProjectDefinition,
+                                          ParseLinks, AlertService) {
         var vm = this;
 
         vm.project = project;
+        vm.releases = projectReleases;
         vm.definitions = [];
         vm.loadPage = loadPage;
         vm.page = 0;
@@ -44,7 +47,12 @@
                 vm.links = ParseLinks.parse(headers('link'));
                 vm.totalItems = headers('X-Total-Count');
                 for (var i = 0; i < data.length; i++) {
-                    vm.definitions.push(data[i]);
+                    // map releases to the definitions
+                    var definition = data[i];
+                    definition.release = vm.releases.find(function (release) {
+                        return definition.releaseId == release.id;
+                    });
+                    vm.definitions.push(definition);
                 }
             }
 

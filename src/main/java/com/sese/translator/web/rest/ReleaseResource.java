@@ -101,6 +101,22 @@ public class ReleaseResource {
     }
 
     /**
+     * GET  /project/{projectId}/releases : get all releases for the given project
+     *
+     * @param projectId the id of the project all releases shall be returned
+     * @return the ResponseEntity with status 200 (OK) and the list of releases in the body
+     */
+    @GetMapping("/project/{projectId}/releases")
+    @Timed
+    public ResponseEntity<List<ReleaseDTO>> getAllReleasesForProject(@PathVariable Long projectId) {
+        log.debug("REST request to get the default release for project {}", projectId);
+        List<ReleaseDTO> releasesForProject = releaseService.findAllForProject(projectId);
+        return Optional.ofNullable(releasesForProject)
+                       .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                       .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    /**
      * GET  /releases/:id : get the "id" release.
      *
      * @param id the id of the releaseDTO to retrieve

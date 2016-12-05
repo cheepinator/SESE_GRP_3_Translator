@@ -4,7 +4,8 @@
         .module('seseTranslatorApp')
         .factory('Project', Project)
         .factory('CountTranslations',CountTranslations)
-        .factory('DefaultRelease', DefaultRelease);
+        .factory('DefaultRelease', DefaultRelease)
+        .factory('ProjectReleases', ProjectReleases);
 
     Project.$inject = ['$resource'];
     Language.$inject = ['$resource'];
@@ -12,6 +13,7 @@
     //CurrentRelease.$inject = ['$resource'];
     CountTranslations.$inject = ['$resource'];
     DefaultRelease.$inject = ['$resource'];
+    ProjectReleases.$inject = ['$resource'];
 
     function Project ($resource) {
         var resourceUrl =  'api/projects/:id';
@@ -106,6 +108,23 @@
         var resourceUrl =  'api/project/:projectId/releases/default';
 
         return $resource(resourceUrl, {}, {
+            'get': {
+                method: 'GET',
+                transformResponse: function (data) {
+                    if (data) {
+                        data = angular.fromJson(data);
+                    }
+                    return data;
+                }
+            }
+        });
+    }
+
+    function ProjectReleases ($resource) {
+        var resourceUrl =  'api/project/:projectId/releases/';
+
+        return $resource(resourceUrl, {}, {
+            'query': { method: 'GET', isArray: true},
             'get': {
                 method: 'GET',
                 transformResponse: function (data) {

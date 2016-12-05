@@ -6,10 +6,10 @@
         .controller('ProjectDefinitionDialogController', ProjectDefinitionDialogController);
 
     ProjectDefinitionDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'DataUtils',
-        'definition', 'defaultRelease', 'Definition', 'Translation', 'Release'];
+        'definition', 'defaultRelease', 'projectReleases', 'Definition', 'Translation', 'Release'];
 
     function ProjectDefinitionDialogController ($timeout, $scope, $stateParams, $uibModalInstance, DataUtils, definition,
-                                                defaultRelease, Definition, Translation, Release) {
+                                                defaultRelease, projectReleases, Definition, Translation, Release) {
         var vm = this;
 
         vm.definition = definition;
@@ -18,7 +18,7 @@
         vm.openFile = DataUtils.openFile;
         vm.save = save;
         vm.translations = Translation.query();
-        vm.releases = Release.query();
+        vm.releases = projectReleases;
         vm.defaultRelease = defaultRelease;
         if (vm.definition.id == null) {
             vm.definition.releaseId = vm.defaultRelease.id;

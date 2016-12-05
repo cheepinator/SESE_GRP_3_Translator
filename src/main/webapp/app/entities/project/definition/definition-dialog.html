@@ -39,7 +39,7 @@
 
         <div class="form-group" ng-show="vm.definition.id"> <!-- todo: only show the release selection for release managers -->
             <label for="field_release">Release</label>
-            <select class="form-control" id="field_release" name="release" ng-model="vm.definition.releaseId" ng-options="release.id as release.id for release in vm.releases"            >
+            <select class="form-control" id="field_release" name="release" ng-model="vm.definition.releaseId" ng-options="release.id as release.versionTag for release in vm.releases">
                 <option value=""></option>
             </select>
         </div>
