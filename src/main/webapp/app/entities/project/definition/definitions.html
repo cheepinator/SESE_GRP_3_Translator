@@ -30,7 +30,11 @@
                     <td><a ui-sref="project-detail.definition-detail({definitionId:definition.id})">{{definition.code}}</a></td>
                     <td>{{definition.originalText}}</td>
                     <td>
-                        <a ui-sref="release-detail({id:definition.releaseId})"><span class="badge">{{definition.release.versionTag}}</span></a>
+                        <a ui-sref="release-detail({id:definition.releaseId})" ng-show="definition.release.dueDate">
+                            <span class="badge" uib-tooltip="Due: {{definition.release.dueDate | date:'mediumDate'}}">
+                                {{definition.release.versionTag}}
+                            </span>
+                        </a>
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">

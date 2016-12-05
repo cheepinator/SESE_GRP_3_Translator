@@ -20,9 +20,9 @@
                 <tr>
                     <th><span>ID</span></th>
                     <th><span>Name</span></th>
-                    <th><span>Nächste Release</span></th>
-                    <th><span>Fortschritt</span></th>
-                    <th><span>Sprachen</span></th>
+                    <th><span>Upcoming Release</span></th>
+                    <th><span>Progress</span></th>
+                    <th><span>Languages</span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -32,8 +32,8 @@
                     <td><a ui-sref="project-detail({projectId:project.id})">{{project.name}}</a></td>
 
                     <td>
-                        {{getCurrentReleaseByProjectID(project.id) }}
-                        <a ui-sref="release-detail({id:currentRelease.id})">{{currentRelease.description}}</a>
+                        {{getCurrentReleaseByProjectID(project.id)}}
+                        <a ui-sref="release-detail({id:currentRelease.id})">{{getReleaseLabel(currentRelease)}}</a>
                     </td>
                     <td>
                         <!--{{getCountOfTranslationsByReleaseID(currentRelease.id) }}

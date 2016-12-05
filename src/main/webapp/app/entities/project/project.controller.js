@@ -5,9 +5,9 @@
         .module('seseTranslatorApp')
         .controller('ProjectController', ProjectController);
 
-    ProjectController.$inject = ['$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations'];
+    ProjectController.$inject = ['$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter'];
 
-    function ProjectController ($scope, $state, Project, Language, Release, CountTranslations) {
+    function ProjectController ($scope, $state, Project, Language, Release, CountTranslations, dateFilter) {
         var vm = this;
 
         vm.projects = [];
@@ -28,6 +28,20 @@
                 vm.releases = result
             });
 
+        }
+
+        $scope.getReleaseLabel = getReleaseLabel;
+
+        function getReleaseLabel(release) {
+            var result = "";
+            if (release.versionTag) {
+                result += release.versionTag;
+            }
+            if (release.dueDate) {
+                const formattedDate = dateFilter(release.dueDate, 'mediumDate');
+                result += ": " + formattedDate;
+            }
+            return result;
         }
 
         $scope.getCurrentReleaseByProjectID = getCurrentReleaseByProjectID;
