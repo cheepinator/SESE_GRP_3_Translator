@@ -1,38 +1,43 @@
 package com.sese.translator.service.impl;
 
+import com.sese.translator.domain.Language;
 import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Release;
 import com.sese.translator.repository.ReleaseRepository;
+import com.sese.translator.service.LanguageService;
 import com.sese.translator.service.ReleaseService;
+import com.sese.translator.service.dto.LanguageDTO;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.dto.ReleaseDTO;
+import com.sese.translator.service.mapper.LanguageMapper;
 import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ReleaseMapper;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing Release.
  */
 @Service
 @Transactional
-public class ReleaseServiceImpl implements ReleaseService{
+public class ReleaseServiceImpl implements ReleaseService {
 
     private final Logger log = LoggerFactory.getLogger(ReleaseServiceImpl.class);
-
+    private final String DEFAULT_LANGUAGE = "Deutsch";
     @Inject
     private ReleaseRepository releaseRepository;
-
+    @Inject
+    private LanguageService languageService;
+    @Inject
+    private LanguageMapper languageMapper;
     @Inject
     private ReleaseMapper releaseMapper;
-
     @Inject
     private ProjectMapper projectMapper;
 
@@ -55,6 +60,7 @@ public class ReleaseServiceImpl implements ReleaseService{
         log.debug("Creating default release for Project: {}", projectDTO);
         Project project = projectMapper.projectDTOToProject(projectDTO);
         Release release = new Release().versionTag(Release.DEFAULT_TAG).project(project).isCurrentRelease(false);
+        release.addLanguages(getDefaultLanguage());
         release = releaseRepository.save(release);
         ReleaseDTO result = releaseMapper.releaseToReleaseDTO(release);
         log.debug("Default release: {}", result);
@@ -70,16 +76,16 @@ public class ReleaseServiceImpl implements ReleaseService{
     }
 
     /**
-     *  Get all the releases.
+     * Get all the releases.
      *
-     *  @return the list of entities
+     * @return the list of entities
      */
     @Transactional(readOnly = true)
     public List<ReleaseDTO> findAll() {
         log.debug("Request to get all Releases");
         List<ReleaseDTO> result = releaseRepository.findAllWithEagerRelationships().stream()
-            .map(releaseMapper::releaseToReleaseDTO)
-            .collect(Collectors.toCollection(LinkedList::new));
+                                                   .map(releaseMapper::releaseToReleaseDTO)
+                                                   .collect(Collectors.toCollection(LinkedList::new));
 
         return result;
     }
@@ -99,10 +105,10 @@ public class ReleaseServiceImpl implements ReleaseService{
     }
 
     /**
-     *  Get one release by id.
+     * Get one release by id.
      *
-     *  @param id the id of the entity
-     *  @return the entity
+     * @param id the id of the entity
+     * @return the entity
      */
     @Transactional(readOnly = true)
     public ReleaseDTO findOne(Long id) {
@@ -124,7 +130,6 @@ public class ReleaseServiceImpl implements ReleaseService{
         return releaseRepository.countByReleaseId(id);
     }
 
-
 //    @Transactional(readOnly = true)
 //    public ReleaseDTO findCurrentByProjectId(Long id) {
 //        log.debug("Request to get current Release of Project : {}", id);
@@ -134,15 +139,32 @@ public class ReleaseServiceImpl implements ReleaseService{
 //    }
 
 
-
-
     /**
-     *  Delete the  release by id.
+     * Delete the  release by id.
      *
-     *  @param id the id of the entity
+     * @param id the id of the entity
      */
     public void delete(Long id) {
         log.debug("Request to delete Release : {}", id);
         releaseRepository.delete(id);
+    }
+
+    private Language getDefaultLanguage() {
+        boolean hasGermanLanguage = false;
+        Long languageId = 0L;
+        for (LanguageDTO languageDTO : languageService.findAll()) {
+            if (languageDTO.getCode().equals(DEFAULT_LANGUAGE)) {
+                hasGermanLanguage = true;
+                languageId = languageDTO.getId();
+            }
+        }
+
+        if (!hasGermanLanguage) {
+            LanguageDTO defaultLanguage = new LanguageDTO();
+            defaultLanguage.setCode(DEFAULT_LANGUAGE);
+            languageId = languageService.save(defaultLanguage).getId();
+        }
+
+        return languageMapper.languageDTOToLanguage(languageService.findOne(languageId));
     }
 }

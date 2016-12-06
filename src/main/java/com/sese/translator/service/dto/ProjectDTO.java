@@ -17,9 +17,8 @@ public class ProjectDTO implements Serializable {
     @NotNull
     private String name;
 
-
     private Long ownerId;
-    
+
     public Long getId() {
         return id;
     }
