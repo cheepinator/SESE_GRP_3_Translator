@@ -1,8 +1,8 @@
 
 <div>
     <button type="button" ui-sref="project-detail.projectassignment({id:vm.project.id})" class="btn btn-primary" style="float: right;">
-        <span class="glyphicon glyphicon-pencil"></span>
-        <span class="hidden-xs hidden-sm"> Edit the Roles</span>
+        <span class="glyphicon glyphicon-user"></span>
+        <span class="hidden-xs hidden-sm">Project Members</span>
     </button>
     <h2><a ui-sref="project">Projects</a> / {{vm.project.name}}</h2>
     <hr>
@@ -32,7 +32,7 @@
         <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
     </button>
 
-    <button type="button" ui-sref="project-detail.edit({id:vm.project.id})" class="btn btn-primary">
+    <button ng-show="vm.isOwner(vm.project.ownerId)" type="button" ui-sref="project-detail.edit({id:vm.project.id})" class="btn btn-primary">
         <span class="glyphicon glyphicon-pencil"></span>
         <span class="hidden-xs hidden-sm"> Edit</span>
     </button>
