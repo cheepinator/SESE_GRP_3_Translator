@@ -6,7 +6,8 @@
         .factory('CountTranslations',CountTranslations)
         .factory('DefaultRelease', DefaultRelease)
         .factory('ProjectReleases', ProjectReleases)
-        .factory('ProjectTranslations', ProjectTranslations);
+        .factory('ProjectTranslations', ProjectTranslations)
+        .factory('ProjectRoles', ProjectRoles);
 
     Project.$inject = ['$resource'];
     Language.$inject = ['$resource'];
@@ -16,6 +17,7 @@
     DefaultRelease.$inject = ['$resource'];
     ProjectReleases.$inject = ['$resource'];
     ProjectTranslations.$inject = ['$resource'];
+    ProjectRoles.$inject = ['$resource'];
 
     function Project ($resource) {
         var resourceUrl =  'api/projects/:id';
@@ -153,6 +155,13 @@
                     return data;
                 }
             }
+        });
+    }
+
+    function ProjectRoles ($resource) {
+        var resourceUrl = 'api/projects/userRole/:projectId';
+        return $resource(resourceUrl, {}, {
+            'query': { method: 'GET', isArray: true}
         });
     }
 

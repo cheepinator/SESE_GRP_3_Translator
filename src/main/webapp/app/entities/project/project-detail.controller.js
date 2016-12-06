@@ -5,11 +5,11 @@
         .module('seseTranslatorApp')
         .controller('ProjectDetailController', ProjectDetailController);
 
-    ProjectDetailController.$inject = ['$scope', '$rootScope', '$http', '$stateParams', 'previousState', 'project',
-        'projectReleases', 'Project', 'Release', 'User'];
+    ProjectDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'project',
+        'projectReleases', 'Project', 'Release', 'User', 'ProjectRoles'];
 
-    function ProjectDetailController($scope, $rootScope, $http, $stateParams, previousState, project, projectReleases,
-                                     Project, Release, User) {
+    function ProjectDetailController($scope, $rootScope, $stateParams, previousState, project, projectReleases,
+                                     Project, Release, User, ProjectRoles) {
         var vm = this;
 
         vm.project = project;
@@ -20,16 +20,11 @@
             vm.project = result;
         });
 
-        /*  $http.get("api/projectusers/" + vm.project.id).then(function (response) {
-         },
-         function (response) {
-         });*/
+        ProjectRoles.query({projectId: vm.project.id}, onSuccess);
 
-        $http.get("api/projects/userRole/" + vm.project.id).then(function (response) {
-            if (response.data.length == 1) {
-                vm.role = response.data[0];
-            }
-        });
+        function onSuccess(response) {
+            vm.role = response[0];
+        }
 
         $scope.$on('$destroy', unsubscribe);
     }

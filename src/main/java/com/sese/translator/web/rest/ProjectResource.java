@@ -137,7 +137,7 @@ public class ProjectResource {
      * @param id of the project.
      * @return a List of Users.
      */
-    @GetMapping("/projectusers/{id}")
+    @GetMapping("/project/users/{id}")
     @Timed
     public List<User> getProjectUsers(@PathVariable Long id) {
 
@@ -159,7 +159,7 @@ public class ProjectResource {
      * @param id of the project.
      * @return a List of Roles.
      */
-    @GetMapping("projects/userRole/{id}")
+    @GetMapping("/projects/userRole/{id}")
     @Timed
     public List<String> getUserRoleForProject(@PathVariable Long id) {
 
