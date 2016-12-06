@@ -21,7 +21,7 @@
                     <th><span>ID</span></th>
                     <th><span>Role</span></th>
                     <th><span>Assigned User</span></th>
-                    <th><span>Assigned Project!!!!!!!! kommteventuellweg</span></th>
+                    <th><span>Assigned Project</span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -29,7 +29,10 @@
                 <tr ng-repeat="projectassignment in vm.projectassignments track by projectassignment.id">
                     <td>{{projectassignment.id}}</td>
                     <td>{{projectassignment.role}}</td>
-                    <td>{{projectassignment.assignedUserId}}</td>
+                    <td>
+                        {{getAssignedUserByID(projectassignment.assignedUserId)}}
+                        {{projectassignment.assignedUserId}} - {{assignedUser.login}}
+                    </td>
                     <td>
                         {{getAssignedProjectProjectID(projectassignment.assignedProjectId)}}
                         <a ui-sref="project-detail({id:projectassignment.assignedProjectId})">{{projectassignment.assignedProjectId}} - {{assignedProject.name}}</a>
