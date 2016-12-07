@@ -6,16 +6,17 @@
         .controller('ProjectDetailController', ProjectDetailController);
 
     ProjectDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'project',
-        'projectReleases', 'Project', 'Release', 'User', 'ProjectRoles', 'Principal'];
+        'projectReleases', 'Project', 'Release', 'User', 'ProjectRoles', 'Principal', 'UserName'];
 
     function ProjectDetailController($scope, $rootScope, $stateParams, previousState, project, projectReleases,
-                                     Project, Release, User, ProjectRoles, Principal) {
+                                     Project, Release, User, ProjectRoles, Principal, UserName) {
         var vm = this;
 
         vm.project = project;
+        vm.ownerDetails = UserName.get({id: vm.project.ownerId});
         vm.previousState = previousState.name;
         vm.releases = projectReleases;
-        vm.role = "Keine Rolle";
+        vm.role = "No role assigned";
         vm.isOwner = isOwner;
 
         var unsubscribe = $rootScope.$on('seseTranslatorApp:projectUpdate', function (event, result) {
@@ -37,7 +38,7 @@
 
         function onSuccess(response) {
             if (response.length > 0) {
-                vm.role = response[0];
+                vm.role = response.join(', ');
             }
         }
 

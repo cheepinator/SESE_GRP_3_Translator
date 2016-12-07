@@ -16,10 +16,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import javax.inject.Inject;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service class for managing users.
@@ -190,6 +193,11 @@ public class UserService {
             u.getAuthorities().size();
             return u;
         });
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> getUserById(Long id) {
+        return Optional.ofNullable(userRepository.findOne(id));
     }
 
     @Transactional(readOnly = true)
