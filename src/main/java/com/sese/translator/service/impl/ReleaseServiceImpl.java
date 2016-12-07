@@ -12,14 +12,15 @@ import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.service.mapper.LanguageMapper;
 import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ReleaseMapper;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing Release.
@@ -29,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReleaseServiceImpl implements ReleaseService {
 
     private final Logger log = LoggerFactory.getLogger(ReleaseServiceImpl.class);
-    private final String DEFAULT_LANGUAGE = "Deutsch";
     @Inject
     private ReleaseRepository releaseRepository;
     @Inject
@@ -153,7 +153,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         boolean hasGermanLanguage = false;
         Long languageId = 0L;
         for (LanguageDTO languageDTO : languageService.findAll()) {
-            if (languageDTO.getCode().equals(DEFAULT_LANGUAGE)) {
+            if (languageDTO.getCode().equals(Language.DEFAULT_LANGUAGE)) {
                 hasGermanLanguage = true;
                 languageId = languageDTO.getId();
             }
@@ -161,7 +161,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         if (!hasGermanLanguage) {
             LanguageDTO defaultLanguage = new LanguageDTO();
-            defaultLanguage.setCode(DEFAULT_LANGUAGE);
+            defaultLanguage.setCode(Language.DEFAULT_LANGUAGE);
             languageId = languageService.save(defaultLanguage).getId();
         }
 

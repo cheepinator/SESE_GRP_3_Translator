@@ -27,7 +27,7 @@
     }
 
     function ProjectassignmentProject ($resource) {
-        var resourceUrl =  '/api/project/:projectId/projectassignments/';
+        var resourceUrl =  '/api/projects/:projectId/projectassignments/';
 
         return $resource(resourceUrl, {}, {
             'query': { method: 'GET', isArray: true},

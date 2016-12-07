@@ -20,6 +20,7 @@ import java.util.Objects;
 public class Language implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    public static final String DEFAULT_LANGUAGE = "Deutsch";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -28,7 +28,7 @@ public class Translation implements Serializable {
 
     @NotNull
     @Column(name = "update_needed", nullable = false)
-    private Boolean updateNeeded;
+    private Boolean updateNeeded = Boolean.FALSE;
 
     @ManyToOne
     private User translator;

@@ -1,7 +1,13 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
+import com.sese.translator.domain.Definition;
+import com.sese.translator.domain.Project;
+import com.sese.translator.domain.Release;
 import com.sese.translator.domain.Translation;
+import com.sese.translator.repository.DefinitionRepository;
+import com.sese.translator.repository.ProjectRepository;
+import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.TranslationDTO;
@@ -46,6 +52,15 @@ public class TranslationResourceIntTest {
 
     @Inject
     private TranslationRepository translationRepository;
+
+    @Inject
+    private DefinitionRepository definitionRepository;
+
+    @Inject
+    private ReleaseRepository releaseRepository;
+
+    @Inject
+    private ProjectRepository projectRepository;
 
     @Inject
     private TranslationMapper translationMapper;
@@ -147,6 +162,72 @@ public class TranslationResourceIntTest {
                 .andExpect(jsonPath("$.[*].id").value(hasItem(translation.getId().intValue())))
                 .andExpect(jsonPath("$.[*].translatedText").value(hasItem(DEFAULT_TRANSLATED_TEXT.toString())))
                 .andExpect(jsonPath("$.[*].updateNeeded").value(hasItem(DEFAULT_UPDATE_NEEDED.booleanValue())));
+    }
+
+    @Test
+    @Transactional
+    public void getAllTranslations_forDefinition() throws Exception {
+        // Initialize the database with a definition and corresponding translation
+        translationRepository.saveAndFlush(translation);
+        Definition definition = new Definition().code("code").originalText("text").addTranslations(translation);
+        definitionRepository.saveAndFlush(definition);
+        translation.definition(definition);
+        translationRepository.saveAndFlush(translation);
+
+        // Get all the translations for the definition
+        restTranslationMockMvc.perform(get("/api/definitions/{id}/translations?sort=id,desc", definition.getId()))
+                              .andExpect(status().isOk())
+                              .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                              .andExpect(jsonPath("$.[*].id").value(hasItem(translation.getId().intValue())))
+                              .andExpect(jsonPath("$.[*].translatedText").value(hasItem(DEFAULT_TRANSLATED_TEXT)))
+                              .andExpect(jsonPath("$.[*].updateNeeded").value(hasItem(DEFAULT_UPDATE_NEEDED)));
+    }
+
+    @Test
+    @Transactional
+    public void getAllTranslations_forDefinition_noTranslationsAvailable() throws Exception {
+        // Initialize the database with a definition that has no translations
+        Definition definition = new Definition().code("code").originalText("text").addTranslations(translation);
+        definitionRepository.saveAndFlush(definition);
+
+        // Get all the translations for the definition -> there should be none
+        restTranslationMockMvc.perform(get("/api/definitions/{id}/translations?sort=id,desc", definition.getId()))
+                              .andExpect(status().isOk())
+                              .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                              .andExpect(jsonPath("$.[*]").isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void getAllTranslations_forProject() throws Exception {
+        // Initialize the database with a definition and corresponding translation as well as a project and release
+        translationRepository.saveAndFlush(translation);
+
+        Project aProject = new Project().name("aProject");
+        projectRepository.saveAndFlush(aProject);
+
+        Release aRelease = new Release().versionTag("aRelease").project(aProject);
+        releaseRepository.saveAndFlush(aRelease);
+
+        Definition definition = new Definition().code("code").originalText("text").addTranslations(translation).release(aRelease);
+        definitionRepository.saveAndFlush(definition);
+
+        translation.definition(definition);
+        translationRepository.saveAndFlush(translation);
+
+        aRelease.addDefinitions(definition);
+        releaseRepository.saveAndFlush(aRelease);
+
+        aProject.addReleases(aRelease);
+        projectRepository.saveAndFlush(aProject);
+
+        // Get all the translations for the definition
+        restTranslationMockMvc.perform(get("/api/projects/{projectId}/translations", aProject.getId()))
+                              .andExpect(status().isOk())
+                              .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                              .andExpect(jsonPath("$.[*].id").value(hasItem(translation.getId().intValue())))
+                              .andExpect(jsonPath("$.[*].translatedText").value(hasItem(DEFAULT_TRANSLATED_TEXT)))
+                              .andExpect(jsonPath("$.[*].updateNeeded").value(hasItem(DEFAULT_UPDATE_NEEDED)));
     }
 
     @Test
