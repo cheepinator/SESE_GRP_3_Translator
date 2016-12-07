@@ -1,8 +1,13 @@
 package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.sese.translator.domain.Language;
+import com.sese.translator.domain.Release;
+import com.sese.translator.domain.Translation;
+import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.TranslationDTO;
+import com.sese.translator.service.mapper.TranslationMapper;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
@@ -11,13 +16,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +43,12 @@ public class TranslationResource {
 
     @Inject
     private TranslationService translationService;
+
+    @Inject
+    private TranslationRepository translationRepository;
+
+    @Inject
+    private TranslationMapper translationMapper;
 
     /**
      * POST  /translations : Create a new translation.
@@ -150,6 +167,52 @@ public class TranslationResource {
         log.debug("REST request to delete Translation : {}", id);
         translationService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("translation", id.toString())).build();
+    }
+
+    /**
+     * GET  /projects/{projectId}/translations : get all translations for the project
+     *
+     * @param projectId the id of the project to get all translations for to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the definitionDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/projects/{projectId}/release/{versionTag}/language/{languageCode}")
+    @ResponseBody
+    public ResponseEntity downloadTranslations(@PathVariable Long projectId, @PathVariable String versionTag, @PathVariable String languageCode) {
+        log.debug("REST request to get all Translations for project with id: {} and release {} and language {}", projectId, versionTag, languageCode);
+
+        //todo: remove the default tags if implemented
+        List<Translation> byProjectIdLanguageIdReleaseId = translationRepository.findByProjectIdLanguageIdReleaseId(projectId, Release.DEFAULT_TAG, Language.DEFAULT_LANGUAGE);
+
+        try {
+            File f = new File("deutsch.strings");
+            FileWriter fw = new FileWriter(f.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            for (Translation t : byProjectIdLanguageIdReleaseId) {
+                log.debug("Code: " + t.getDefinition().getCode());
+                log.debug("Translated text: " + t.getTranslatedText());
+                log.debug("Original text: " + t.getDefinition().getOriginalText());
+
+                bw.write("'" + t.getDefinition().getCode() + "' = '" + t.getTranslatedText() + "';");
+                bw.flush();
+            }
+            fw.flush();
+            fw.close();
+
+            byte[] file;
+            file = Files.readAllBytes(f.toPath());
+
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(new MediaType("application", "txt"));
+            header.set("Content-Disposition", "inline; filename=" + f.getName());
+            header.setContentLength(file.length);
+
+            return new ResponseEntity<>(file, header, HttpStatus.OK);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
