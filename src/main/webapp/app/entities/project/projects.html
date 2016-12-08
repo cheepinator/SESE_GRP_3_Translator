@@ -21,7 +21,7 @@
                     <th><span>ID</span></th>
                     <th><span>Name</span></th>
                     <!--<th><span>Upcoming Release</span></th>-->
-                    <th><span>Progress</span></th>
+                    <!--<th><span>Progress</span></th>-->
                     <th><span>Languages</span></th>
                     <th></th>
                 </tr>
@@ -32,18 +32,19 @@
                     <td><a ui-sref="project-detail({projectId:project.id})">{{project.name}}</a></td>
 
                     <!--<td>-->
-                        <!--{{getCurrentReleaseByProjectID(project.id)}}-->
-                        <!--<a ui-sref="release-detail({id:currentRelease.id})">-->
+                    <!--<a ui-sref="release-detail({id:currentRelease.id})">-->
                             <!--<span class="badge" uib-tooltip="{{vm.getReleaseTooltip(currentRelease)}}">{{currentRelease.versionTag}}</span>-->
                         <!--</a>-->
                     <!--</td>-->
+                    <!--<td>-->
+                        <!--&lt;!&ndash;{{getCountOfTranslationsByReleaseID(currentRelease.id) }}-->
+                       <!--{{countOfTranslations}}&ndash;&gt;-->
+                        <!--leer-->
+                    <!--</td>-->
                     <td>
-                        <!--{{getCountOfTranslationsByReleaseID(currentRelease.id) }}
-                       {{countOfTranslations}}-->
-                        leer
-                    </td>
-                    <td>
+                        {{getCurrentReleaseByProjectID(project.id)}}
                         <span ng-repeat="languages in currentRelease.languages">
+
                             <!--<a class="form-control-static" ui-sref="language-detail({id: languages.id})">-->
                                 {{languages.code}}{{$last ? '' : ', '}}
                             <!--</a>-->

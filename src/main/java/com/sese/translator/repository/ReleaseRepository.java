@@ -35,7 +35,7 @@ public interface ReleaseRepository extends JpaRepository<Release,Long> {
 //    @Query("select release from Release release join release.project where project.owner.login = ?#{principal.username}")
 //    List<Release> findByOwnerIsCurrentUser();
 
-    @Query("select release from Release release where release.project.owner.login = ?#{principal.username}")
+    @Query("select release from Release release left join fetch release.languages where release.project.owner.login = ?#{principal.username} ")
     List<Release> findByOwnerIsCurrentUser();
 
 }
