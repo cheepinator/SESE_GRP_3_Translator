@@ -1,7 +1,9 @@
 package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
+import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
@@ -29,6 +31,9 @@ public class ReleaseResource {
 
     @Inject
     private ReleaseService releaseService;
+
+    @Inject
+    private ProjectService projectService;
 
     /**
      * POST  /releases : Create a new release.
@@ -80,8 +85,8 @@ public class ReleaseResource {
     @GetMapping("/releases")
     @Timed
     public List<ReleaseDTO> getAllReleases() {
-        log.debug("REST request to get all Releases");
-        return releaseService.findAll();
+        log.debug("REST request to get all Releases for the current user");
+        return releaseService.findAllForCurrentUser(); //releaseService.findAll();
     }
 
     /**
@@ -94,10 +99,25 @@ public class ReleaseResource {
     @Timed
     public ResponseEntity<ReleaseDTO> getDefaultRelease(@PathVariable Long projectId) {
         log.debug("REST request to get the default release for project {}", projectId);
-        ReleaseDTO defaultReleaseForProject = releaseService.getDefaultReleaseForProject(projectId);
-        return Optional.ofNullable(defaultReleaseForProject)
-                       .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                       .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+        if(containsId(projectService.findAllOfCurrentUser(),projectId)) {
+            ReleaseDTO defaultReleaseForProject = releaseService.getDefaultReleaseForProject(projectId);
+            return Optional.ofNullable(defaultReleaseForProject)
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        }
+        else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+
+    private static boolean containsId(List<ProjectDTO> list, long id) {
+        for (ProjectDTO proj : list) {
+            System.out.println("comparing proj"+ proj.getId() + " with "+ id);
+            if (proj.getId() == id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -110,10 +130,13 @@ public class ReleaseResource {
     @Timed
     public ResponseEntity<List<ReleaseDTO>> getAllReleasesForProject(@PathVariable Long projectId) {
         log.debug("REST request to get the default release for project {}", projectId);
-        List<ReleaseDTO> releasesForProject = releaseService.findAllForProject(projectId);
-        return Optional.ofNullable(releasesForProject)
-                       .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                       .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        if(containsId(projectService.findAllOfCurrentUser(),projectId)) {
+            List<ReleaseDTO> releasesForProject = releaseService.findAllForProject(projectId);
+            return Optional.ofNullable(releasesForProject)
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        }
+        else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     /**
@@ -127,11 +150,16 @@ public class ReleaseResource {
     public ResponseEntity<ReleaseDTO> getRelease(@PathVariable Long id) {
         log.debug("REST request to get Release : {}", id);
         ReleaseDTO releaseDTO = releaseService.findOne(id);
-        return Optional.ofNullable(releaseDTO)
-            .map(result -> new ResponseEntity<>(
-                result,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        if(releaseDTO==null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        if(containsId(projectService.findAllOfCurrentUser(),releaseDTO.getProjectId())) {
+            return Optional.ofNullable(releaseDTO)
+                .map(result -> new ResponseEntity<>(
+                    result,
+                    HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        }
+        else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
 

@@ -4,6 +4,7 @@ import com.sese.translator.SeseTranslatorApp;
 import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Release;
 import com.sese.translator.repository.ReleaseRepository;
+import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
@@ -72,6 +73,9 @@ public class ReleaseResourceIntTest {
     private ReleaseService releaseService;
 
     @Inject
+    private ProjectService projectService;
+
+    @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Inject
@@ -89,7 +93,9 @@ public class ReleaseResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         ReleaseResource releaseResource = new ReleaseResource();
+        ProjectResource projectResource = new ProjectResource();
         ReflectionTestUtils.setField(releaseResource, "releaseService", releaseService);
+        ReflectionTestUtils.setField(projectResource, "projectService", projectService);
         this.restReleaseMockMvc = MockMvcBuilders.standaloneSetup(releaseResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -181,6 +187,7 @@ public class ReleaseResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser
     public void getAllReleases() throws Exception {
         // Initialize the database
         releaseRepository.saveAndFlush(release);
@@ -198,6 +205,7 @@ public class ReleaseResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser
     public void getRelease() throws Exception {
         // Initialize the database
         releaseRepository.saveAndFlush(release);
@@ -248,6 +256,7 @@ public class ReleaseResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser
     public void getNonExistingRelease() throws Exception {
         // Get the release
         restReleaseMockMvc.perform(get("/api/releases/{id}", Long.MAX_VALUE))
