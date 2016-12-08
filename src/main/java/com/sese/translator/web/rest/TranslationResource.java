@@ -205,10 +205,13 @@ public class TranslationResource {
 
         log.debug("Get translations for default language");
         List<Translation> defaultTranslations = translationRepository.findByProjectIdLanguageIdReleaseId(projectId, Release.DEFAULT_TAG, Language.DEFAULT_LANGUAGE);
+        log.debug("Got {} translations", defaultTranslations.size());
         StringBuilder stringBuilder = new StringBuilder();
         for (Translation t : defaultTranslations) {
+            log.debug("Process {}", t);
             stringBuilder.append("\"").append(t.getDefinition().getCode()).append("\" = \"").append(t.getTranslatedText()).append("\";\n");
         }
+        log.debug("Get byte array for {}", stringBuilder.toString());
         byte[] german_file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
 
         // append the english definitions
