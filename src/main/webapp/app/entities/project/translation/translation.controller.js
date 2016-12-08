@@ -5,10 +5,10 @@
         .module('seseTranslatorApp')
         .controller('TranslatorController', TranslatorController);
 
-    TranslatorController.$inject = ['$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter',
+    TranslatorController.$inject = ['$scope', '$state', '$stateParams', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter',
         'ReleaseTooltips', 'Definition', 'project', 'currentRelease', 'nextTranslation', 'language', 'previousState', 'Translation', 'NextTranslation'];
 
-    function TranslatorController($scope, $state, Project, Language, Release,
+    function TranslatorController($scope, $state, $stateParams, Project, Language, Release,
                                   CountTranslations, dateFilter, ReleaseTooltips, Definition,
                                   project, currentRelease, nextTranslation, language, previousState, Translation, NextTranslation) {
         var vm = this;
@@ -31,8 +31,8 @@
                     console.log(result);
                     NextTranslation.query(
                         {
-                            releaseId:vm.currentRelease.id,
-                            languageId:1//todo change for languages!
+                            releaseId:$stateParams.curReleaseId,
+                            languageId:$stateParams.languageId
                         }
                     ).$promise.then(function (result) {
                         console.log(result);
