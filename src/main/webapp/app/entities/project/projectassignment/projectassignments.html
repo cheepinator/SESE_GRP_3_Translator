@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-4 no-padding-left">
-                <button ng-show="vm.isOwner()" class="btn btn-primary" ui-sref="project-detail.projectassignment.new({projectId:vm.project.id})" >
+                <button ng-if="vm.isOwner()" class="btn btn-primary" ui-sref="project-detail.projectassignment.new({projectId:vm.project.id})" >
                     <span class="glyphicon glyphicon-plus"></span>
                     <span>
                         Assign new Role
@@ -32,7 +32,7 @@
                     <td>{{projectassignment.role}}</td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
-                            <button ng-show="vm.isOwner()" type="submit"
+                            <button ng-if="vm.isOwner()" type="submit"
                                     ui-sref="project-detail.projectassignment.delete({id:projectassignment.id})"
                                     class="btn btn-danger btn-sm">
                                 <span class="glyphicon glyphicon-remove-circle"></span>

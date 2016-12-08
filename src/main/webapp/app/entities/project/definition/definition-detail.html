@@ -12,7 +12,7 @@
         <dt><span>Original Text</span></dt>
         <dd>
             <span>{{vm.definition.originalText}}</span>
-            <button type="button" ng-show="vm.isDeveloper()"
+            <button type="button" ng-if="vm.isDeveloper()"
                     ui-sref="project-detail.definition-detail.edit({definitionId:vm.definition.id})"
                     class="btn btn-default btn-xs">
                 <span class="glyphicon glyphicon-pencil"></span>

@@ -33,9 +33,9 @@
 
                     <td>
                         {{getCurrentReleaseByProjectID(project.id)}}
-                        <a ui-sref="release-detail({id:currentRelease.id})">
+                        <!--<a ui-sref="release-detail({id:currentRelease.id})">-->
                             <span class="badge" uib-tooltip="{{vm.getReleaseTooltip(currentRelease)}}">{{currentRelease.versionTag}}</span>
-                        </a>
+                        <!--</a>-->
                     </td>
                     <td>
                         <!--{{getCountOfTranslationsByReleaseID(currentRelease.id) }}
@@ -44,7 +44,9 @@
                     </td>
                     <td>
                         <span ng-repeat="languages in currentRelease.languages">
-                            <a class="form-control-static" ui-sref="language-detail({id: languages.id})">{{languages.code}}</a>{{$last ? '' : ', '}}
+                            <!--<a class="form-control-static" ui-sref="language-detail({id: languages.id})">-->
+                                {{languages.code}}{{$last ? '' : ', '}}
+                            <!--</a>-->
                         </span>
                     </td>
                     <td class="text-right">
@@ -55,13 +57,13 @@
                                 <span class="glyphicon glyphicon-eye-open"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
-                            <button ng-show="vm.isOwner(project.ownerId)" type="submit"
+                            <button ng-if="vm.isOwner(project.ownerId)" type="submit"
                                     ui-sref="project.edit({projectId:project.id})"
                                     class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
-                            <button ng-show="vm.isOwner(project.ownerId)" type="submit"
+                            <button ng-if="vm.isOwner(project.ownerId)" type="submit"
                                     ui-sref="project.delete({projectId:project.id})"
                                     class="btn btn-danger btn-sm">
                                 <span class="glyphicon glyphicon-remove-circle"></span>

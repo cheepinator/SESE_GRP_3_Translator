@@ -1,6 +1,6 @@
 
 <div>
-    <button ng-show="vm.isOwner()" type="button" ui-sref="project-detail.projectassignment({id:vm.project.id})"
+    <button ng-if="vm.isOwner()" type="button" ui-sref="project-detail.projectassignment({id:vm.project.id})"
             class="btn btn-default" style="float: right;">
         <span class="glyphicon glyphicon-user"></span>
         <span class="hidden-xs hidden-sm">Manage Project Members</span>

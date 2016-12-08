@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-4 no-padding-left">
-                <button ng-show="vm.isDeveloper()" class="btn btn-primary" ui-sref="project-detail.new-definition" >
+                <button ng-if="vm.isDeveloper()" class="btn btn-primary" ui-sref="project-detail.new-definition" >
                     <span class="glyphicon glyphicon-plus"></span>
                     <span >
                         Create new Definition
@@ -51,13 +51,13 @@
                                 <span class="glyphicon glyphicon-eye-open"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
-                            <button ng-show="vm.isDeveloper()" type="submit"
+                            <button ng-if="vm.isDeveloper()" type="submit"
                                     ui-sref="project-detail.edit-definition({definitionId:definition.id})"
                                     class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
-                            <button ng-show="vm.isDeveloper()" type="submit"
+                            <button ng-if="vm.isDeveloper()" type="submit"
                                     ui-sref="project-detail.delete-definition({definitionId:definition.id})"
                                     class="btn btn-danger btn-sm">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
