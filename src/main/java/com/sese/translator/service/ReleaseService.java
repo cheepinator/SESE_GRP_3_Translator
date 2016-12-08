@@ -39,7 +39,7 @@ public interface ReleaseService {
      */
     ReleaseDTO findOne(Long id);
 
-
+    List<ReleaseDTO> findAllForCurrentUser();
     /**
      *  Count All Translations in the current Release
      *

@@ -1,10 +1,10 @@
 package com.sese.translator.repository;
 
+import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Release;
-
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -31,5 +31,11 @@ public interface ReleaseRepository extends JpaRepository<Release,Long> {
 
     @Query("select distinct release from Release release left join fetch release.languages where release.project.id = :projectId")
     List<Release> findByProjectIdWithEagerRelationships(@Param("projectId") Long projectId);
+
+//    @Query("select release from Release release join release.project where project.owner.login = ?#{principal.username}")
+//    List<Release> findByOwnerIsCurrentUser();
+
+    @Query("select release from Release release where release.project.owner.login = ?#{principal.username}")
+    List<Release> findByOwnerIsCurrentUser();
 
 }

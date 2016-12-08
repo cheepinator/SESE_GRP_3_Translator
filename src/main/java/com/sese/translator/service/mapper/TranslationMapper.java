@@ -22,6 +22,7 @@ public interface TranslationMapper {
     @Mapping(source = "translatorId", target = "translator")
     @Mapping(source = "languageId", target = "language")
     @Mapping(source = "definitionId", target = "definition")
+    @Mapping(source = "updateNeeded", target = "updateNeeded")
     Translation translationDTOToTranslation(TranslationDTO translationDTO);
 
     List<Translation> translationDTOsToTranslations(List<TranslationDTO> translationDTOs);

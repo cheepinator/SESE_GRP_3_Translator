@@ -112,11 +112,17 @@ public class ProjectResource {
     public ResponseEntity<ProjectDTO> getProject(@PathVariable Long id) {
         log.debug("REST request to get Project : {}", id);
         ProjectDTO projectDTO = projectService.findOne(id);
-        return Optional.ofNullable(projectDTO)
-                       .map(result -> new ResponseEntity<>(
-                           result,
-                           HttpStatus.OK))
-                       .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+        if(projectService.findAllOfCurrentUser().contains(projectDTO)) {
+            return Optional.ofNullable(projectDTO)
+                .map(result -> new ResponseEntity<>(
+                    result,
+                    HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+        }
+
+        else return new ResponseEntity<ProjectDTO>(HttpStatus.FORBIDDEN);
     }
 
     /**

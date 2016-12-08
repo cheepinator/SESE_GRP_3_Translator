@@ -6,6 +6,7 @@ import com.sese.translator.domain.Release;
 import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.TranslationService;
+import com.sese.translator.service.dto.NextTranslationDTO;
 import com.sese.translator.service.dto.TranslationDTO;
 import com.sese.translator.service.mapper.TranslationMapper;
 import com.sese.translator.web.rest.util.HeaderUtil;
@@ -85,7 +86,7 @@ public class TranslationResource {
         if (translationDTO.getId() == null) {
             return createTranslation(translationDTO);
         }
-        TranslationDTO result = translationService.save(translationDTO);
+        TranslationDTO result = translationService.update(translationDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("translation", translationDTO.getId().toString()))
             .body(result);
@@ -166,6 +167,23 @@ public class TranslationResource {
         log.debug("REST request to delete Translation : {}", id);
         translationService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("translation", id.toString())).build();
+    }
+
+    /**
+     * POST /release/next_definition get the next open Translation.
+     *
+     * @param nextTranslationDTO the request object
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @PostMapping("/release/next_translation")
+    @Timed
+    public ResponseEntity<TranslationDTO> getNextOpenTranslation(@Valid @RequestBody NextTranslationDTO nextTranslationDTO) {
+        log.debug("REST request the next definition of Release : {} with language: {}", nextTranslationDTO.getReleaseId(), nextTranslationDTO.getLanguageId());
+        TranslationDTO translationDTO = translationService.getNextOpenTranslation(nextTranslationDTO);
+        if (translationDTO == null) {
+            translationDTO = new TranslationDTO();
+        }
+        return new ResponseEntity<>(translationDTO, HttpStatus.OK);
     }
 
     /**

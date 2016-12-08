@@ -1,5 +1,6 @@
 package com.sese.translator.service;
 
+import com.sese.translator.service.dto.NextTranslationDTO;
 import com.sese.translator.service.dto.TranslationDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,14 @@ public interface TranslationService {
      * @return the persisted entity
      */
     TranslationDTO save(TranslationDTO translationDTO);
+
+    /**
+     * Updates a translation.
+     *
+     * @param translationDTO the entity to update
+     * @return the persisted entity
+     */
+    TranslationDTO update(TranslationDTO translationDTO);
 
     /**
      *  Get all the translations.
@@ -47,4 +56,14 @@ public interface TranslationService {
      *  @param id the id of the entity
      */
     void delete(Long id);
+
+
+    /**
+     *  Get the next open translation for a
+     *  release and language
+     *
+     *  @param dto the request Object
+     */
+    TranslationDTO getNextOpenTranslation(NextTranslationDTO dto);
+
 }

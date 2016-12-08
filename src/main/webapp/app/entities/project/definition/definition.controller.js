@@ -40,16 +40,12 @@
             });
         }
 
-        ProjectRoles.query({projectId: vm.project.id}, onSuccess);
-
-        function onSuccess(response) {
-            if (response.length > 0) {
-                vm.role = response[0];
-            }
-        }
+        ProjectRoles.query({projectId: vm.project.id}, function (response) {
+            vm.roles = response;
+        });
 
         function isDeveloper() {
-            return vm.role == 'DEVELOPER';
+            return vm.roles && vm.roles.includes('DEVELOPER');
         }
 
         function loadAll() {

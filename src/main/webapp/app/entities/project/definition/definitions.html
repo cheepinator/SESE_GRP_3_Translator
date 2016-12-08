@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-4 no-padding-left">
-                <button ng-show="vm.isDeveloper()" class="btn btn-primary" ui-sref="project-detail.new-definition" >
+                <button ng-if="vm.isDeveloper()" class="btn btn-primary" ui-sref="project-detail.new-definition" >
                     <span class="glyphicon glyphicon-plus"></span>
                     <span >
                         Create new Definition
@@ -17,7 +17,7 @@
         <table class="jh-table table table-striped">
             <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
-                    <th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <!--<th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>-->
                     <th jh-sort-by="code"><span>Code</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="originalText"><span>Original Text</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th><span>Available in</span></span></th>
@@ -27,7 +27,7 @@
             </thead>
             <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
                 <tr ng-repeat="definition in vm.definitions track by definition.id">
-                    <td>{{definition.id}}</td>
+                    <!--<td>{{definition.id}}</td>-->
                     <td><a ui-sref="project-detail.definition-detail({definitionId:definition.id})">{{definition.code}}</a></td>
                     <td>{{definition.originalText}}</td>
                     <td>
@@ -37,11 +37,11 @@
                         </span>
                     </td>
                     <td>
-                        <a ui-sref="release-detail({id:definition.releaseId})">
+                        <!--<a ui-sref="release-detail({id:definition.releaseId})">-->
                             <span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(definition.release)}}">
                                 {{definition.release.versionTag}}
                             </span>
-                        </a>
+                        <!--</a>-->
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
@@ -51,13 +51,13 @@
                                 <span class="glyphicon glyphicon-eye-open"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
-                            <button ng-show="vm.isDeveloper()" type="submit"
+                            <button ng-if="vm.isDeveloper()" type="submit"
                                     ui-sref="project-detail.edit-definition({definitionId:definition.id})"
                                     class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
-                            <button ng-show="vm.isDeveloper()" type="submit"
+                            <button ng-if="vm.isDeveloper()" type="submit"
                                     ui-sref="project-detail.delete-definition({definitionId:definition.id})"
                                     class="btn btn-danger btn-sm">
                                 <span class="glyphicon glyphicon-remove-circle"></span>

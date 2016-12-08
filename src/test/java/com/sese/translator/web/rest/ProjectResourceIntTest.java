@@ -274,6 +274,7 @@ public class ProjectResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser
     public void getProject() throws Exception {
         // Initialize the database
         projectRepository.saveAndFlush(project);
@@ -288,10 +289,11 @@ public class ProjectResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser
     public void getNonExistingProject() throws Exception {
         // Get the project
         restProjectMockMvc.perform(get("/api/projects/{id}", Long.MAX_VALUE))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
     }
 
     @WithMockUser

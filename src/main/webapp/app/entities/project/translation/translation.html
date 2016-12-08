@@ -1,0 +1,67 @@
+<div>
+    <h2><a ui-sref="project">Projects</a> /
+        <a ui-sref="project-detail({projectId:{{vm.project.id}}})">{{vm.project.name}}</a> /
+        Translation</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span>Release</span></dt>
+        <dd>
+            {{vm.currentRelease.versionTag}}
+        </dd>
+        <dt><span>Language</span></dt>
+        <dd>
+            {{vm.language.code}}
+        </dd>
+    </dl>
+    <div align="column" ng-if="vm.nextTranslation.id === null">
+        <h4> There are no translations needed for the Release and Language.</h4>
+        <button type="button"
+                ui-sref="{{ vm.previousState }}"
+                class="btn btn-info">
+            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+        </button>
+    </div>
+    <div align="column" ng-if="vm.nextTranslation.id != null">
+
+        <form name="editForm" role="form" novalidate ng-submit="vm.saveAndNext()" show-validation>
+            <div class="modal-body">
+                <jhi-alert-error></jhi-alert-error>
+                <div class="form-group">
+                    <label class="control-label">Definition-Code: {{vm.definition.code}}</label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="field_originalText">Original Text</label>
+                    <textarea class="form-control" name="originalText" id="field_originalText"
+                              ng-model="vm.definition.originalText" readonly></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="field_translation">Translated Text</label>
+                    <textarea class="form-control" name="translationText" id="field_translation"
+                              ng-model="vm.nextTranslation.translatedText" required></textarea>
+                    <div ng-show="editForm.translationText.$invalid">
+                        <p class="help-block"
+                           ng-show="editForm.translationText.$error.required">
+                            The Translation must not be empty.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div id="buttonRow" align="row">
+                <button type="button"
+                        ui-sref="{{ vm.previousState }}"
+                        class="btn btn-info">
+                    <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+                </button>
+
+                <button type="submit"
+                        ng-if="vm.nextTranslation.id != null"
+                        class="btn btn-info"
+                        ng-disabled="editForm.$invalid">
+                    <span class="glyphicon glyphicon-arrow-right"></span>&nbsp;<span> Save and Next</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,11 +1,9 @@
 package com.sese.translator.service.dto;
 
-import javax.validation.constraints.*;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Objects;
 import javax.persistence.Lob;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.Objects;
 
 
 /**
@@ -23,11 +21,13 @@ public class TranslationDTO implements Serializable {
 
 
     private Long translatorId;
-    
+
+    @NotNull
     private Long languageId;
-    
+
+    @NotNull
     private Long definitionId;
-    
+
     public Long getId() {
         return id;
     }

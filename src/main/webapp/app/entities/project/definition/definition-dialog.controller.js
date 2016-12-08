@@ -24,8 +24,14 @@
             vm.definition.releaseId = vm.defaultRelease.id;
         }
 
+        vm.isEdit = vm.definition.id != null;
+
         $timeout(function (){
-            angular.element('.form-group:eq(1)>input').focus();
+            if (vm.isEdit) {
+                angular.element('.form-group:eq(1)>textarea').focus();
+            } else {
+                angular.element('.form-group:eq(0)>input').focus();
+            }
         });
 
         function clear () {

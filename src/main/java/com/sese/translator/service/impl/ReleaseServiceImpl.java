@@ -90,6 +90,22 @@ public class ReleaseServiceImpl implements ReleaseService {
         return result;
     }
 
+
+    /**
+     * Get all the releases for the current owner .
+     *
+     * @return the list of entities
+     */
+    @Transactional(readOnly = true)
+    public List<ReleaseDTO> findAllForCurrentUser() {
+        log.debug("Request to get all Releases for CurrentUser");
+        List<ReleaseDTO> result = releaseRepository.findByOwnerIsCurrentUser().stream()
+            .map(releaseMapper::releaseToReleaseDTO)
+            .collect(Collectors.toCollection(LinkedList::new));
+
+        return result;
+    }
+
     /**
      * Get all the releases for the given project id.
      *

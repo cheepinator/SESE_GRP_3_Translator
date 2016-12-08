@@ -4,7 +4,6 @@ import com.sese.translator.SeseTranslatorApp;
 import com.sese.translator.domain.User;
 import com.sese.translator.repository.UserRepository;
 import com.sese.translator.service.UserService;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +73,18 @@ public class UserResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.lastName").value("Administrator"));
+    }
+
+    @Test
+    public void testGetExistingUser_nameOnly() throws Exception {
+        User user = userService.getUserWithAuthoritiesByLogin("user")
+                               .orElseThrow(() -> new IllegalStateException("Could not find User 'user'"));
+
+        restUserMockMvc.perform(get("/api/users/{id}/name", user.getId())
+            .accept(MediaType.APPLICATION_JSON))
+                       .andExpect(status().isOk())
+                       .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                       .andExpect(jsonPath("$.name").value("user"));
     }
 
     @Test
