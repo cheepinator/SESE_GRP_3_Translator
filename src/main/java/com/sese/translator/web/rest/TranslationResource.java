@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
@@ -210,10 +211,10 @@ public class TranslationResource {
 
                 stringBuilder.append("'" + t.getDefinition().getCode() + "' = '" + t.getTranslatedText() + "';\n");
             }
-            byte[] file = stringBuilder.toString().getBytes();
+            byte[] file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
 
             // make the zip file...
-            ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream("tmp.zip"));
+            ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream("tmp.zip"), StandardCharsets.UTF_8);
             zipOutputStream.putNextEntry(new ZipEntry("german.strings"));
             zipOutputStream.write(file);
             zipOutputStream.close();
