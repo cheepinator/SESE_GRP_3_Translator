@@ -16,7 +16,9 @@
         vm.projects = [];
         vm.languages = [];
         vm.releases = [];
+        vm.roles = [];
         vm.isOwner = isOwner;
+        vm.isDeveloper = isDeveloper;
         getAccount();
         loadAll();
 
@@ -30,6 +32,10 @@
             return id == vm.account.id;
         }
 
+        function isDeveloper() {
+            return vm.roles && vm.roles.includes('DEVELOPER');
+        }
+
         function loadAll() {
             Project.query(function (result) {
                 vm.projects = result;
@@ -40,6 +46,10 @@
 
             Release.query(function (result) {
                 vm.releases = result
+            });
+
+            ProjectRoles.query({projectId: vm.project.id}, function(response) {
+                vm.roles = response;
             });
         }
 
