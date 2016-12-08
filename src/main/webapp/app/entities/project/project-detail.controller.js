@@ -5,27 +5,47 @@
         .module('seseTranslatorApp')
         .controller('ProjectDetailController', ProjectDetailController);
 
-    ProjectDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'project',
+    ProjectDetailController.$inject = ['$state','$scope', '$rootScope', '$stateParams', 'previousState', 'project',
         'projectReleases', 'Project', 'Release', 'User', 'ProjectRoles'];
 
-    function ProjectDetailController($scope, $rootScope, $stateParams, previousState, project, projectReleases,
+    function ProjectDetailController($state,$scope, $rootScope, $stateParams, previousState, project, projectReleases,
                                      Project, Release, User, ProjectRoles) {
         var vm = this;
+
+        vm.goToTranslate = goToTranslate;
 
         vm.project = project;
         vm.previousState = previousState.name;
         vm.releases = projectReleases;
+        vm.currentRelease = null;
         vm.role = "Keine Rolle";
-        var unsubscribe = $rootScope.$on('seseTranslatorApp:projectUpdate', function (event, result) {
-            vm.project = result;
-        });
 
-        ProjectRoles.query({projectId: vm.project.id}, onSuccess);
+        activate();
 
-        function onSuccess(response) {
-            vm.role = response[0];
+        function activate() {
+            var unsubscribe = $rootScope.$on('seseTranslatorApp:projectUpdate', function (event, result) {
+                vm.project = result;
+            });
+
+            $scope.$on('$destroy', unsubscribe);
+
+            ProjectRoles.query({projectId: vm.project.id}, onSuccess);
+            function onSuccess(response) {
+                if(response[0] != null){
+                    vm.role = response[0];
+                }
+            }
+
+            for(var x in vm.releases){
+                if(vm.releases[x].isCurrentRelease){
+                    vm.currentRelease = vm.releases[x];
+                }
+            }
+
         }
 
-        $scope.$on('$destroy', unsubscribe);
+        function goToTranslate() {
+            $state.go('project-detail.translation', { curReleaseId:vm.currentRelease.id.toString() });//todo send language id
+        }
     }
 })();

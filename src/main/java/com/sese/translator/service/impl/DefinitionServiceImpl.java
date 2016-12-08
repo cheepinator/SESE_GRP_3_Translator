@@ -1,7 +1,10 @@
 package com.sese.translator.service.impl;
 
 import com.sese.translator.domain.Definition;
+import com.sese.translator.domain.Language;
+import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.DefinitionRepository;
+import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.DefinitionService;
 import com.sese.translator.service.dto.DefinitionDTO;
 import com.sese.translator.service.mapper.DefinitionMapper;
@@ -29,6 +32,9 @@ public class DefinitionServiceImpl implements DefinitionService{
     @Inject
     private DefinitionMapper definitionMapper;
 
+    @Inject
+    private TranslationRepository translationRepository;
+
     /**
      * Save a definition.
      *
@@ -38,7 +44,20 @@ public class DefinitionServiceImpl implements DefinitionService{
     public DefinitionDTO save(DefinitionDTO definitionDTO) {
         log.debug("Request to save Definition : {}", definitionDTO);
         Definition definition = definitionMapper.definitionDTOToDefinition(definitionDTO);
+        //new definition with release
         definition = definitionRepository.save(definition);
+        if(definition.getRelease() != null){
+            for(Language lang : definition.getRelease().getLanguages()){
+                if(!definition.getTranslations().stream().map(Translation::getLanguage).anyMatch(a->lang.equals(a))){
+                    Translation translation = new Translation();
+                    translation.setUpdateNeeded(true);
+                    translation.setLanguage(lang);
+                    translation.setDefinition(definition);
+                    translationRepository.save(translation);
+
+                }
+            }
+        }
         DefinitionDTO result = definitionMapper.definitionToDefinitionDTO(definition);
         return result;
     }

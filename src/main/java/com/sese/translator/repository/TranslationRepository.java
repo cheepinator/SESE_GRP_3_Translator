@@ -22,4 +22,10 @@ public interface TranslationRepository extends JpaRepository<Translation,Long> {
     @Query("select translation from Translation translation where translation.definition.release.project.id = :id")
     List<Translation> findByProjectId(@Param("id") Long id);
 
+    @Query("select translation from Translation translation where " +
+        "translation.updateNeeded = true and " +
+        "translation.definition.release.id = :releaseId and " +
+        "translation.language.id = :languageId")
+    List<Translation> findOpenTranslationsByReleaseAndLanguage(@Param("releaseId") Long releaseId, @Param("languageId") Long languageId);
+
 }
