@@ -6,10 +6,12 @@
         .controller('ProjectController', ProjectController);
 
     ProjectController.$inject = ['$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter', 'Principal',
-        'ReleaseTooltips'];
+        'ReleaseTooltips', '$location'];
 
-    function ProjectController($scope, $state, Project, Language, Release, CountTranslations, dateFilter, Principal, ReleaseTooltips) {
+    function ProjectController($scope, $state, Project, Language, Release, CountTranslations, dateFilter, Principal, ReleaseTooltips, $location) {
         var vm = this;
+
+        vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
 
         vm.projects = [];
         vm.languages = [];

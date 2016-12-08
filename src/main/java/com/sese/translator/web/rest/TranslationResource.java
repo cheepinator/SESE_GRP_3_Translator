@@ -22,15 +22,14 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * REST controller for managing Translation.
@@ -170,7 +169,7 @@ public class TranslationResource {
     }
 
     /**
-     * GET  /projects/{projectId}/translations : get all translations for the project
+     * GET  /projects/{projectId}/release/{versionTag}/language/{languageCode} : get all translations for the project
      *
      * @param projectId the id of the project to get all translations for to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the definitionDTO, or with status 404 (Not Found)
@@ -180,34 +179,37 @@ public class TranslationResource {
     public ResponseEntity downloadTranslations(@PathVariable Long projectId, @PathVariable String versionTag, @PathVariable String languageCode) {
         log.debug("REST request to get all Translations for project with id: {} and release {} and language {}", projectId, versionTag, languageCode);
 
-        //todo: remove the default tags if implemented
+        //todo: remove the default tags and language if implemented
         List<Translation> byProjectIdLanguageIdReleaseId = translationRepository.findByProjectIdLanguageIdReleaseId(projectId, Release.DEFAULT_TAG, Language.DEFAULT_LANGUAGE);
 
         try {
-            File f = new File("deutsch.strings");
-            FileWriter fw = new FileWriter(f.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
+            StringBuilder stringBuilder = new StringBuilder();
 
             for (Translation t : byProjectIdLanguageIdReleaseId) {
                 log.debug("Code: " + t.getDefinition().getCode());
                 log.debug("Translated text: " + t.getTranslatedText());
                 log.debug("Original text: " + t.getDefinition().getOriginalText());
 
-                bw.write("'" + t.getDefinition().getCode() + "' = '" + t.getTranslatedText() + "';");
-                bw.flush();
+                stringBuilder.append("'" + t.getDefinition().getCode() + "' = '" + t.getTranslatedText() + "';\n");
             }
-            fw.flush();
-            fw.close();
+            byte[] file = stringBuilder.toString().getBytes();
 
-            byte[] file;
-            file = Files.readAllBytes(f.toPath());
+            // make the zip file...
+            ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream("tmp.zip"));
+            zipOutputStream.putNextEntry(new ZipEntry("german.strings"));
+            zipOutputStream.write(file);
+            zipOutputStream.close();
 
+            File zipfile = new File("tmp.zip");
+            byte[] downloadFile = Files.readAllBytes(zipfile.toPath());
+
+            // set the headers
             HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "txt"));
-            header.set("Content-Disposition", "inline; filename=" + f.getName());
-            header.setContentLength(file.length);
+            header.setContentType(new MediaType("application", "zip"));
+            header.set("Content-Disposition", "inline; filename=" + projectId + ".zip");
+            header.setContentLength(downloadFile.length);
 
-            return new ResponseEntity<>(file, header, HttpStatus.OK);
+            return new ResponseEntity<>(downloadFile, header, HttpStatus.OK);
 
         } catch (IOException e) {
             e.printStackTrace();
