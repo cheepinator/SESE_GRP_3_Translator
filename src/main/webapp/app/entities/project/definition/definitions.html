@@ -2,13 +2,17 @@
     <h3>Definitions</h3>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-xs-4 no-padding-left">
+            <div class="no-padding-left">
                 <button ng-if="vm.isDeveloper()" class="btn btn-primary" ui-sref="project-detail.new-definition" >
                     <span class="glyphicon glyphicon-plus"></span>
                     <span >
                         Create new Definition
                     </span>
                 </button>
+                <a ng-if="vm.isDeveloper()" class="btn btn-default" ng-href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/release/null/language/null" >
+                    <span class="glyphicon glyphicon-download"></span>
+                    <span class="hidden-xs">Download</span>
+                </a>
             </div>
         </div>
     </div>

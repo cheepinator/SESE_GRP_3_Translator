@@ -1,16 +1,13 @@
 <div>
     <div id="upperButtonRow" style="float: right;">
-
-
         <button ng-if="vm.isOwner()" type="button" ui-sref="project-detail.projectassignment({id:vm.project.id})"
                 class="btn btn-default" style="float: right;">
             <span class="glyphicon glyphicon-user"></span>
             <span class="hidden-xs hidden-sm">Manage Project Members</span>
         </button>
-        <!--ng-if=""-->
         <button ng-if="vm.isTranslator()" class="btn btn-default" ng-click="vm.goToTranslate()">
             <span class="glyphicon glyphicon-globe"></span>
-            <span>Start Translating</span>
+            <span class="hidden-xs">Start Translating</span>
         </button>
     </div>
     <h2><a ui-sref="project">Projects</a> / {{vm.project.name}}</h2>

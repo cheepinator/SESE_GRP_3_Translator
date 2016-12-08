@@ -209,7 +209,7 @@ public class TranslationResource {
 
         StringBuilder stringBuilder = new StringBuilder();
         for (Translation t : byProjectIdLanguageIdReleaseId) {
-            stringBuilder.append("'" + t.getDefinition().getCode() + "' = '" + t.getTranslatedText() + "';\n");
+            stringBuilder.append("\"").append(t.getDefinition().getCode()).append("\" = \"").append(t.getTranslatedText()).append("\";\n");
         }
         byte[] language_file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
 
@@ -217,7 +217,7 @@ public class TranslationResource {
         stringBuilder.setLength(0);
         List<Definition> byProjectIdAndVersionTag = definitionRepository.findByProjectIdAndVersionTag(projectId, Release.DEFAULT_TAG);
         for (Definition d : byProjectIdAndVersionTag) {
-            stringBuilder.append("'" + d.getCode() + "' = '" + d.getOriginalText() + "';\n");
+            stringBuilder.append("\"").append(d.getCode()).append("\" = \"").append(d.getOriginalText()).append("\";\n");
         }
         byte[] definition_file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
 
