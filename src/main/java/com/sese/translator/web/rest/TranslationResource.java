@@ -203,6 +203,7 @@ public class TranslationResource {
         //todo: remove the default tags and language if implemented
         //todo: also some security that only a developer of a project can do this
 
+        log.debug("Get translations for default language");
         List<Translation> defaultTranslations = translationRepository.findByProjectIdLanguageIdReleaseId(projectId, Release.DEFAULT_TAG, Language.DEFAULT_LANGUAGE);
         StringBuilder stringBuilder = new StringBuilder();
         for (Translation t : defaultTranslations) {
@@ -212,6 +213,7 @@ public class TranslationResource {
 
         // append the english definitions
         stringBuilder.setLength(0);
+        log.debug("Get definitions");
         List<Definition> getDefinitionsFromRelease = definitionRepository.findByProjectIdAndVersionTag(projectId, Release.DEFAULT_TAG);
         for (Definition d : getDefinitionsFromRelease) {
             stringBuilder.append("\"").append(d.getCode()).append("\" = \"").append(d.getOriginalText()).append("\";\n");
@@ -220,22 +222,26 @@ public class TranslationResource {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream, StandardCharsets.UTF_8)) {
+            log.debug("Append default language file to zip");
             zipOutputStream.putNextEntry(new ZipEntry("german.strings"));
             zipOutputStream.write(german_file);
+            log.debug("Append definitions file to zip");
             zipOutputStream.putNextEntry(new ZipEntry("english.strings"));
             zipOutputStream.write(definition_file);
         } catch (IOException e) {
             log.error("Failed to generate zip file to download", e);
             return null;
         }
+        log.debug("Zip file was assembled, get bytes and prepare headers");
         byte[] downloadFile = outputStream.toByteArray();
 
         // set the headers
         HttpHeaders header = new HttpHeaders();
         header.setContentType(new MediaType("application", "zip"));
         header.set("Content-Disposition", "inline; filename=" + projectId + ".zip");
-        header.setContentLength(outputStream.toByteArray().length);
+        header.setContentLength(downloadFile.length);
 
+        log.debug("Zip file finished");
         return new ResponseEntity<>(downloadFile, header, HttpStatus.OK);
     }
 
