@@ -53,7 +53,7 @@
                             url: $state.href($state.current.name, $state.params)
                         };
                         // fix for issue of sub pages overriding the correct previous sate in modal dialogs via 'reload' current page
-                        if (currentStateData.name.startsWith('translation')) {
+                        if (currentStateData.name.includes('translation')) {
                             currentStateData.name = 'project-detail'
                         }
                         return currentStateData;

@@ -24,6 +24,18 @@
                 }
             },
             resolve: {
+                previousState: ["$state", function ($state) {
+                    var currentStateData = {
+                        name: $state.current.name || 'project-detail',
+                        params: $state.params,
+                        url: $state.href($state.current.name, $state.params)
+                    };
+                    // fix for issue of sub pages overriding the correct previous sate in modal dialogs via 'reload' current page
+                    if (currentStateData.name.includes ('projectassignment')) {
+                        currentStateData.name = 'project-detail'
+                    }
+                    return currentStateData;
+                }]
             }
         })
         .state('project-detail.projectassignment.new', {
