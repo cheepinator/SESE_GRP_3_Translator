@@ -25,10 +25,6 @@
             vm.isOwner = isOwner;
             vm.isTranslator = isTranslator;
 
-            var unsubscribe = $rootScope.$on('seseTranslatorApp:projectUpdate', function (event, result) {
-                vm.project = result;
-            });
-
             getAccount();
             activate();
 
