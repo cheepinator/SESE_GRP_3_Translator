@@ -59,7 +59,8 @@ public class ReleaseServiceImpl implements ReleaseService {
     public ReleaseDTO createDefaultRelease(ProjectDTO projectDTO) {
         log.debug("Creating default release for Project: {}", projectDTO);
         Project project = projectMapper.projectDTOToProject(projectDTO);
-        Release release = new Release().versionTag(Release.DEFAULT_TAG).project(project).isCurrentRelease(false);
+        // todo: change the current release back to false if we have proper release management
+        Release release = new Release().versionTag(Release.DEFAULT_TAG).project(project).isCurrentRelease(true);
         release.addLanguages(getDefaultLanguage());
         release = releaseRepository.save(release);
         ReleaseDTO result = releaseMapper.releaseToReleaseDTO(release);
