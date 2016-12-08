@@ -55,13 +55,13 @@
                                 <span class="glyphicon glyphicon-eye-open"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
-                            <button type="submit"
+                            <button ng-show="vm.isOwner(project.ownerId)" type="submit"
                                     ui-sref="project.edit({projectId:project.id})"
                                     class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
-                            <button type="submit"
+                            <button ng-show="vm.isOwner(project.ownerId)" type="submit"
                                     ui-sref="project.delete({projectId:project.id})"
                                     class="btn btn-danger btn-sm">
                                 <span class="glyphicon glyphicon-remove-circle"></span>

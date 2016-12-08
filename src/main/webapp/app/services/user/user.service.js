@@ -3,9 +3,11 @@
 
     angular
         .module('seseTranslatorApp')
-        .factory('User', User);
+        .factory('User', User)
+        .factory('UserName', UserName);
 
     User.$inject = ['$resource'];
+    UserName.$inject = ['$resource'];
 
     function User ($resource) {
         var service = $resource('api/users/:login', {}, {
@@ -23,5 +25,19 @@
         });
 
         return service;
+    }
+
+    function UserName ($resource) {
+        return $resource('api/users/:id/name', {}, {
+            'get': {
+                method: 'GET',
+                transformResponse: function (data) {
+                    if (data) {
+                        data = angular.fromJson(data);
+                    }
+                    return data;
+                }
+            }
+        });
     }
 })();

@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular
@@ -6,10 +6,10 @@
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
     ProjectDefinitionController.$inject = ['$scope', '$state', 'project', 'projectReleases', 'DataUtils',
-        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations'];
+        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles'];
 
-    function ProjectDefinitionController ($scope, $state, project, projectReleases, DataUtils, ProjectDefinition,
-                                          ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations) {
+    function ProjectDefinitionController($scope, $state, project, projectReleases, DataUtils, ProjectDefinition,
+                                         ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations, Principal, ProjectRoles) {
         var vm = this;
 
         vm.project = project;
@@ -30,10 +30,25 @@
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
         vm.getLanguageCode = getLanguageCode;
         vm.getTranslations = getTranslations;
-
+        vm.isDeveloper = isDeveloper;
         loadAll();
+        getAccount();
 
-        function loadAll () {
+        function getAccount() {
+            Principal.identity().then(function (account) {
+                vm.account = account;
+            });
+        }
+
+        ProjectRoles.query({projectId: vm.project.id}, function (response) {
+            vm.roles = response;
+        });
+
+        function isDeveloper() {
+            return vm.roles && vm.roles.includes('DEVELOPER');
+        }
+
+        function loadAll() {
             ProjectDefinition.query({
                 projectId: vm.project.id,
                 page: vm.page,
@@ -94,7 +109,7 @@
             });
         }
 
-        function reset () {
+        function reset() {
             vm.page = 0;
             vm.definitions = [];
             vm.translations = [];

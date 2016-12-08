@@ -159,7 +159,7 @@
     }
 
     function ProjectRoles ($resource) {
-        var resourceUrl = 'api/projects/userRole/:projectId';
+        var resourceUrl = 'api/projects/:projectId/userRoles/';
         return $resource(resourceUrl, {}, {
             'query': { method: 'GET', isArray: true}
         });

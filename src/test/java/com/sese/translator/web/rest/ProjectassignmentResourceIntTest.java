@@ -1,26 +1,21 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
-
 import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Projectassignment;
-import com.sese.translator.domain.User;
-import com.sese.translator.repository.ProjectRepository;
+import com.sese.translator.domain.enumeration.Projectrole;
 import com.sese.translator.repository.ProjectassignmentRepository;
-import com.sese.translator.repository.UserRepository;
 import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectassignmentDTO;
 import com.sese.translator.service.mapper.ProjectassignmentMapper;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -33,10 +28,10 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import com.sese.translator.domain.enumeration.Projectrole;
 /**
  * Test class for the ProjectassignmentResource REST controller.
  *
@@ -77,6 +72,7 @@ public class ProjectassignmentResourceIntTest {
         ProjectassignmentResource projectassignmentResource = new ProjectassignmentResource();
         ReflectionTestUtils.setField(projectassignmentResource, "projectassignmentRepository", projectassignmentRepository);
         ReflectionTestUtils.setField(projectassignmentResource, "projectassignmentMapper", projectassignmentMapper);
+        ReflectionTestUtils.setField(projectassignmentResource, "userService", userService);
         this.restProjectassignmentMockMvc = MockMvcBuilders.standaloneSetup(projectassignmentResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -89,26 +85,21 @@ public class ProjectassignmentResourceIntTest {
      * if they test an entity which requires the current entity.
      */
     public static Projectassignment createEntity(EntityManager em) {
-        User u = new User();
-        u.setLogin("sfsd");
-        u.setPassword("ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
-        u.setActivated(true);
-
         Project p = new Project().name("test");
-
-        em.persist(u);
         em.persist(p);
         em.flush();
 
-        Projectassignment projectassignment = new Projectassignment()
-                .role(DEFAULT_ROLE).assignedProject(p).assignedUser(u);
-        return projectassignment;
+        return new Projectassignment()
+                .role(DEFAULT_ROLE).assignedProject(p);
     }
 
     @Before
     public void initTest() {
         projectassignment = createEntity(em);
-        userService.getUserWithAuthoritiesByLogin("user").ifPresent(user -> projectassignment.getAssignedProject().setOwner(user));
+        userService.getUserWithAuthoritiesByLogin("user").ifPresent(user -> {
+            projectassignment.getAssignedProject().setOwner(user);
+            projectassignment.setAssignedUser(user);
+        });
     }
 
     @Test
@@ -177,6 +168,35 @@ public class ProjectassignmentResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(projectassignment.getId().intValue()))
             .andExpect(jsonPath("$.role").value(DEFAULT_ROLE.toString()));
+    }
+
+    @Test
+    @Transactional
+    public void getProjectassignment_forProject() throws Exception {
+        // Initialize the database
+        projectassignmentRepository.saveAndFlush(projectassignment);
+
+        // Get the projectassignment
+        restProjectassignmentMockMvc.perform(get("/api/projects/{projectId}/projectassignments", projectassignment.getAssignedProject().getId()))
+                                    .andExpect(status().isOk())
+                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                                    .andExpect(jsonPath("$.[*].id").value(hasItem(projectassignment.getId().intValue())))
+                                    .andExpect(jsonPath("$.[*].role").value(hasItem(DEFAULT_ROLE.toString())));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    public void getUserRoles_forProject() throws Exception {
+        // Initialize the database
+        projectassignmentRepository.saveAndFlush(projectassignment);
+
+        // Get the user roles for the current user as string
+        restProjectassignmentMockMvc.perform(get("/api//projects/{projectId}/userRoles", projectassignment.getAssignedProject().getId()))
+                                    .andExpect(status().isOk())
+                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                                    .andExpect(jsonPath("$.[*]").value(hasSize(1)))
+                                    .andExpect(jsonPath("$.[*]").value(hasItem(projectassignment.getRole().name())));
     }
 
     @Test

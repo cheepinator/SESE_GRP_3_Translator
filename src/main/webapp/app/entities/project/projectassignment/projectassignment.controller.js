@@ -5,17 +5,28 @@
         .module('seseTranslatorApp')
         .controller('ProjectassignmentController', ProjectassignmentController);
 
-    ProjectassignmentController.$inject = ['$scope', '$state', 'project', 'Projectassignment', 'Project', 'ProjectassignmentProject', 'User'];
+    ProjectassignmentController.$inject = ['$scope', '$state', 'project', 'Projectassignment', 'Project', 'ProjectassignmentProject', 'User', 'Principal'];
 
-    function ProjectassignmentController ($scope, $state, project, Projectassignment, Project, ProjectassignmentProject, User) {
+    function ProjectassignmentController ($scope, $state, project, Projectassignment, Project, ProjectassignmentProject, User, Principal) {
         var vm = this;
 
         vm.projectassignments = [];
         vm.projects = [];
         vm.users = [];
+        vm.isOwner = isOwner;
         vm.project = project;
 
+        getAccount();
         loadAll();
+        function getAccount() {
+            Principal.identity().then(function (account) {
+                vm.account = account;
+            });
+        }
+
+        function isOwner() {
+            return vm.project.ownerId == vm.account.id;
+        }
 
         function loadAll() {
             ProjectassignmentProject.query({projectId: vm.project.id},function(result) {

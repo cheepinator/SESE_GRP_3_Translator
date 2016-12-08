@@ -1,15 +1,11 @@
 package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.sese.translator.domain.Projectassignment;
-import com.sese.translator.domain.User;
 import com.sese.translator.repository.ProjectassignmentRepository;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
-import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
-import com.sese.translator.service.mapper.ProjectassignmentMapper;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +17,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -42,12 +36,7 @@ public class ProjectResource {
     private ProjectMapper projectMapper;
 
     @Inject
-    private UserService userService;
-    @Inject
     private ProjectassignmentRepository projectassignmentRepository;
-
-    @Inject
-    private ProjectassignmentMapper projectassignmentMapper;
 
     @Inject
     private ReleaseService releaseService;
@@ -123,57 +112,17 @@ public class ProjectResource {
     public ResponseEntity<ProjectDTO> getProject(@PathVariable Long id) {
         log.debug("REST request to get Project : {}", id);
         ProjectDTO projectDTO = projectService.findOne(id);
-        return Optional.ofNullable(projectDTO)
-                       .map(result -> new ResponseEntity<>(
-                           result,
-                           HttpStatus.OK))
-                       .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
 
+        if(projectService.findAllOfCurrentUser().contains(projectDTO)) {
+            return Optional.ofNullable(projectDTO)
+                .map(result -> new ResponseEntity<>(
+                    result,
+                    HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
-    /**
-     * Get all Users of an Project.
-     *
-     * @param id of the project.
-     * @return a List of Users.
-     */
-    @GetMapping("/project/users/{id}")
-    @Timed
-    public List<User> getProjectUsers(@PathVariable Long id) {
-
-        List<Projectassignment> projectassignments = projectassignmentRepository.findByAssignedProject(
-            projectMapper.projectDTOToProject(projectService.findOne(id)));
-        // not work with userMapper.userToUserDTO
-        List<User> result = new ArrayList<>();
-
-        for (Projectassignment projectassignment : projectassignments) {
-            result.add(projectassignment.getAssignedUser());
         }
 
-        return result;
-    }
-
-    /**
-     * Get all Roles of the authentified user for a project.
-     *
-     * @param id of the project.
-     * @return a List of Roles.
-     */
-    @GetMapping("/projects/userRole/{id}")
-    @Timed
-    public List<String> getUserRoleForProject(@PathVariable Long id) {
-
-        List<Projectassignment> projectassignments = projectassignmentRepository.findByAssignedUser(userService.getUserWithAuthorities());
-
-        List<String> result = new ArrayList<>();
-
-        for (Projectassignment projectassignment : projectassignments) {
-            if (Objects.equals(projectassignment.getAssignedProject().getId(), id)) {
-                result.add(projectassignment.getRole().name());
-            }
-        }
-
-        return result;
+        else return new ResponseEntity<ProjectDTO>(HttpStatus.FORBIDDEN);
     }
 
     /**

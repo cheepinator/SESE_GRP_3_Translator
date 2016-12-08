@@ -6,11 +6,12 @@
         .controller('ProjectDefinitionDetailController', ProjectDefinitionDetailController);
 
     ProjectDefinitionDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'DataUtils',
-        'project', 'definition', 'release', 'translations', 'Definition', 'Translation', 'Release', 'ReleaseTooltips'];
+        'project', 'definition', 'release', 'translations', 'Definition', 'Translation', 'Release', 'ReleaseTooltips',
+        'ProjectRoles'];
 
     function ProjectDefinitionDetailController($scope, $rootScope, $stateParams, previousState, DataUtils, project,
                                                definition, release, translations, Definition, Translation, Release,
-                                               ReleaseTooltips) {
+                                               ReleaseTooltips, ProjectRoles) {
         var vm = this;
 
         vm.project = project;
@@ -23,6 +24,7 @@
         vm.openFile = DataUtils.openFile;
 
         vm.getTranslation = getTranslation;
+        vm.isDeveloper = isDeveloper;
 
         function getTranslation(languageId) {
             // save the translation in the current scope i.e. in our case inside a ng-repeat for just the current element
@@ -32,6 +34,14 @@
         }
 
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
+
+        ProjectRoles.query({projectId: vm.project.id}, function (response) {
+            vm.roles = response;
+        });
+
+        function isDeveloper() {
+            return vm.roles && vm.roles.includes('DEVELOPER');
+        }
 
         var unsubscribe = $rootScope.$on('seseTranslatorApp:definitionUpdate', function (event, result) {
             vm.definition = result;

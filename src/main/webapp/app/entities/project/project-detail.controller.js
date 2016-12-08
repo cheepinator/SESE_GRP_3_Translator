@@ -1,51 +1,79 @@
 (function () {
-    'use strict';
+        'use strict';
 
-    angular
-        .module('seseTranslatorApp')
-        .controller('ProjectDetailController', ProjectDetailController);
+        angular
+            .module('seseTranslatorApp')
+            .controller('ProjectDetailController', ProjectDetailController);
 
-    ProjectDetailController.$inject = ['$state','$scope', '$rootScope', '$stateParams', 'previousState', 'project',
-        'projectReleases', 'Project', 'Release', 'User', 'ProjectRoles'];
 
-    function ProjectDetailController($state,$scope, $rootScope, $stateParams, previousState, project, projectReleases,
-                                     Project, Release, User, ProjectRoles) {
-        var vm = this;
+        ProjectDetailController.$inject = ['$state', '$scope', '$rootScope', '$stateParams', 'previousState', 'project',
+            'projectReleases', 'Project', 'Release', 'User', 'ProjectRoles', 'Principal', 'UserName'];
 
-        vm.goToTranslate = goToTranslate;
+        function ProjectDetailController($state, $scope, $rootScope, $stateParams, previousState, project, projectReleases,
+                                         Project, Release, User, ProjectRoles, Principal, UserName) {
 
-        vm.project = project;
-        vm.previousState = previousState.name;
-        vm.releases = projectReleases;
-        vm.currentRelease = null;
-        vm.role = "Keine Rolle";
+            var vm = this;
 
-        activate();
+            vm.goToTranslate = goToTranslate;
 
-        function activate() {
+            vm.project = project;
+            vm.ownerDetails = UserName.get({id: vm.project.ownerId});
+            vm.previousState = previousState.name;
+            vm.releases = projectReleases;
+            vm.currentRelease = null;
+            vm.role = "No role assigned";
+            vm.isOwner = isOwner;
+
             var unsubscribe = $rootScope.$on('seseTranslatorApp:projectUpdate', function (event, result) {
                 vm.project = result;
             });
 
-            $scope.$on('$destroy', unsubscribe);
+            getAccount();
+            activate();
 
-            ProjectRoles.query({projectId: vm.project.id}, onSuccess);
+            function getAccount() {
+                Principal.identity().then(function (account) {
+                    vm.account = account;
+                });
+            }
+
+            function isOwner() {
+                return vm.project.ownerId == vm.account.id;
+            }
+
+
+            function activate() {
+                var unsubscribe = $rootScope.$on('seseTranslatorApp:projectUpdate', function (event, result) {
+                    vm.project = result;
+                });
+
+                $scope.$on('$destroy', unsubscribe);
+
+                ProjectRoles.query({projectId: vm.project.id}, onSuccess);
+                function onSuccess(response) {
+                    if (response[0] != null) {
+                        vm.role = response[0];
+                    }
+                }
+
+                for (var x in vm.releases) {
+                    if (vm.releases[x].isCurrentRelease) {
+                        vm.currentRelease = vm.releases[x];
+                    }
+                }
+            }
+
+
             function onSuccess(response) {
-                if(response[0] != null){
-                    vm.role = response[0];
+                if (response.length > 0) {
+                    vm.role = response.join(', ');
                 }
+
             }
 
-            for(var x in vm.releases){
-                if(vm.releases[x].isCurrentRelease){
-                    vm.currentRelease = vm.releases[x];
-                }
+            function goToTranslate() {
+                $state.go('project-detail.translation', {curReleaseId: vm.currentRelease.id.toString()});//todo send language id
             }
 
         }
-
-        function goToTranslate() {
-            $state.go('project-detail.translation', { curReleaseId:vm.currentRelease.id.toString() });//todo send language id
-        }
-    }
-})();
+    })();

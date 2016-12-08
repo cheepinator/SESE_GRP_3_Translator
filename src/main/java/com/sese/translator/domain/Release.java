@@ -40,7 +40,7 @@ public class Release implements Serializable {
 
     @NotNull
     @Column(name = "is_current_release", nullable = false)
-    private Boolean isCurrentRelease;
+    private Boolean isCurrentRelease = Boolean.FALSE;
 
     @Column(name = "due_date")
     private ZonedDateTime dueDate;

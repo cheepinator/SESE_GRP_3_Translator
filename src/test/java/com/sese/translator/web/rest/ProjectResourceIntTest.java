@@ -1,9 +1,13 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
+import com.sese.translator.domain.Language;
 import com.sese.translator.domain.Project;
+import com.sese.translator.domain.Projectassignment;
 import com.sese.translator.domain.Release;
+import com.sese.translator.domain.enumeration.Projectrole;
 import com.sese.translator.repository.ProjectRepository;
+import com.sese.translator.repository.ProjectassignmentRepository;
 import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
@@ -32,6 +36,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -52,6 +57,9 @@ public class ProjectResourceIntTest {
 
     @Inject
     private ReleaseRepository releaseRepository;
+
+    @Inject
+    private ProjectassignmentRepository projectassignmentRepository;
 
     @Inject
     private ProjectMapper projectMapper;
@@ -139,6 +147,10 @@ public class ProjectResourceIntTest {
         assertThat(defaultRelease.getProject()).isEqualTo(testProject);
         assertThat(defaultRelease.getVersionTag()).isEqualTo(Release.DEFAULT_TAG);
         assertThat(defaultRelease.getDueDate()).isNull();
+
+        // Assert a default language was created for the release
+        assertThat(defaultRelease.getLanguages()).hasSize(1);
+        assertThat(defaultRelease.getLanguages().iterator().next().getCode()).isEqualTo(Language.DEFAULT_LANGUAGE);
     }
 
     @Test
@@ -201,20 +213,68 @@ public class ProjectResourceIntTest {
     @WithMockUser
     @Test
     @Transactional
-    public void getAllProjects() throws Exception {
+    public void getAllProjects_includingAssignedOnes() throws Exception {
         // Initialize the database
         projectRepository.saveAndFlush(project);
+        // create project, the current user is only assigned to, not the owner of
+        String projectNameForAssignedProject = "Test";
+        Project testProject = new Project().name(projectNameForAssignedProject).owner(null);
+        projectRepository.saveAndFlush(testProject);
+        Projectassignment projectassignment = new Projectassignment().assignedProject(testProject).role(Projectrole.TRANSLATOR);
+        userService.getUserWithAuthoritiesByLogin("user").ifPresent(projectassignment::setAssignedUser);
+        projectassignmentRepository.saveAndFlush(projectassignment);
+
+        // Get all the projects the current user owns including the project the user is only assigned to
+        restProjectMockMvc.perform(get("/api/projects?sort=id,desc"))
+                          .andExpect(status().isOk())
+                          .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                          .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
+                          .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+                          .andExpect(jsonPath("$.[*].id").value(hasItem(testProject.getId().intValue())))
+                          .andExpect(jsonPath("$.[*].name").value(hasItem(projectNameForAssignedProject)));
+    }
+
+    @WithMockUser
+    @Test
+    @Transactional
+    public void getAllProjects_ignoresProjectsNotOwnedByCurrentUser() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+        // create project not owned by current user
+        String projectNameForOtherUser = "Test";
+        projectRepository.saveAndFlush(new Project().name(projectNameForOtherUser).owner(null));
 
         // Get all the projects
         restProjectMockMvc.perform(get("/api/projects?sort=id,desc"))
                           .andExpect(status().isOk())
                           .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                           .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
-                          .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+                          .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+                          .andExpect(jsonPath("$.[*].name").value(not(hasItem(projectNameForOtherUser))));
+    }
+
+    @WithMockUser
+    @Test
+    @Transactional
+    public void getAllProjects_ignoresProjectsNotAssignedToCurrentUser() throws Exception {
+        // Initialize the database
+        projectRepository.saveAndFlush(project);
+        // create project not owned by current user
+        String projectNameForOtherUser = "Test";
+        projectRepository.saveAndFlush(new Project().name(projectNameForOtherUser).owner(null));
+
+        // Get all the projects
+        restProjectMockMvc.perform(get("/api/projects?sort=id,desc"))
+                          .andExpect(status().isOk())
+                          .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                          .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
+                          .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+                          .andExpect(jsonPath("$.[*].name").value(not(hasItem(projectNameForOtherUser))));
     }
 
     @Test
     @Transactional
+    @WithMockUser
     public void getProject() throws Exception {
         // Initialize the database
         projectRepository.saveAndFlush(project);
@@ -229,10 +289,11 @@ public class ProjectResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser
     public void getNonExistingProject() throws Exception {
         // Get the project
         restProjectMockMvc.perform(get("/api/projects/{id}", Long.MAX_VALUE))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
     }
 
     @WithMockUser

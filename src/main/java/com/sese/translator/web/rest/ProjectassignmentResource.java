@@ -2,14 +2,13 @@ package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.sese.translator.domain.Projectassignment;
-
 import com.sese.translator.repository.ProjectassignmentRepository;
-import com.sese.translator.web.rest.util.HeaderUtil;
+import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectassignmentDTO;
 import com.sese.translator.service.mapper.ProjectassignmentMapper;
+import com.sese.translator.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +17,10 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Projectassignment.
@@ -37,6 +36,9 @@ public class ProjectassignmentResource {
 
     @Inject
     private ProjectassignmentMapper projectassignmentMapper;
+
+    @Inject
+    private UserService userService;
 
     /**
      * POST  /projectassignments : Create a new projectassignment.
@@ -85,14 +87,14 @@ public class ProjectassignmentResource {
     }
 
     /**
-     * GET  /projectassignments/:id : get all the projectassignments with a specific project id.
+     * GET  /projects/{projectId}/projectassignments : get all the projectassignments with a specific project id.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of projectassignments in body
      */
-    @GetMapping("project/{projectId}/projectassignments")
+    @GetMapping("/projects/{projectId}/projectassignments")
     @Timed
     public List<ProjectassignmentDTO> getAllProjectassignmentsByProjectId(@PathVariable Long projectId) {
-        log.debug("REST request to get all Projectassignments by ProjectID");
+        log.debug("REST request to get all Projectassignments for project: {}", projectId);
         List<Projectassignment> projectassignments = projectassignmentRepository.findByAssignedProjectId(projectId);
         return projectassignmentMapper.projectassignmentsToProjectassignmentDTOs(projectassignments);
     }
@@ -127,6 +129,25 @@ public class ProjectassignmentResource {
                 result,
                 HttpStatus.OK))
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    /**
+     * Get all Roles of the authenticated user for a project.
+     *
+     * @param projectId of the project.
+     * @return a List of Roles.
+     */
+    @GetMapping("/projects/{projectId}/userRoles")
+    @Timed
+    public List<String> getUserRolesForProject(@PathVariable Long projectId) {
+        List<Projectassignment> projectassignments = projectassignmentRepository.findByAssignedUser(userService.getUserWithAuthorities());
+        List<String> result = new ArrayList<>();
+        for (Projectassignment projectassignment : projectassignments) {
+            if (Objects.equals(projectassignment.getAssignedProject().getId(), projectId)) {
+                result.add(projectassignment.getRole().name());
+            }
+        }
+        return result;
     }
 
     /**

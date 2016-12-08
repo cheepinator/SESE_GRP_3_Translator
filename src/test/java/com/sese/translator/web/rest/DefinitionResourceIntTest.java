@@ -2,7 +2,13 @@ package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
 import com.sese.translator.domain.Definition;
+import com.sese.translator.domain.Project;
+import com.sese.translator.domain.Release;
+import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.DefinitionRepository;
+import com.sese.translator.repository.ProjectRepository;
+import com.sese.translator.repository.ReleaseRepository;
+import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.DefinitionService;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.DefinitionDTO;
@@ -49,6 +55,15 @@ public class DefinitionResourceIntTest {
     private DefinitionRepository definitionRepository;
 
     @Inject
+    private TranslationRepository translationRepository;
+
+    @Inject
+    private ProjectRepository projectRepository;
+
+    @Inject
+    private ReleaseRepository releaseRepository;
+
+    @Inject
     private DefinitionMapper definitionMapper;
 
     @Inject
@@ -69,6 +84,7 @@ public class DefinitionResourceIntTest {
     private MockMvc restDefinitionMockMvc;
 
     private Definition definition;
+    private Translation translation;
 
     @Before
     public void setup() {
@@ -97,6 +113,7 @@ public class DefinitionResourceIntTest {
     @Before
     public void initTest() {
         definition = createEntity(em);
+        translation = new Translation().translatedText("Translation");
     }
 
     @Test
@@ -175,6 +192,44 @@ public class DefinitionResourceIntTest {
 
     @Test
     @Transactional
+    public void getAllDefinitions_forAProject_noProjectAvailable() throws Exception {
+        // Initialize the database
+        definitionRepository.saveAndFlush(definition);
+
+        // Get all the definitions
+        restDefinitionMockMvc.perform(get("/api//projects/{projectId}/definitions?sort=id,desc", 1))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                             .andExpect(jsonPath("$.[*]").isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void getAllDefinitions_forAProject() throws Exception {
+        // Initialize the database
+        definitionRepository.saveAndFlush(definition);
+
+        Project project = new Project().name("Test");
+        projectRepository.saveAndFlush(project);
+
+        Release release = new Release().project(project).versionTag("new");
+        release.addDefinitions(definition);
+        releaseRepository.saveAndFlush(release);
+
+        project.addReleases(release);
+        projectRepository.saveAndFlush(project);
+
+        // Get all the definitions
+        restDefinitionMockMvc.perform(get("/api//projects/{projectId}/definitions?sort=id,desc", project.getId()))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                             .andExpect(jsonPath("$.[*].id").value(hasItem(definition.getId().intValue())))
+                             .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
+                             .andExpect(jsonPath("$.[*].originalText").value(hasItem(DEFAULT_ORIGINAL_TEXT)));
+    }
+
+    @Test
+    @Transactional
     public void getDefinition() throws Exception {
         // Initialize the database
         definitionRepository.saveAndFlush(definition);
@@ -225,18 +280,59 @@ public class DefinitionResourceIntTest {
 
     @Test
     @Transactional
-    public void deleteDefinition() throws Exception {
+    public void updateDefinition_translationGetsMarkedAsUpdateNeeded() throws Exception {
+        saveDefinitionWithTranslation();
+
+        int databaseSizeBeforeUpdate = definitionRepository.findAll().size();
+
+        // Update the definition: we need to create a new definition object here or else the cache of the database gets confused
+        Definition updatedDefinition = new Definition().code(UPDATED_CODE).originalText(UPDATED_ORIGINAL_TEXT);
+        updatedDefinition.setId(definition.getId());
+        DefinitionDTO definitionDTO = definitionMapper.definitionToDefinitionDTO(updatedDefinition);
+
+        restDefinitionMockMvc.perform(put("/api/definitions")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(definitionDTO)))
+                             .andExpect(status().isOk());
+
+        // Validate the Definition in the database
+        List<Definition> definitions = definitionRepository.findAll();
+        assertThat(definitions).hasSize(databaseSizeBeforeUpdate);
+        Definition testDefinition = definitions.get(definitions.size() - 1);
+        assertThat(testDefinition.getCode()).isEqualTo(UPDATED_CODE);
+        assertThat(testDefinition.getOriginalText()).isEqualTo(UPDATED_ORIGINAL_TEXT);
+        // Assert that all translations have been marked as "update needed"
+        List<Translation> translations = translationRepository.findByDefinitionId(definition.getId());
+        assertThat(translations).allMatch(Translation::isUpdateNeeded);
+    }
+
+    private void saveDefinitionWithTranslation() {
         // Initialize the database
         definitionRepository.saveAndFlush(definition);
+        // save translation
+        translation.definition(definition);
+        translationRepository.saveAndFlush(translation);
+        definition.addTranslations(translation);
+        definitionRepository.saveAndFlush(definition);
+    }
+
+
+    @Test
+    @Transactional
+    public void deleteDefinition() throws Exception {
+        saveDefinitionWithTranslation();
         int databaseSizeBeforeDelete = definitionRepository.findAll().size();
 
         // Get the definition
         restDefinitionMockMvc.perform(delete("/api/definitions/{id}", definition.getId())
-                .accept(TestUtil.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
+            .accept(TestUtil.APPLICATION_JSON_UTF8))
+                             .andExpect(status().isOk());
 
         // Validate the database is empty
         List<Definition> definitions = definitionRepository.findAll();
         assertThat(definitions).hasSize(databaseSizeBeforeDelete - 1);
+        // Test if the delete cascaded to all the translations of the definition
+        List<Translation> translations = translationRepository.findByDefinitionId(definition.getId());
+        assertThat(translations).hasSize(0);
     }
 }

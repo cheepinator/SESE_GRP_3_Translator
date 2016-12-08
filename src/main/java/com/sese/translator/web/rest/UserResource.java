@@ -1,15 +1,15 @@
 package com.sese.translator.web.rest;
 
-import com.sese.translator.config.Constants;
 import com.codahale.metrics.annotation.Timed;
+import com.sese.translator.config.Constants;
 import com.sese.translator.domain.User;
 import com.sese.translator.repository.UserRepository;
 import com.sese.translator.security.AuthoritiesConstants;
 import com.sese.translator.service.MailService;
 import com.sese.translator.service.UserService;
-import com.sese.translator.web.rest.vm.ManagedUserVM;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
+import com.sese.translator.web.rest.vm.ManagedUserVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -21,10 +21,11 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -172,6 +173,23 @@ public class UserResource {
                 .map(ManagedUserVM::new)
                 .map(managedUserVM -> new ResponseEntity<>(managedUserVM, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    /**
+     * GET  /users/{id}/name : get the login name of the user with the given id
+     *
+     * @param id the id of the user to get the name of the user
+     * @return the ResponseEntity with status 200 (OK) and with body the "login" user, or with status 404 (Not Found)
+     */
+    @GetMapping(value = "/users/{id}/name", produces = "application/json;charset=UTF-8")
+    @Timed
+    public ResponseEntity<String> getUserName(@PathVariable Long id) {
+        log.debug("REST request to get User by id: {}", id);
+        return userService.getUserById(id)
+                          .map(User::getLogin)
+                          .map(login -> "{\"name\": \"" + login + "\"}")
+                          .map(login -> new ResponseEntity<>(login, HttpStatus.OK))
+                          .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     /**

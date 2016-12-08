@@ -4,8 +4,10 @@ import com.sese.translator.SeseTranslatorApp;
 import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Release;
 import com.sese.translator.repository.ReleaseRepository;
+import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.dto.ReleaseDTO;
+import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ReleaseMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -64,7 +67,13 @@ public class ReleaseResourceIntTest {
     private ReleaseMapper releaseMapper;
 
     @Inject
+    private ProjectMapper projectMapper;
+
+    @Inject
     private ReleaseService releaseService;
+
+    @Inject
+    private ProjectService projectService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -78,12 +87,15 @@ public class ReleaseResourceIntTest {
     private MockMvc restReleaseMockMvc;
 
     private Release release;
+    private static Project testProject;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
         ReleaseResource releaseResource = new ReleaseResource();
+        ProjectResource projectResource = new ProjectResource();
         ReflectionTestUtils.setField(releaseResource, "releaseService", releaseService);
+        ReflectionTestUtils.setField(projectResource, "projectService", projectService);
         this.restReleaseMockMvc = MockMvcBuilders.standaloneSetup(releaseResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -96,7 +108,7 @@ public class ReleaseResourceIntTest {
      * if they test an entity which requires the current entity.
      */
     public static Release createEntity(EntityManager em) {
-        Project testProject = new Project().name("TestProject");
+        testProject = new Project().name("TestProject");
         em.persist(testProject);
         Release release = new Release()
             .description(DEFAULT_DESCRIPTION)
@@ -175,6 +187,7 @@ public class ReleaseResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser
     public void getAllReleases() throws Exception {
         // Initialize the database
         releaseRepository.saveAndFlush(release);
@@ -192,6 +205,7 @@ public class ReleaseResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser
     public void getRelease() throws Exception {
         // Initialize the database
         releaseRepository.saveAndFlush(release);
@@ -209,6 +223,40 @@ public class ReleaseResourceIntTest {
 
     @Test
     @Transactional
+    @WithMockUser
+    public void getDefaultRelease() throws Exception {
+        // Initialize the database
+        ReleaseDTO defaultRelease = releaseService.createDefaultRelease(projectMapper.projectToProjectDTO(testProject));
+
+        // Get the default release
+        restReleaseMockMvc.perform(get("/api/projects/{projectId}/releases/default", testProject.getId()))
+                          .andExpect(status().isOk())
+                          .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                          .andExpect(jsonPath("$.id").value(defaultRelease.getId().intValue()))
+                          .andExpect(jsonPath("$.versionTag").value(defaultRelease.getVersionTag()));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    public void getAllReleasesForProject() throws Exception {
+        // Initialize the database
+        releaseRepository.saveAndFlush(release);
+
+        // Get all the releases
+        restReleaseMockMvc.perform(get("/api/projects/{projectId}/releases?sort=id,desc", testProject.getId()))
+                          .andExpect(status().isOk())
+                          .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                          .andExpect(jsonPath("$.[*].id").value(hasItem(release.getId().intValue())))
+                          .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+                          .andExpect(jsonPath("$.[*].versionTag").value(hasItem(DEFAULT_VERSION_TAG)))
+                          .andExpect(jsonPath("$.[*].isCurrentRelease").value(hasItem(DEFAULT_IS_CURRENT_RELEASE)))
+                          .andExpect(jsonPath("$.[*].dueDate").value(hasItem(DEFAULT_DUE_DATE_STR)));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
     public void getNonExistingRelease() throws Exception {
         // Get the release
         restReleaseMockMvc.perform(get("/api/releases/{id}", Long.MAX_VALUE))
