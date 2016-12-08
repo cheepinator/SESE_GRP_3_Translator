@@ -21,7 +21,7 @@
             vm.previousState = previousState.name;
             vm.releases = projectReleases;
             vm.currentRelease = null;
-            vm.role = "No role assigned";
+            vm.roles = "No role assigned";
             vm.isOwner = isOwner;
             vm.isTranslator = isTranslator;
 
@@ -47,6 +47,7 @@
             }
 
 
+
             function activate() {
                 var unsubscribe = $rootScope.$on('seseTranslatorApp:projectUpdate', function (event, result) {
                     vm.project = result;
@@ -55,10 +56,9 @@
                 $scope.$on('$destroy', unsubscribe);
 
                 ProjectRoles.query({projectId: vm.project.id}, onSuccess);
+
                 function onSuccess(response) {
-                    if (response[0] != null) {
-                        vm.role = response[0];
-                    }
+                        vm.roles = response;
                 }
 
                 for (var x in vm.releases) {
@@ -66,14 +66,6 @@
                         vm.currentRelease = vm.releases[x];
                     }
                 }
-            }
-
-
-            function onSuccess(response) {
-                if (response.length > 0) {
-                    vm.role = response.join(', ');
-                }
-
             }
 
             function goToTranslate() {
