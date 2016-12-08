@@ -5,7 +5,7 @@
         </div>
         <div class="col-md-8">
             <h1>Welcome to the Translator Tool!</h1>
-            <p class="lead">Some cool catch phrase</p>
+            <p class="lead"></p>
 
             <div ng-switch="vm.isAuthenticated()">
                 <div class="alert alert-success" ng-switch-when="true">
@@ -13,7 +13,11 @@
                 </div>
 
                 <div class="alert alert-warning" ng-switch-when="false">
-                    You don't have an account yet? <a class="alert-link" ui-sref="register">Register a new account</a>
+                    Please <a class="alert-link" href="" ng-click="vm.login()">sign in</a> to see your projects.
+                </div>
+
+                <div class="alert alert-warning" ng-switch-when="false">
+                    You don't have an account yet? <a class="alert-link" ui-sref="register">Register a new account</a>.
                 </div>
             </div>
         </div>
