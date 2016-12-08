@@ -32,7 +32,7 @@
                     <td>{{definition.originalText}}</td>
                     <td>
                         <span ng-repeat="translation in vm.getTranslations(definition) track by translation.id">
-                            <span class="label" ng-class="translation.updateNeeded ? 'label-warning' : 'label-success'">
+                            <span ng-if="translation.translatedText" class="label" ng-class="translation.updateNeeded ? 'label-warning' : 'label-success'">
                                 {{::vm.getLanguageCode(definition, translation.languageId)}}</span>
                         </span>
                     </td>
