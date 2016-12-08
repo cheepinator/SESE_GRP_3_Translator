@@ -33,7 +33,7 @@ public class ReleaseResource {
     private ReleaseService releaseService;
 
     @Inject
-    private ProjectService projectService;
+    public ProjectService projectService;
 
     /**
      * POST  /releases : Create a new release.

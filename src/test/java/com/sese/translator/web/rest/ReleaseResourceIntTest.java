@@ -3,9 +3,11 @@ package com.sese.translator.web.rest;
 import com.sese.translator.SeseTranslatorApp;
 import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Release;
+import com.sese.translator.repository.ProjectRepository;
 import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
+import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ReleaseMapper;
@@ -64,6 +66,9 @@ public class ReleaseResourceIntTest {
     private ReleaseRepository releaseRepository;
 
     @Inject
+    private ProjectRepository projectRepository;
+
+    @Inject
     private ReleaseMapper releaseMapper;
 
     @Inject
@@ -74,6 +79,10 @@ public class ReleaseResourceIntTest {
 
     @Inject
     private ProjectService projectService;
+
+
+    @Inject
+    private UserService userService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -96,6 +105,7 @@ public class ReleaseResourceIntTest {
         ProjectResource projectResource = new ProjectResource();
         ReflectionTestUtils.setField(releaseResource, "releaseService", releaseService);
         ReflectionTestUtils.setField(projectResource, "projectService", projectService);
+        releaseResource.projectService = projectService;
         this.restReleaseMockMvc = MockMvcBuilders.standaloneSetup(releaseResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -122,6 +132,7 @@ public class ReleaseResourceIntTest {
     @Before
     public void initTest() {
         release = createEntity(em);
+        userService.getUserWithAuthoritiesByLogin("user").ifPresent(user -> testProject.setOwner(user));
     }
 
     @Test
@@ -209,7 +220,7 @@ public class ReleaseResourceIntTest {
     public void getRelease() throws Exception {
         // Initialize the database
         releaseRepository.saveAndFlush(release);
-
+        //projectRepository.saveAndFlush(testProject);
         // Get the release
         restReleaseMockMvc.perform(get("/api/releases/{id}", release.getId()))
             .andExpect(status().isOk())
