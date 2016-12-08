@@ -1,14 +1,15 @@
 package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.sese.translator.domain.Definition;
 import com.sese.translator.domain.Language;
 import com.sese.translator.domain.Release;
 import com.sese.translator.domain.Translation;
+import com.sese.translator.repository.DefinitionRepository;
 import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.NextTranslationDTO;
 import com.sese.translator.service.dto.TranslationDTO;
-import com.sese.translator.service.mapper.TranslationMapper;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
@@ -23,7 +24,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +52,7 @@ public class TranslationResource {
     private TranslationRepository translationRepository;
 
     @Inject
-    private TranslationMapper translationMapper;
+    private DefinitionRepository definitionRepository;
 
     /**
      * POST  /translations : Create a new translation.
@@ -190,33 +193,41 @@ public class TranslationResource {
     /**
      * GET  /projects/{projectId}/release/{versionTag}/language/{languageCode} : get all translations for the project
      *
-     * @param projectId the id of the project to get all translations for to retrieve
+     * @param projectId the id of the project
+     * @param versionTag the version of the translation
+     * @param languageCode the language of the translation
      * @return the ResponseEntity with status 200 (OK) and with body the definitionDTO, or with status 404 (Not Found)
      */
     @GetMapping("/projects/{projectId}/release/{versionTag}/language/{languageCode}")
     @ResponseBody
     public ResponseEntity downloadTranslations(@PathVariable Long projectId, @PathVariable String versionTag, @PathVariable String languageCode) {
         log.debug("REST request to get all Translations for project with id: {} and release {} and language {}", projectId, versionTag, languageCode);
-
         //todo: remove the default tags and language if implemented
+        //todo: also some security that only a developer of a project can do this
+
         List<Translation> byProjectIdLanguageIdReleaseId = translationRepository.findByProjectIdLanguageIdReleaseId(projectId, Release.DEFAULT_TAG, Language.DEFAULT_LANGUAGE);
 
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Translation t : byProjectIdLanguageIdReleaseId) {
+            stringBuilder.append("'" + t.getDefinition().getCode() + "' = '" + t.getTranslatedText() + "';\n");
+        }
+        byte[] language_file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
+
+        // append the english definitions
+        stringBuilder.setLength(0);
+        List<Definition> byProjectIdAndVersionTag = definitionRepository.findByProjectIdAndVersionTag(projectId, Release.DEFAULT_TAG);
+        for (Definition d : byProjectIdAndVersionTag) {
+            stringBuilder.append("'" + d.getCode() + "' = '" + d.getOriginalText() + "';\n");
+        }
+        byte[] definition_file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
+
         try {
-            StringBuilder stringBuilder = new StringBuilder();
-
-            for (Translation t : byProjectIdLanguageIdReleaseId) {
-                log.debug("Code: " + t.getDefinition().getCode());
-                log.debug("Translated text: " + t.getTranslatedText());
-                log.debug("Original text: " + t.getDefinition().getOriginalText());
-
-                stringBuilder.append("'" + t.getDefinition().getCode() + "' = '" + t.getTranslatedText() + "';\n");
-            }
-            byte[] file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
-
             // make the zip file...
             ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream("tmp.zip"), StandardCharsets.UTF_8);
             zipOutputStream.putNextEntry(new ZipEntry("german.strings"));
-            zipOutputStream.write(file);
+            zipOutputStream.write(language_file);
+            zipOutputStream.putNextEntry(new ZipEntry("english.strings"));
+            zipOutputStream.write(definition_file);
             zipOutputStream.close();
 
             File zipfile = new File("tmp.zip");
