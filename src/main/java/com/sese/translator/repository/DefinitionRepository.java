@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 /**
  * Spring Data JPA repository for the Definition entity.
  */
@@ -15,5 +17,9 @@ public interface DefinitionRepository extends JpaRepository<Definition, Long> {
 
     @Query("SELECT definition from Definition definition where definition.release.project.id = :id")
     Page<Definition> findByProjectId(@Param("id") Long id, Pageable pageable);
+
+    @Query("SELECT definition from Definition definition where definition.release.project.id = :id " +
+        "and definition.release.versionTag = :versionTag")
+    List<Definition> findByProjectIdAndVersionTag(@Param("id") Long id, @Param("versionTag") String versionTag);
 
 }
