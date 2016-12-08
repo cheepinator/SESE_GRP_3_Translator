@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -198,6 +199,7 @@ public class TranslationResource {
      */
     @GetMapping("/projects/{projectId}/release/{versionTag}/language/{languageCode}")
     @ResponseBody
+    @Transactional
     public ResponseEntity downloadTranslations(@PathVariable Long projectId, @PathVariable String versionTag, @PathVariable String languageCode) {
         log.debug("REST request to get all Translations for project with id: {} and release {} and language {}", projectId, versionTag, languageCode);
         //todo: remove the default tags and language if implemented
