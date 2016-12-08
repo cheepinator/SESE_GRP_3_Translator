@@ -16,6 +16,8 @@
         vm.register = register;
         $scope.$on('authenticationSuccess', function() {
             getAccount();
+            $state.go('project');
+            //$location.path('/projects')
         });
 
         getAccount();
