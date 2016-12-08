@@ -2,8 +2,10 @@ package com.sese.translator.service.impl;
 
 import com.sese.translator.domain.Definition;
 import com.sese.translator.domain.Language;
+import com.sese.translator.domain.Release;
 import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.DefinitionRepository;
+import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.DefinitionService;
 import com.sese.translator.service.dto.DefinitionDTO;
@@ -35,6 +37,9 @@ public class DefinitionServiceImpl implements DefinitionService{
     @Inject
     private TranslationRepository translationRepository;
 
+    @Inject
+    private ReleaseRepository releaseRepository;
+
     /**
      * Save a definition.
      *
@@ -47,7 +52,8 @@ public class DefinitionServiceImpl implements DefinitionService{
         //new definition with release
         definition = definitionRepository.save(definition);
         if(definition.getRelease() != null){
-            for(Language lang : definition.getRelease().getLanguages()){
+            Release release = releaseRepository.findOne(definition.getRelease().getId());
+            for(Language lang : release.getLanguages()){
                 if(!definition.getTranslations().stream().map(Translation::getLanguage).anyMatch(a->lang.equals(a))){
                     Translation translation = new Translation();
                     translation.setUpdateNeeded(true);

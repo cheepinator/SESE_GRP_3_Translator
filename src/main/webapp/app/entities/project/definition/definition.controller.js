@@ -48,6 +48,7 @@
             return vm.roles && vm.roles.includes('DEVELOPER');
         }
 
+
         function loadAll() {
             ProjectDefinition.query({
                 projectId: vm.project.id,

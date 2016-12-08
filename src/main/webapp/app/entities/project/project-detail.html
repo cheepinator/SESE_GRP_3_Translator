@@ -8,7 +8,7 @@
             <span class="hidden-xs hidden-sm">Manage Project Members</span>
         </button>
         <!--ng-if=""-->
-        <button class="btn btn-primary" ng-click="vm.goToTranslate()">
+        <button  ng-if="vm.isTranslator()" class="btn btn-default" ng-click="vm.goToTranslate()">
             <span class="glyphicon glyphicon-bookmark"></span>
             <span>
                         Start Translating
@@ -25,7 +25,7 @@
         </dd>
         <dt><span>My roles</span></dt>
         <dd>
-            {{vm.role}}
+            {{vm.roles.join(", ")}}
         </dd>
         <!--<dt><span>Sprache</span></dt>-->
         <!--<dd>-->
