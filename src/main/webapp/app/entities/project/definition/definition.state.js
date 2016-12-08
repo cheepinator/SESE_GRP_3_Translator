@@ -39,6 +39,10 @@
                             params: $state.params,
                             url: $state.href($state.current.name, $state.params)
                         };
+                        // fix for issue of sub pages overriding the correct previous sate in modal dialogs via 'reload' current page
+                        if (currentStateData.name.includes ('definition-detail')) {
+                            currentStateData.name = 'project-detail'
+                        }
                         return currentStateData;
                     }]
                 }

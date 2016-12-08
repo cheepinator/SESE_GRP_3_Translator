@@ -5,9 +5,11 @@
         .module('seseTranslatorApp')
         .controller('ProjectassignmentController', ProjectassignmentController);
 
-    ProjectassignmentController.$inject = ['$scope', '$state', 'project', 'Projectassignment', 'Project', 'ProjectassignmentProject', 'User', 'Principal'];
+    ProjectassignmentController.$inject = ['$scope', '$state', 'project', 'Projectassignment', 'Project', 'ProjectassignmentProject',
+        'User', 'Principal', 'previousState'];
 
-    function ProjectassignmentController ($scope, $state, project, Projectassignment, Project, ProjectassignmentProject, User, Principal) {
+    function ProjectassignmentController ($scope, $state, project, Projectassignment, Project, ProjectassignmentProject,
+                                          User, Principal, previousState) {
         var vm = this;
 
         vm.projectassignments = [];
@@ -15,6 +17,7 @@
         vm.users = [];
         vm.isOwner = isOwner;
         vm.project = project;
+        vm.previousState = previousState.name;
 
         getAccount();
         loadAll();

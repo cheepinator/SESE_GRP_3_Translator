@@ -8,11 +8,9 @@
             <span class="hidden-xs hidden-sm">Manage Project Members</span>
         </button>
         <!--ng-if=""-->
-        <button  ng-if="vm.isTranslator()" class="btn btn-default" ng-click="vm.goToTranslate()">
-            <span class="glyphicon glyphicon-bookmark"></span>
-            <span>
-                        Start Translating
-        </span>
+        <button ng-if="vm.isTranslator()" class="btn btn-default" ng-click="vm.goToTranslate()">
+            <span class="glyphicon glyphicon-globe"></span>
+            <span>Start Translating</span>
         </button>
     </div>
     <h2><a ui-sref="project">Projects</a> / {{vm.project.name}}</h2>

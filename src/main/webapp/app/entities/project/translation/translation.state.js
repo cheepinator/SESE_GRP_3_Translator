@@ -13,7 +13,8 @@
                 parent: 'project-detail',
                 url: '/translation',
                 params: {
-                    curReleaseId: null
+                    curReleaseId: null,
+                    languageId: null
                 },
                 data: {
                     authorities: ['ROLE_USER'],
@@ -33,18 +34,15 @@
                     currentRelease: ['$stateParams', 'Release', function ($stateParams, Release) {
                         return Release.get({id: $stateParams.curReleaseId}).$promise;
                     }],
-                    language:['$stateParams', function ($stateParams) { //todo expand when more languages
-                        return {
-                            id:1,
-                            code:'Deutsch'
-                        };
+                    language:['$stateParams', 'Language', function ($stateParams, Language) {
+                        return Language.get({id: $stateParams.languageId}).$promise;
                     }],
 
                     nextTranslation:['$stateParams','NextTranslation', function ($stateParams,NextTranslation) {
                         return NextTranslation.query(
                             {
                                 releaseId:$stateParams.curReleaseId,
-                                languageId:1
+                                languageId:$stateParams.languageId
                             }
                         ).$promise;
                     }],
@@ -55,7 +53,7 @@
                             url: $state.href($state.current.name, $state.params)
                         };
                         // fix for issue of sub pages overriding the correct previous sate in modal dialogs via 'reload' current page
-                        if (currentStateData.name.startsWith('translation')) {
+                        if (currentStateData.name.includes('translation')) {
                             currentStateData.name = 'project-detail'
                         }
                         return currentStateData;

@@ -5,7 +5,7 @@
         .module('seseTranslatorApp')
         .controller('ProjectController', ProjectController);
 
-    ProjectController.$inject = ['$q','$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter', 'Principal',
+    ProjectController.$inject = ['$q', '$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter', 'Principal',
         'ReleaseTooltips', '$location', 'ProjectRoles'];
 
     function ProjectController($q, $scope, $state, Project, Language, Release, CountTranslations, dateFilter, Principal, ReleaseTooltips, $location, ProjectRoles) {
@@ -19,6 +19,8 @@
         vm.roles = [];
         vm.isOwner = isOwner;
         vm.isDeveloper = isDeveloper;
+        vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
+
         getAccount();
         loadAll();
 
@@ -32,30 +34,20 @@
             return id == vm.account.id;
         }
 
-        function isDeveloper(id) {
-            for(var x in vm.projects){
-                if(vm.projects[x].id === id){
-                    return vm.projects[x].roles && vm.projects[x].roles.includes('DEVELOPER');
-
-                }
-            }
-            return false;
+        function isDeveloper(project) {
+            return project.roles && project.roles.includes('DEVELOPER');
         }
 
         function loadAll() {
             Project.query(function (result) {
                 vm.projects = result;
                 var promises = [];
-                for(var x = 0; x < vm.projects.length; x++){
-                    var i = x;
-                    promises.push(ProjectRoles.query({projectId: vm.projects[i].id}));
+                for (var x = 0; x < vm.projects.length; x++) {
+                    promises.push(ProjectRoles.query({projectId: vm.projects[x].id}));
                 }
                 $q.all(promises).then(function (response) {
-
-                    for (var i=0,len = response.length;i<len;++i){
-
+                    for (var i = 0, len = response.length; i < len; ++i) {
                         vm.projects[i].roles = response[i];
-
                     }
                 });
             });
@@ -66,16 +58,9 @@
             Release.query(function (result) {
                 vm.releases = result
             });
-
-
-
-
         }
 
-        vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
-
         $scope.getReleaseLabel = getReleaseLabel;
-
         function getReleaseLabel(release) {
             var result = "";
             if (release) {
@@ -91,29 +76,20 @@
         }
 
         $scope.getCurrentReleaseByProjectID = getCurrentReleaseByProjectID;
-
         function getCurrentReleaseByProjectID(id) {
-
             $scope.currentRelease = null;
             vm.releases.forEach(function (entry) {
-                console.log("Aufgerufen mit id: "+id + " Entry PID "+entry.projectId+ " entryiscurrent: "+entry.isCurrentRelease +" Entry: "+entry)
                 if (entry.projectId == id && entry.isCurrentRelease) {
-                    console.log(entry.description + " wurde geloggt") ;
                     $scope.currentRelease = entry;
                 }
-
             })
         }
 
-
         $scope.getCountOfTranslationsByReleaseID = getCountOfTranslationsByReleaseID;
-
         function getCountOfTranslationsByReleaseID(id) {
             console.log("looking for id " + id);
             $scope.countOfTranslations = CountTranslations.get(0);
         }
-
-
     }
 
 
