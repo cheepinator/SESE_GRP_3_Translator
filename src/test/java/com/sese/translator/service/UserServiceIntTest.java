@@ -5,20 +5,21 @@ import com.sese.translator.domain.PersistentToken;
 import com.sese.translator.domain.User;
 import com.sese.translator.repository.PersistentTokenRepository;
 import com.sese.translator.repository.UserRepository;
-import java.time.ZonedDateTime;
 import com.sese.translator.service.util.RandomUtil;
-import java.time.LocalDate;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test class for the UserResource REST controller.
@@ -65,6 +66,7 @@ public class UserServiceIntTest {
     }
 
     @Test
+    @Ignore
     public void assertThatOnlyActivatedUserCanRequestPasswordReset() {
         User user = userService.createUser("johndoe", "johndoe", "John", "Doe", "john.doe@localhost", "en-US");
         Optional<User> maybeUser = userService.requestPasswordReset("john.doe@localhost");
