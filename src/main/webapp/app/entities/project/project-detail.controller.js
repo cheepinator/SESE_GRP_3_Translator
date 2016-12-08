@@ -30,8 +30,8 @@
             });
         }
 
-        function isOwner(id) {
-            return id == vm.account.id;
+        function isOwner() {
+            return vm.project.ownerId == vm.account.id;
         }
 
         ProjectRoles.query({projectId: vm.project.id}, onSuccess);

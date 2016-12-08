@@ -17,7 +17,7 @@
         <table class="jh-table table table-striped">
             <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
-                    <th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <!--<th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>-->
                     <th jh-sort-by="code"><span>Code</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="originalText"><span>Original Text</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th><span>Available in</span></span></th>
@@ -27,7 +27,7 @@
             </thead>
             <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
                 <tr ng-repeat="definition in vm.definitions track by definition.id">
-                    <td>{{definition.id}}</td>
+                    <!--<td>{{definition.id}}</td>-->
                     <td><a ui-sref="project-detail.definition-detail({definitionId:definition.id})">{{definition.code}}</a></td>
                     <td>{{definition.originalText}}</td>
                     <td>
@@ -37,11 +37,11 @@
                         </span>
                     </td>
                     <td>
-                        <a ui-sref="release-detail({id:definition.releaseId})">
+                        <!--<a ui-sref="release-detail({id:definition.releaseId})">-->
                             <span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(definition.release)}}">
                                 {{definition.release.versionTag}}
                             </span>
-                        </a>
+                        <!--</a>-->
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
