@@ -24,11 +24,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
@@ -191,8 +193,8 @@ public class TranslationResource {
     /**
      * GET  /projects/{projectId}/release/{versionTag}/language/{languageCode} : get all translations for the project
      *
-     * @param projectId    the id of the project
-     * @param versionTag   the version of the translation
+     * @param projectId the id of the project
+     * @param versionTag the version of the translation
      * @param languageCode the language of the translation
      * @return the ResponseEntity with status 200 (OK) and with body the definitionDTO, or with status 404 (Not Found)
      */
@@ -203,49 +205,46 @@ public class TranslationResource {
         //todo: remove the default tags and language if implemented
         //todo: also some security that only a developer of a project can do this
 
-        log.debug("Get translations for default language");
-        List<Translation> defaultTranslations = translationRepository.findByProjectIdLanguageIdReleaseId(projectId, Release.DEFAULT_TAG, Language.DEFAULT_LANGUAGE);
-        log.debug("Got {} translations", defaultTranslations.size());
+        List<Translation> byProjectIdLanguageIdReleaseId = translationRepository.findByProjectIdLanguageIdReleaseId(projectId, Release.DEFAULT_TAG, Language.DEFAULT_LANGUAGE);
+
         StringBuilder stringBuilder = new StringBuilder();
-        for (Translation t : defaultTranslations) {
-            log.debug("Process {}", t);
+        for (Translation t : byProjectIdLanguageIdReleaseId) {
             stringBuilder.append("\"").append(t.getDefinition().getCode()).append("\" = \"").append(t.getTranslatedText()).append("\";\n");
         }
-        log.debug("Get byte array for {}", stringBuilder.toString());
-        byte[] german_file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
+        byte[] language_file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
 
         // append the english definitions
         stringBuilder.setLength(0);
-        log.debug("Get definitions");
-        List<Definition> getDefinitionsFromRelease = definitionRepository.findByProjectIdAndVersionTag(projectId, Release.DEFAULT_TAG);
-        for (Definition d : getDefinitionsFromRelease) {
+        List<Definition> byProjectIdAndVersionTag = definitionRepository.findByProjectIdAndVersionTag(projectId, Release.DEFAULT_TAG);
+        for (Definition d : byProjectIdAndVersionTag) {
             stringBuilder.append("\"").append(d.getCode()).append("\" = \"").append(d.getOriginalText()).append("\";\n");
         }
         byte[] definition_file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream, StandardCharsets.UTF_8)) {
-            log.debug("Append default language file to zip");
+        try {
+            // make the zip file...
+            ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream("tmp.zip"), StandardCharsets.UTF_8);
             zipOutputStream.putNextEntry(new ZipEntry("german.strings"));
-            zipOutputStream.write(german_file);
-            log.debug("Append definitions file to zip");
+            zipOutputStream.write(language_file);
             zipOutputStream.putNextEntry(new ZipEntry("english.strings"));
             zipOutputStream.write(definition_file);
+            zipOutputStream.close();
+
+            File zipfile = new File("tmp.zip");
+            byte[] downloadFile = Files.readAllBytes(zipfile.toPath());
+
+            // set the headers
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(new MediaType("application", "zip"));
+            header.set("Content-Disposition", "inline; filename=" + projectId + ".zip");
+            header.setContentLength(downloadFile.length);
+
+            return new ResponseEntity<>(downloadFile, header, HttpStatus.OK);
+
         } catch (IOException e) {
-            log.error("Failed to generate zip file to download", e);
-            return null;
+            e.printStackTrace();
         }
-        log.debug("Zip file was assembled, get bytes and prepare headers");
-        byte[] downloadFile = outputStream.toByteArray();
-
-        // set the headers
-        HttpHeaders header = new HttpHeaders();
-        header.setContentType(new MediaType("application", "zip"));
-        header.set("Content-Disposition", "inline; filename=" + projectId + ".zip");
-        header.setContentLength(downloadFile.length);
-
-        log.debug("Zip file finished");
-        return new ResponseEntity<>(downloadFile, header, HttpStatus.OK);
+        return null;
     }
 
 }
