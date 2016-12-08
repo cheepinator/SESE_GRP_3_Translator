@@ -5,10 +5,10 @@
         .module('seseTranslatorApp')
         .controller('ProjectController', ProjectController);
 
-    ProjectController.$inject = ['$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter', 'Principal',
-        'ReleaseTooltips', '$location'];
+    ProjectController.$inject = ['$q','$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter', 'Principal',
+        'ReleaseTooltips', '$location', 'ProjectRoles'];
 
-    function ProjectController($scope, $state, Project, Language, Release, CountTranslations, dateFilter, Principal, ReleaseTooltips, $location) {
+    function ProjectController($q, $scope, $state, Project, Language, Release, CountTranslations, dateFilter, Principal, ReleaseTooltips, $location, ProjectRoles) {
         var vm = this;
 
         vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
@@ -32,13 +32,32 @@
             return id == vm.account.id;
         }
 
-        function isDeveloper() {
-            return vm.roles && vm.roles.includes('DEVELOPER');
+        function isDeveloper(id) {
+            for(var x in vm.projects){
+                if(vm.projects[x].id === id){
+                    return vm.projects[x].roles && vm.projects[x].roles.includes('DEVELOPER');
+
+                }
+            }
+            return false;
         }
 
         function loadAll() {
             Project.query(function (result) {
                 vm.projects = result;
+                var promises = [];
+                for(var x = 0; x < vm.projects.length; x++){
+                    var i = x;
+                    promises.push(ProjectRoles.query({projectId: vm.projects[i].id}));
+                }
+                $q.all(promises).then(function (response) {
+
+                    for (var i=0,len = response.length;i<len;++i){
+
+                        vm.projects[i].roles = response[i];
+
+                    }
+                });
             });
             Language.query(function (result) {
                 vm.languages = result
@@ -48,9 +67,9 @@
                 vm.releases = result
             });
 
-            ProjectRoles.query({projectId: vm.project.id}, function(response) {
-                vm.roles = response;
-            });
+
+
+
         }
 
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
