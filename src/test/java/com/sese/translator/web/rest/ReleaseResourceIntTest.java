@@ -102,10 +102,8 @@ public class ReleaseResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         ReleaseResource releaseResource = new ReleaseResource();
-        ProjectResource projectResource = new ProjectResource();
         ReflectionTestUtils.setField(releaseResource, "releaseService", releaseService);
-        ReflectionTestUtils.setField(projectResource, "projectService", projectService);
-        releaseResource.projectService = projectService;
+        ReflectionTestUtils.setField(releaseResource, "projectService", projectService);
         this.restReleaseMockMvc = MockMvcBuilders.standaloneSetup(releaseResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
