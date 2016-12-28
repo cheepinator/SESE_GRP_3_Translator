@@ -1,9 +1,7 @@
 package com.sese.translator.service.dto;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 
 
@@ -18,6 +16,8 @@ public class ProjectDTO implements Serializable {
     private String name;
 
     private Long ownerId;
+
+    private String ownerName;
 
     public Long getId() {
         return id;
@@ -40,6 +40,14 @@ public class ProjectDTO implements Serializable {
 
     public void setOwnerId(Long userId) {
         this.ownerId = userId;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     @Override

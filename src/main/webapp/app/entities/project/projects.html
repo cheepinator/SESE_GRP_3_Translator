@@ -18,8 +18,8 @@
         <table class="jh-table table table-striped">
             <thead>
                 <tr>
-                    <th><span>ID</span></th>
-                    <th><span>Name</span></th>
+                    <th><span>Owner / Name</span></th>
+                    <th><span>Roles</span></th>
                     <!--<th><span>Upcoming Release</span></th>-->
                     <!--<th><span>Progress</span></th>-->
                     <th><span>Languages</span></th>
@@ -28,8 +28,15 @@
             </thead>
             <tbody>
                 <tr ng-repeat="project in vm.projects track by project.id">
-                    <td>{{project.id}}</td>
-                    <td><a ui-sref="project-detail({projectId:project.id})">{{project.name}}</a></td>
+                    <td><a ui-sref="project-detail({projectId:project.id})">{{project.ownerName}} / {{project.name}}</a></td>
+                    <td>
+                        <span ng-if="!vm.isOwner(project.ownerId)" ng-repeat="role in project.roles">
+                                {{role}}{{$last ? '' : ', '}}
+                        </span>
+                        <span ng-if="vm.isOwner(project.ownerId)">
+                                Owner
+                        </span>
+                    </td>
 
                     <!--<td>-->
                     <!--<a ui-sref="release-detail({id:currentRelease.id})">-->

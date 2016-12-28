@@ -13,6 +13,7 @@ import java.util.List;
 public interface ProjectMapper {
 
     @Mapping(source = "owner.id", target = "ownerId")
+    @Mapping(source = "owner.login", target = "ownerName")
     ProjectDTO projectToProjectDTO(Project project);
 
     List<ProjectDTO> projectsToProjectDTOs(List<Project> projects);
