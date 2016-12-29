@@ -1,9 +1,9 @@
-
 <div>
-    <h2><a ui-sref="project">Projects</a> / <a ui-sref="project-detail({projectId:vm.project.id})">{{vm.project.name}}</a> / {{vm.definition.code}}
+    <h2><a ui-sref="project">Projects</a> / <a
+        ui-sref="project-detail({projectId:vm.project.id})">{{vm.project.name}}</a> / {{vm.definition.code}}
         <!--<a ui-sref="release-detail({id:vm.definition.releaseId})">-->
-            <!--<span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(vm.release)}}">-->
-            <!--{{vm.release.versionTag}}</span>-->
+        <!--<span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(vm.release)}}">-->
+        <!--{{vm.release.versionTag}}</span>-->
         <!--</a>-->
     </h2>
     <hr>
@@ -21,7 +21,7 @@
         </dd>
     </dl>
 
-
+    <!--todo adapt-->
     <h3>Translations</h3>
 
     <div ng-repeat="language in vm.release.languages track by language.id">
@@ -29,7 +29,16 @@
             <dt><span>{{language.code}}</span></dt>
             {{::vm.getTranslation(language.id)}}
             <dd><span>{{translation.translatedText ? translation.translatedText : '-'}}</span>
-                <br><span ng-show="translation.translatedText && translation.updateNeeded" class="label label-warning">Update needed</span></dd>
+                <button type="button" ng-if="vm.isTranslator()"
+                        ui-sref="project-detail.definition-detail.translation-edit({translationId:translation.id})"
+                        class="btn btn-default btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    <span class="hidden-xs hidden-sm"> </span>
+                </button>
+                <br><span ng-show="translation.translatedText && translation.updateNeeded" class="label label-warning">Update needed</span>
+
+            </dd>
+
         </dl>
     </div>
 

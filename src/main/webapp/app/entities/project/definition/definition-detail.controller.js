@@ -25,6 +25,7 @@
 
         vm.getTranslation = getTranslation;
         vm.isDeveloper = isDeveloper;
+        vm.isTranslator = isTranslator;
 
         function getTranslation(languageId) {
             // save the translation in the current scope i.e. in our case inside a ng-repeat for just the current element
@@ -42,10 +43,15 @@
         function isDeveloper() {
             return vm.roles && vm.roles.includes('DEVELOPER');
         }
+        function isTranslator() {
+            return vm.roles && vm.roles.includes('TRANSLATOR');
+        }
+
 
         var unsubscribe = $rootScope.$on('seseTranslatorApp:definitionUpdate', function (event, result) {
             vm.definition = result;
         });
+
         $scope.$on('$destroy', unsubscribe);
     }
 })();

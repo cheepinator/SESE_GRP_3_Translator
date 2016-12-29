@@ -169,7 +169,35 @@
                         $state.go('^');
                     });
                 }]
-            });
+            })
+            .state('project-detail.definition-detail.translation-edit', {
+            parent: 'project-detail.definition-detail',
+            url: '/translation/{translationId}/edit',
+            data: {
+                authorities: ['ROLE_USER']
+            },
+            onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
+                $uibModal.open({
+                    templateUrl: 'app/entities/project/definition/translation-dialog.html',
+                    controller: 'DefinitionTranslationDialogController',
+                    controllerAs: 'vm',
+                    backdrop: 'static',
+                    size: 'lg',
+                    resolve: {
+                        entity: ['Translation', function(Translation) {
+                            return Translation.get({id : $stateParams.translationId}).$promise;
+                        }],
+                        definition: ['Definition', function(Definition) {
+                            return Definition.get({id : $stateParams.definitionId}).$promise;
+                        }]
+                    }
+                }).result.then(function() {
+                    $state.go('^', {}, { reload: true });
+                }, function() {
+                    $state.go('^');
+                });
+            }]
+        });
     }
 
 })();
