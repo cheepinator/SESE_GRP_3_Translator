@@ -64,6 +64,6 @@ public interface TranslationService {
      *
      *  @param dto the request Object
      */
-    TranslationDTO getNextOpenTranslation(NextTranslationDTO dto);
+    List<TranslationDTO> getNextOpenTranslation(NextTranslationDTO dto);
 
 }

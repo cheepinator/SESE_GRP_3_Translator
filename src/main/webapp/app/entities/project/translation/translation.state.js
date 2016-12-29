@@ -38,7 +38,7 @@
                         return Language.get({id: $stateParams.languageId}).$promise;
                     }],
 
-                    nextTranslation:['$stateParams','NextTranslation', function ($stateParams,NextTranslation) {
+                    nextTranslations:['$stateParams','NextTranslation', function ($stateParams,NextTranslation) {
                         return NextTranslation.query(
                             {
                                 releaseId:$stateParams.curReleaseId,

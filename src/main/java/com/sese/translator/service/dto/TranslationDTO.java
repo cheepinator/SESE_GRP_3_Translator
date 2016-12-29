@@ -28,6 +28,12 @@ public class TranslationDTO implements Serializable {
     @NotNull
     private Long definitionId;
 
+    @NotNull
+    private String definitionCode;
+
+    @NotNull
+    private String originalText;
+
     public Long getId() {
         return id;
     }
@@ -72,6 +78,22 @@ public class TranslationDTO implements Serializable {
 
     public void setDefinitionId(Long definitionId) {
         this.definitionId = definitionId;
+    }
+
+    public String getDefinitionCode() {
+        return definitionCode;
+    }
+
+    public void setDefinitionCode(String definitionCode) {
+        this.definitionCode = definitionCode;
+    }
+
+    public String getOriginalText() {
+        return originalText;
+    }
+
+    public void setOriginalText(String originalText) {
+        this.originalText = originalText;
     }
 
     @Override

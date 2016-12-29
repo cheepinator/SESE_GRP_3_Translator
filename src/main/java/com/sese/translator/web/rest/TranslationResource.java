@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
@@ -173,20 +174,20 @@ public class TranslationResource {
     }
 
     /**
-     * POST /release/next_definition get the next open Translation.
+     * POST /release/next_definition get the next 10 open Translation.
      *
      * @param nextTranslationDTO the request object
      * @return the ResponseEntity with status 200 (OK)
      */
     @PostMapping("/release/next_translation")
     @Timed
-    public ResponseEntity<TranslationDTO> getNextOpenTranslation(@Valid @RequestBody NextTranslationDTO nextTranslationDTO) {
+    public ResponseEntity<List<TranslationDTO>> getNextOpenTranslations(@Valid @RequestBody NextTranslationDTO nextTranslationDTO) {
         log.debug("REST request the next definition of Release : {} with language: {}", nextTranslationDTO.getReleaseId(), nextTranslationDTO.getLanguageId());
-        TranslationDTO translationDTO = translationService.getNextOpenTranslation(nextTranslationDTO);
-        if (translationDTO == null) {
-            translationDTO = new TranslationDTO();
+        List<TranslationDTO> translationDTOs = translationService.getNextOpenTranslation(nextTranslationDTO);
+        if (translationDTOs == null) {
+            translationDTOs = new ArrayList<>();
         }
-        return new ResponseEntity<>(translationDTO, HttpStatus.OK);
+        return new ResponseEntity<>(translationDTOs, HttpStatus.OK);
     }
 
     /**

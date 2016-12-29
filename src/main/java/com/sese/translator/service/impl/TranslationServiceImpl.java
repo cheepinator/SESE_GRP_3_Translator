@@ -18,11 +18,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Service Implementation for managing Translation.
@@ -154,12 +152,8 @@ public class TranslationServiceImpl implements TranslationService {
     }
 
     @Override
-    public TranslationDTO getNextOpenTranslation(NextTranslationDTO dto) {
-        List<Translation> translations = translationRepository.findOpenTranslationsByReleaseAndLanguage(dto.getReleaseId(), dto.getLanguageId());
-        if (!CollectionUtils.isEmpty(translations)) {//todo fill with translations
-            return translationMapper.translationToTranslationDTO(translations.get((int) new Random().nextDouble() * translations.size()));
-        } else {
-            return null;
-        }
+    @Transactional
+    public List<TranslationDTO> getNextOpenTranslation(NextTranslationDTO dto) {
+        return translationMapper.translationsToTranslationDTOs(translationRepository.findOpenTranslationsByReleaseAndLanguage(dto.getReleaseId(), dto.getLanguageId()));
     }
 }

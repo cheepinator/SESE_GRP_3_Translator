@@ -10,7 +10,7 @@
     function NextTranslation ($resource) {
         var resourceUrl = 'api/release/next_translation';
         return $resource(resourceUrl, {}, {
-            'query': { method: 'POST', isArray: false}
+            'query': { method: 'POST', isArray: true}
         });
     }
 
