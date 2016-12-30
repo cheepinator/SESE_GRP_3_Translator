@@ -2,8 +2,10 @@ package com.sese.translator.service.impl;
 
 import com.sese.translator.domain.Definition;
 import com.sese.translator.domain.Language;
+import com.sese.translator.domain.Release;
 import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.DefinitionRepository;
+import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.UserService;
@@ -11,6 +13,7 @@ import com.sese.translator.service.dto.LanguageDTO;
 import com.sese.translator.service.dto.NextTranslationDTO;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.dto.TranslationDTO;
+import com.sese.translator.service.mapper.LanguageMapper;
 import com.sese.translator.service.mapper.TranslationMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +27,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -43,10 +49,16 @@ public class TranslationServiceImpl implements TranslationService {
     private DefinitionRepository definitionRepository;
 
     @Inject
+    private ReleaseRepository releaseRepository;
+
+    @Inject
     private TranslationMapper translationMapper;
 
     @Inject
     private UserService userService;
+
+    @Inject
+    private LanguageMapper languageMapper;
 
     /**
      * Save a translation.
@@ -151,18 +163,18 @@ public class TranslationServiceImpl implements TranslationService {
     public void addMissingTranslationsForProjectAndLanguage(ProjectDTO projectDTO, LanguageDTO languageDTO) {
         log.debug("Adding missing translations for project with id {} and new language {}", projectDTO.getId(),
             languageDTO.getCode());
+        Language language = languageMapper.languageDTOToLanguage(languageDTO);
         Page<Definition> projectDefinitions = definitionRepository.findByProjectId(projectDTO.getId(), null);
-        projectDefinitions.getContent().forEach(this::addMissingTranslationsToDefinition);
+        projectDefinitions.getContent().forEach(definition -> addMissingTranslationsToDefinition(definition, language));
     }
 
     @Override
     @Transactional
     public void addMissingTranslationsToDefinition(Definition definition) {
-        Set<Language> alreadyTranslatedLanguages = definition.getTranslations()
-                                                             .stream()
-                                                             .map(Translation::getLanguage)
-                                                             .collect(Collectors.toSet());
-        for (Language projectLanguage : definition.getRelease().getProject().getLanguages()) {
+        Set<Language> alreadyTranslatedLanguages = getAlreadyTranslatedLanguages(definition);
+        // fetch the release manually to avoid non fetched data problems
+        Release release = releaseRepository.findOne(definition.getRelease().getId());
+        for (Language projectLanguage : release.getProject().getLanguages()) {
             if (!alreadyTranslatedLanguages.contains(projectLanguage)) {
                 Translation translation = new Translation()
                     .updateNeeded(true)
@@ -173,6 +185,30 @@ public class TranslationServiceImpl implements TranslationService {
                     projectLanguage.getCode());
             }
         }
+    }
+
+    private Set<Language> getAlreadyTranslatedLanguages(Definition definition) {
+        return definition.getTranslations().stream()
+                         .map(Translation::getLanguage)
+                         .collect(Collectors.toSet());
+    }
+
+    private void addMissingTranslationsToDefinition(Definition definition, Language newLanguage) {
+        if (isNotAlreadyTranslated(definition, newLanguage)) {
+            Translation translation = new Translation()
+                .updateNeeded(true)
+                .language(newLanguage)
+                .definition(definition);
+            translationRepository.save(translation);
+            log.debug("Added new empty translation for definition with id {} and language {}", definition.getId(),
+                newLanguage.getCode());
+        }
+    }
+
+    private boolean isNotAlreadyTranslated(Definition definition, Language newLanguage) {
+        return definition.getTranslations().stream()
+                         .map(Translation::getLanguage)
+                         .noneMatch(availableLanguage -> availableLanguage.equals(newLanguage));
     }
 
     @Override
