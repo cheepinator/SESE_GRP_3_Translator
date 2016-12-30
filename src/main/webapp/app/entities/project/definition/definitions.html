@@ -7,8 +7,10 @@
             <div ng-repeat="language in vm.project.languages track by language.id" style="float:left;">
                 <div class="no-padding-left" style="/*background-color: rgb(157,157,157);*/ border-radius: 4px; padding: 3px 7px; display: inline-block">
                     <div style="float: left; height: 100%; /*color: white;*/">{{language.code}}: &nbsp</div>
-                    <uib-progressbar value="0" max="200" style="min-width: 125px; margin-bottom: 0; float: left"> <!--TODO: fetch progress from server -->
-                        <span style="color:white; white-space:nowrap; min-width: 2em;">0/200</span>
+                    <uib-progressbar value="vm.getProgressValue(language)" max="vm.getMaxProgressValue()" animate="false"
+                                     type="{{vm.getProgressValue(language) == vm.getMaxProgressValue() ? 'success' : null}}"
+                                     style="min-width: 125px; margin-bottom: 0; float: left">
+                        <span style="color:white; white-space:nowrap; min-width: 2em;">{{vm.getProgressValue(language)}} / {{vm.getMaxProgressValue()}}</span>
                     </uib-progressbar>
                     &nbsp;
                     <button class="btn btn-default btn-xs" ui-sref="project-detail.delete-language({languageId:language.id})">

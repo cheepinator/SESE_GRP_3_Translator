@@ -5,6 +5,7 @@ import com.sese.translator.service.LanguageService;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.LanguageDTO;
+import com.sese.translator.service.dto.ProgressDTO;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
@@ -133,6 +134,25 @@ public class LanguageResource {
         languageService.delete(languageId);
 
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("language", languageId.toString())).build();
+    }
+
+    /**
+     * GET  /projects/{projectId}/languages-progress/ : get the progress of the given project
+     *
+     * @param projectId the id of project we are interested in the progress
+     * @return the ResponseEntity with status 200 (OK) and with body the list of progress objects, or with status 404 (Not Found)
+     */
+    @GetMapping("/projects/{projectId}/languages-progress")
+    @Timed
+    public ResponseEntity<?> getLanguageProgress(@PathVariable Long projectId) {
+        log.debug("REST request to get the progress of all languages in the project with id {}", projectId);
+        ProjectDTO projectDTO = projectService.findOne(projectId);
+        if (projectDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<ProgressDTO> progressForProject = translationService.getProgressForProject(projectDTO);
+        return ResponseEntity.ok(progressForProject);
     }
 
     /**

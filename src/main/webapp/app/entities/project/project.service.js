@@ -8,7 +8,8 @@
         .factory('ProjectReleases', ProjectReleases)
         .factory('ProjectTranslations', ProjectTranslations)
         .factory('ProjectRoles', ProjectRoles)
-        .factory('NewProjectLanguage', NewProjectLanguage);
+        .factory('NewProjectLanguage', NewProjectLanguage)
+        .factory('ProjectProgress', ProjectProgress);
 
     Project.$inject = ['$resource'];
     Language.$inject = ['$resource'];
@@ -20,6 +21,7 @@
     ProjectTranslations.$inject = ['$resource'];
     ProjectRoles.$inject = ['$resource'];
     NewProjectLanguage.$inject = ['$resource'];
+    ProjectProgress.$inject = ['$resource'];
 
     function Project ($resource) {
         var resourceUrl =  'api/projects/:id';
@@ -169,6 +171,12 @@
 
     function NewProjectLanguage ($resource) {
         var resourceUrl =  'api/projects/:projectId/languages/:languageId';
+
+        return $resource(resourceUrl, {}, {});
+    }
+
+    function ProjectProgress ($resource) {
+        var resourceUrl =  'api/projects/:projectId/languages-progress';
 
         return $resource(resourceUrl, {}, {});
     }

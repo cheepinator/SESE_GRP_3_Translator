@@ -1,19 +1,14 @@
 package com.sese.translator.service.impl;
 
-import com.sese.translator.domain.Definition;
-import com.sese.translator.domain.Language;
-import com.sese.translator.domain.Release;
-import com.sese.translator.domain.Translation;
+import com.sese.translator.domain.*;
 import com.sese.translator.repository.DefinitionRepository;
 import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.UserService;
-import com.sese.translator.service.dto.LanguageDTO;
-import com.sese.translator.service.dto.NextTranslationDTO;
-import com.sese.translator.service.dto.ProjectDTO;
-import com.sese.translator.service.dto.TranslationDTO;
+import com.sese.translator.service.dto.*;
 import com.sese.translator.service.mapper.LanguageMapper;
+import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.TranslationMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +55,9 @@ public class TranslationServiceImpl implements TranslationService {
 
     @Inject
     private LanguageMapper languageMapper;
+
+    @Inject
+    private ProjectMapper projectMapper;
 
     /**
      * Save a translation.
@@ -209,6 +208,28 @@ public class TranslationServiceImpl implements TranslationService {
         return definition.getTranslations().stream()
                          .map(Translation::getLanguage)
                          .noneMatch(availableLanguage -> availableLanguage.equals(newLanguage));
+    }
+
+    @Override
+    @Transactional
+    public List<ProgressDTO> getProgressForProject(ProjectDTO projectDTO) {
+        Page<Definition> definitionsPage = definitionRepository.findByProjectId(projectDTO.getId(), null);
+        List<Definition> definitions = definitionsPage.getContent();
+        Project project = projectMapper.projectDTOToProject(projectDTO);
+        ArrayList<ProgressDTO> result = new ArrayList<>();
+        for (Language language : project.getLanguages()) {
+            LanguageDTO languageDTO = languageMapper.languageToLanguageDTO(language);
+            long count = definitions.stream()
+                                    .flatMap(definition -> definition.getTranslations().stream())
+                                    .filter(translation -> !translation.isUpdateNeeded())
+                                    .map(Translation::getLanguage)
+                                    .filter(Predicate.isEqual(language))
+                                    .count();
+
+            ProgressDTO progressDTO = new ProgressDTO(languageDTO, ((long) definitions.size()), count);
+            result.add(progressDTO);
+        }
+        return result;
     }
 
     @Override
