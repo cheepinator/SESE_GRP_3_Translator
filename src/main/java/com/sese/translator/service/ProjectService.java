@@ -1,5 +1,6 @@
 package com.sese.translator.service;
 
+import com.sese.translator.service.dto.LanguageDTO;
 import com.sese.translator.service.dto.ProjectDTO;
 
 import java.util.List;
@@ -17,15 +18,16 @@ public interface ProjectService {
      */
     ProjectDTO save(ProjectDTO projectDTO);
 
+    LanguageDTO addLanguageToProject(ProjectDTO projectDTO, LanguageDTO languageDTO);
+
+    LanguageDTO removeLanguageFromProject(ProjectDTO projectDTO, LanguageDTO languageDTO);
+
     /**
      *  Get all the projects of the current user.
      *
      *  @return the list of entities
      */
     List<ProjectDTO> findAllOfCurrentUser();
-
-
-
 
     /**
      *  Get the "id" project.

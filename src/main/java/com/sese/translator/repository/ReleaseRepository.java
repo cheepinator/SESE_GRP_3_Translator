@@ -14,10 +14,10 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface ReleaseRepository extends JpaRepository<Release,Long> {
 
-    @Query("select distinct release from Release release left join fetch release.languages")
+    @Query("select release from Release release")
     List<Release> findAllWithEagerRelationships();
 
-    @Query("select release from Release release left join fetch release.languages where release.id =:id")
+    @Query("select release from Release release where release.id =:id")
     Release findOneWithEagerRelationships(@Param("id") Long id);
 
 //    @Query("SELECT release FROM Release release where release.project_id = :id")
@@ -29,13 +29,13 @@ public interface ReleaseRepository extends JpaRepository<Release,Long> {
     @Query("select release from Release release where release.versionTag = :#{T(com.sese.translator.domain.Release).DEFAULT_TAG} and release.project.id = :id")
     Release findDefaultForProject(@Param("id") Long id);
 
-    @Query("select distinct release from Release release left join fetch release.languages where release.project.id = :projectId")
+    @Query("select distinct release from Release release where release.project.id = :projectId")
     List<Release> findByProjectIdWithEagerRelationships(@Param("projectId") Long projectId);
 
 //    @Query("select release from Release release join release.project where project.owner.login = ?#{principal.username}")
 //    List<Release> findByOwnerIsCurrentUser();
 
-    @Query("select release from Release release left join fetch release.languages where release.project.owner.login = ?#{principal.username} ")
+    @Query("select release from Release release where release.project.owner.login = ?#{principal.username} ")
     List<Release> findByOwnerIsCurrentUser();
 
 }

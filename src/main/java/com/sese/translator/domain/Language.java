@@ -33,7 +33,7 @@ public class Language implements Serializable {
     @ManyToMany(mappedBy = "languages")
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private Set<Release> releases = new HashSet<>();
+    private Set<Project> projects = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -56,29 +56,29 @@ public class Language implements Serializable {
         this.code = code;
     }
 
-    public Set<Release> getReleases() {
-        return releases;
+    public Set<Project> getProjects() {
+        return projects;
     }
 
-    public Language releases(Set<Release> releases) {
-        this.releases = releases;
+    public Language projects(Set<Project> projects) {
+        this.projects = projects;
         return this;
     }
 
-    public Language addReleases(Release release) {
-        releases.add(release);
-        release.getLanguages().add(this);
+    public Language addProjects(Project project) {
+        projects.add(project);
+        project.getLanguages().add(this);
         return this;
     }
 
-    public Language removeReleases(Release release) {
-        releases.remove(release);
-        release.getLanguages().remove(this);
+    public Language removeProjects(Project project) {
+        projects.remove(project);
+        project.getLanguages().remove(this);
         return this;
     }
 
-    public void setReleases(Set<Release> releases) {
-        this.releases = releases;
+    public void setProjects(Set<Project> projects) {
+        this.projects = projects;
     }
 
     @Override

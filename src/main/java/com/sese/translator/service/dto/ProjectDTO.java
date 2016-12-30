@@ -2,7 +2,9 @@ package com.sese.translator.service.dto;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -18,6 +20,8 @@ public class ProjectDTO implements Serializable {
     private Long ownerId;
 
     private String ownerName;
+
+    private Set<LanguageDTO> languages = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -48,6 +52,14 @@ public class ProjectDTO implements Serializable {
 
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
+    }
+
+    public Set<LanguageDTO> getLanguages() {
+        return languages;
+    }
+
+    public void setLanguages(Set<LanguageDTO> languages) {
+        this.languages = languages;
     }
 
     @Override

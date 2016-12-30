@@ -7,7 +7,8 @@
         .factory('DefaultRelease', DefaultRelease)
         .factory('ProjectReleases', ProjectReleases)
         .factory('ProjectTranslations', ProjectTranslations)
-        .factory('ProjectRoles', ProjectRoles);
+        .factory('ProjectRoles', ProjectRoles)
+        .factory('NewProjectLanguage', NewProjectLanguage);
 
     Project.$inject = ['$resource'];
     Language.$inject = ['$resource'];
@@ -18,6 +19,7 @@
     ProjectReleases.$inject = ['$resource'];
     ProjectTranslations.$inject = ['$resource'];
     ProjectRoles.$inject = ['$resource'];
+    NewProjectLanguage.$inject = ['$resource'];
 
     function Project ($resource) {
         var resourceUrl =  'api/projects/:id';
@@ -163,6 +165,12 @@
         return $resource(resourceUrl, {}, {
             'query': { method: 'GET', isArray: true}
         });
+    }
+
+    function NewProjectLanguage ($resource) {
+        var resourceUrl =  'api/projects/:projectId/languages/:languageId';
+
+        return $resource(resourceUrl, {}, {});
     }
 
 

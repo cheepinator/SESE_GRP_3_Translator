@@ -18,5 +18,6 @@
     <include file="classpath:config/liquibase/changelog/20161126164219_added_entity_constraints_Translation.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20161126164221_added_entity_constraints_Projectassignment.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20161205135620_added_column_UpdateNeeded_to_Translation.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20161230114724_changed_language_assignment_from_release_to_project.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

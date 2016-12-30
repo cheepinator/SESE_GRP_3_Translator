@@ -1,11 +1,15 @@
 package com.sese.translator.service.impl;
 
+import com.sese.translator.domain.Definition;
+import com.sese.translator.domain.Language;
 import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.DefinitionRepository;
 import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.UserService;
+import com.sese.translator.service.dto.LanguageDTO;
 import com.sese.translator.service.dto.NextTranslationDTO;
+import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.dto.TranslationDTO;
 import com.sese.translator.service.mapper.TranslationMapper;
 import org.slf4j.Logger;
@@ -20,7 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing Translation.
@@ -139,6 +144,55 @@ public class TranslationServiceImpl implements TranslationService {
         List<Translation> translations = translationRepository.findByDefinitionId(definitionId);
         translations.forEach(translation -> translation.setUpdateNeeded(true));
         translationRepository.save(translations);
+    }
+
+    @Override
+    @Transactional
+    public void addMissingTranslationsForProjectAndLanguage(ProjectDTO projectDTO, LanguageDTO languageDTO) {
+        log.debug("Adding missing translations for project with id {} and new language {}", projectDTO.getId(),
+            languageDTO.getCode());
+        Page<Definition> projectDefinitions = definitionRepository.findByProjectId(projectDTO.getId(), null);
+        projectDefinitions.getContent().forEach(this::addMissingTranslationsToDefinition);
+    }
+
+    @Override
+    @Transactional
+    public void addMissingTranslationsToDefinition(Definition definition) {
+        Set<Language> alreadyTranslatedLanguages = definition.getTranslations()
+                                                             .stream()
+                                                             .map(Translation::getLanguage)
+                                                             .collect(Collectors.toSet());
+        for (Language projectLanguage : definition.getRelease().getProject().getLanguages()) {
+            if (!alreadyTranslatedLanguages.contains(projectLanguage)) {
+                Translation translation = new Translation()
+                    .updateNeeded(true)
+                    .language(projectLanguage)
+                    .definition(definition);
+                translationRepository.save(translation);
+                log.debug("Added new empty translation for definition with id {} and language {}", definition.getId(),
+                    projectLanguage.getCode());
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void removeAllTranslationsForProjectAndLanguage(ProjectDTO projectDTO, LanguageDTO languageDTO) {
+        log.debug("Remove translations for project with id {} and language {}", projectDTO.getId(),
+            languageDTO.getCode());
+        Page<Definition> projectDefinitions = definitionRepository.findByProjectId(projectDTO.getId(), null);
+        projectDefinitions.getContent().forEach(definition -> removeTranslationsForDefinition(definition, languageDTO));
+    }
+
+    private void removeTranslationsForDefinition(Definition definition, LanguageDTO languageDTO) {
+        ArrayList<Translation> translations = new ArrayList<>(definition.getTranslations());
+        for (Translation translation : translations) {
+            if (Objects.equals(translation.getLanguage().getId(), languageDTO.getId())) {
+                definition.removeTranslations(translation);
+                translationRepository.delete(translation);
+                log.debug("Removed translation for definition with id {} and language {}", definition.getId(), languageDTO.getCode());
+            }
+        }
     }
 
     /**

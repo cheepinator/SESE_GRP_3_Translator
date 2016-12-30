@@ -1,6 +1,9 @@
 package com.sese.translator.service;
 
+import com.sese.translator.domain.Definition;
+import com.sese.translator.service.dto.LanguageDTO;
 import com.sese.translator.service.dto.NextTranslationDTO;
+import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.dto.TranslationDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +52,12 @@ public interface TranslationService {
     List<TranslationDTO> findForProject(Long id);
 
     void markAllTranslationsForDefinitionAsUpdateNeeded(Long definitionId);
+
+    void addMissingTranslationsForProjectAndLanguage(ProjectDTO projectDTO, LanguageDTO languageDTO);
+
+    void addMissingTranslationsToDefinition(Definition definition);
+
+    void removeAllTranslationsForProjectAndLanguage(ProjectDTO projectDTO, LanguageDTO languageDTO);
 
     /**
      *  Delete the "id" translation.

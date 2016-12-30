@@ -1,13 +1,9 @@
 package com.sese.translator.service.impl;
 
 import com.sese.translator.domain.Definition;
-import com.sese.translator.domain.Language;
-import com.sese.translator.domain.Release;
-import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.DefinitionRepository;
-import com.sese.translator.repository.ReleaseRepository;
-import com.sese.translator.repository.TranslationRepository;
 import com.sese.translator.service.DefinitionService;
+import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.DefinitionDTO;
 import com.sese.translator.service.mapper.DefinitionMapper;
 import org.slf4j.Logger;
@@ -35,10 +31,7 @@ public class DefinitionServiceImpl implements DefinitionService{
     private DefinitionMapper definitionMapper;
 
     @Inject
-    private TranslationRepository translationRepository;
-
-    @Inject
-    private ReleaseRepository releaseRepository;
+    private TranslationService translationService;
 
     /**
      * Save a definition.
@@ -51,21 +44,10 @@ public class DefinitionServiceImpl implements DefinitionService{
         Definition definition = definitionMapper.definitionDTOToDefinition(definitionDTO);
         //new definition with release
         definition = definitionRepository.save(definition);
-        if(definition.getRelease() != null){
-            Release release = releaseRepository.findOne(definition.getRelease().getId());
-            for(Language lang : release.getLanguages()){
-                if(!definition.getTranslations().stream().map(Translation::getLanguage).anyMatch(a->lang.equals(a))){
-                    Translation translation = new Translation();
-                    translation.setUpdateNeeded(true);
-                    translation.setLanguage(lang);
-                    translation.setDefinition(definition);
-                    translationRepository.save(translation);
-
-                }
-            }
+        if (definition.getRelease() != null) {
+            translationService.addMissingTranslationsToDefinition(definition);
         }
-        DefinitionDTO result = definitionMapper.definitionToDefinitionDTO(definition);
-        return result;
+        return definitionMapper.definitionToDefinitionDTO(definition);
     }
 
     /**

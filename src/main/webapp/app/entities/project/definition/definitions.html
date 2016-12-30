@@ -1,22 +1,41 @@
 <div>
-    <h3>Definitions</h3>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="no-padding-left">
-                <button ng-if="vm.isDeveloper()" class="btn btn-primary" ui-sref="project-detail.new-definition" >
-                    <span class="glyphicon glyphicon-plus"></span>
-                    <span >
-                        Create new Definition
-                    </span>
-                </button>
-                <a ng-if="vm.isDeveloper()" class="btn btn-default" ng-href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/release/null/language/null" >
-                    <span class="glyphicon glyphicon-download"></span>
-                    <span class="hidden-xs">Download</span>
-                </a>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Available languages</h3>
+        </div>
+        <div class="panel-body">
+            <div ng-repeat="language in vm.project.languages track by language.id" style="float:left;">
+                <div class="no-padding-left" style="/*background-color: rgb(157,157,157);*/ border-radius: 4px; padding: 3px 7px; display: inline-block">
+                    <div style="float: left; height: 100%; /*color: white;*/">{{language.code}}: &nbsp</div>
+                    <uib-progressbar value="0" max="200" style="min-width: 125px; margin-bottom: 0; float: left"> <!--TODO: fetch progress from server -->
+                        <span style="color:white; white-space:nowrap; min-width: 2em;">0/200</span>
+                    </uib-progressbar>
+                    &nbsp;
+                    <button class="btn btn-default btn-xs" ui-sref="project-detail.delete-language({languageId:language.id})">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
+                </div>
+                &nbsp;
             </div>
+            <button ng-if="vm.isDeveloper()" class="btn btn-default btn-xs" ui-sref="project-detail.new-language" style="margin-top: 3px;">
+                <span class="glyphicon glyphicon-plus"></span>
+                <span>Add language</span>
+            </button>
         </div>
     </div>
-    <br/>
+    <div>
+        <h3>Definitions
+            <button ng-if="vm.isDeveloper()" class="btn btn-primary btn-sm" ui-sref="project-detail.new-definition">
+                <span class="glyphicon glyphicon-plus"></span>
+                <span>New</span>
+            </button>
+            <a ng-if="vm.isDeveloper()" class="btn btn-default btn-sm"
+               ng-href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/release/null/language/null">
+                <span class="glyphicon glyphicon-download"></span>
+                <span class="hidden-xs">Download</span>
+            </a>
+        </h3>
+    </div>
     <div class="table-responsive">
         <table class="jh-table table table-striped">
             <thead>
@@ -37,7 +56,7 @@
                     <td>
                         <span ng-repeat="translation in vm.getTranslations(definition) track by translation.id">
                             <span ng-if="translation.translatedText" class="label" ng-class="translation.updateNeeded ? 'label-warning' : 'label-success'">
-                                {{::vm.getLanguageCode(definition, translation.languageId)}}</span>
+                                {{translation.languageCode}}</span>
                         </span>
                     </td>
                     <td>

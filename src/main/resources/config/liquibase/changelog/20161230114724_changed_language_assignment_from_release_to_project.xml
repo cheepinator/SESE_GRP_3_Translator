@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="Stefan (generated)" id="1483098447193-1">
+        <createTable tableName="project_languages">
+            <column name="projects_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="languages_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="Stefan (generated)" id="1483098447193-2">
+        <addPrimaryKey columnNames="projects_id, languages_id" tableName="project_languages"/>
+    </changeSet>
+    <changeSet author="Stefan (generated)" id="1483098447193-3">
+        <addForeignKeyConstraint baseColumnNames="projects_id"
+                                 baseTableName="project_languages"
+                                 constraintName="FK_PROJECT_LANGUAGES_PROJECTS_ID"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="project"/>
+    </changeSet>
+    <changeSet author="Stefan (generated)" id="1483098447193-4">
+        <addForeignKeyConstraint baseColumnNames="languages_id"
+                                 baseTableName="project_languages"
+                                 constraintName="FK_PROJECT_LANGUAGES_LANGUAGES_ID"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="language"/>
+    </changeSet>
+    <changeSet author="Stefan (generated)" id="1483098447193-5">
+        <dropForeignKeyConstraint baseTableName="RELEASE_LANGUAGES"
+                                  constraintName="FK_RELEASE_LANGUAGES_LANGUAGES_ID"/>
+    </changeSet>
+    <changeSet author="Stefan (generated)" id="1483098447193-6">
+        <dropForeignKeyConstraint baseTableName="RELEASE_LANGUAGES"
+                                  constraintName="FK_RELEASE_LANGUAGES_RELEASES_ID"/>
+    </changeSet>
+    <changeSet author="Stefan (generated)" id="1483098447193-7">
+        <dropTable tableName="RELEASE_LANGUAGES"/>
+    </changeSet>
+</databaseChangeLog>

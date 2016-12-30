@@ -25,6 +25,8 @@ public class TranslationDTO implements Serializable {
     @NotNull
     private Long languageId;
 
+    private String languageCode;
+
     @NotNull
     private Long definitionId;
 
@@ -70,6 +72,14 @@ public class TranslationDTO implements Serializable {
 
     public void setLanguageId(Long languageId) {
         this.languageId = languageId;
+    }
+
+    public String getLanguageCode() {
+        return languageCode;
+    }
+
+    public void setLanguageCode(String languageCode) {
+        this.languageCode = languageCode;
     }
 
     public Long getDefinitionId() {

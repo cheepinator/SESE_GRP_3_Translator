@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Mapper for the entity Release and its DTO ReleaseDTO.
  */
-@Mapper(componentModel = "spring", uses = {LanguageMapper.class, })
+@Mapper(componentModel = "spring", uses = { })
 public interface ReleaseMapper {
 
     @Mapping(source = "project.id", target = "projectId")
@@ -22,15 +22,6 @@ public interface ReleaseMapper {
     Release releaseDTOToRelease(ReleaseDTO releaseDTO);
 
     List<Release> releaseDTOsToReleases(List<ReleaseDTO> releaseDTOs);
-
-    default Language languageFromId(Long id) {
-        if (id == null) {
-            return null;
-        }
-        Language language = new Language();
-        language.setId(id);
-        return language;
-    }
 
     default Project projectFromId(Long id) {
         if (id == null) {

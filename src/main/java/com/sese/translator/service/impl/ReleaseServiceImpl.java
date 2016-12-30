@@ -61,7 +61,6 @@ public class ReleaseServiceImpl implements ReleaseService {
         Project project = projectMapper.projectDTOToProject(projectDTO);
         // todo: change the current release back to false if we have proper release management
         Release release = new Release().versionTag(Release.DEFAULT_TAG).project(project).isCurrentRelease(true);
-        release.addLanguages(getDefaultLanguage());
         release = releaseRepository.save(release);
         ReleaseDTO result = releaseMapper.releaseToReleaseDTO(release);
         log.debug("Default release: {}", result);
@@ -166,7 +165,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         releaseRepository.delete(id);
     }
 
-    private Language getDefaultLanguage() {
+    private Language getDefaultLanguage() { // todo: refactor to new logic
         boolean hasGermanLanguage = false;
         Long languageId = 0L;
         for (LanguageDTO languageDTO : languageService.findAll()) {

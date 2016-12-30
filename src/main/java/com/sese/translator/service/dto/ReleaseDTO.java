@@ -3,9 +3,7 @@ package com.sese.translator.service.dto;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 
 /**
@@ -24,9 +22,6 @@ public class ReleaseDTO implements Serializable {
     private Boolean isCurrentRelease;
 
     private ZonedDateTime dueDate;
-
-
-    private Set<LanguageDTO> languages = new HashSet<>();
 
     @NotNull
     private Long projectId;
@@ -65,14 +60,6 @@ public class ReleaseDTO implements Serializable {
 
     public void setDueDate(ZonedDateTime dueDate) {
         this.dueDate = dueDate;
-    }
-
-    public Set<LanguageDTO> getLanguages() {
-        return languages;
-    }
-
-    public void setLanguages(Set<LanguageDTO> languages) {
-        this.languages = languages;
     }
 
     public Long getProjectId() {

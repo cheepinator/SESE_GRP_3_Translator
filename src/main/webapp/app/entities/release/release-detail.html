@@ -20,12 +20,6 @@
         <dd>
             <span>{{vm.release.dueDate | date:'medium'}}</span>
         </dd>
-        <dt><span>Languages</span></dt>
-        <dd>
-            <span ng-repeat="languages in vm.release.languages">
-                <a ui-sref="language-detail({id: languages.id})">{{languages.id}}</a>{{$last ? '' : ', '}}
-            </span>
-        </dd>
         <dt><span>Project</span></dt>
         <dd>
             <a ui-sref="project-detail({id:vm.release.projectId})">{{vm.release.projectId}}</a>
