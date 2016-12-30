@@ -10,7 +10,7 @@
                     <uib-progressbar value="vm.getProgressValue(language)" max="vm.getMaxProgressValue()" animate="false"
                                      type="{{vm.getProgressValue(language) == vm.getMaxProgressValue() ? 'success' : 'warning'}}"
                                      style="min-width: 125px; margin-bottom: 0; float: left">
-                        <span style="color:white; white-space:nowrap; min-width: 2em;">{{vm.getProgressValue(language)}} / {{vm.getMaxProgressValue()}}</span>
+                        <span ng-style="vm.getProgressValue(language) > 0 ? {'color':'white'} : {'color':'black'}" style="white-space:nowrap; min-width: 2em;">{{vm.getProgressValue(language)}} / {{vm.getMaxProgressValue()}}</span>
                     </uib-progressbar>
                     &nbsp;<button ng-if="vm.isDeveloper()" class="btn btn-default btn-xs"
                             ui-sref="project-detail.delete-language({languageId:language.id})"
