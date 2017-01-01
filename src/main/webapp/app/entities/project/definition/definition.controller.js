@@ -16,6 +16,8 @@
 
         vm.project = project;
         vm.releases = projectReleases;
+        vm.selectedRelease = [];
+        vm.filterBy = '';
         vm.definitions = [];
         vm.translations = [];
         vm.loadPage = loadPage;
@@ -33,6 +35,8 @@
         vm.getLanguageCode = getLanguageCode;
         vm.getTranslations = getTranslations;
         vm.isDeveloper = isDeveloper;
+        vm.setSelectedRelease = setSelectedRelease;
+        vm.getReleaseName = getReleaseName;
         loadAll();
         getAccount();
 
@@ -50,6 +54,14 @@
             return vm.roles && vm.roles.includes('DEVELOPER');
         }
 
+        function setSelectedRelease(release) {
+            if (vm.selectedRelease != null) {
+                vm.filterBy = vm.selectedRelease.versionTag;
+            } else {
+                vm.filterBy = '';
+            }
+
+        }
 
         function loadAll() {
             ProjectDefinition.query({
@@ -122,6 +134,17 @@
         function loadPage(page) {
             vm.page = page;
             loadAll();
+        }
+
+        function getReleaseName(releaseId) {
+            var result = '';
+            angular.forEach(vm.releases, function (value, key) {
+                if (value.id == releaseId) {
+                    result = value.versionTag;
+                }
+            });
+
+            return result;
         }
     }
 })();

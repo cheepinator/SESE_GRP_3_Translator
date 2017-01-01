@@ -1,0 +1,61 @@
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myReleaseLabel">Create or edit a Release</h4>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" for="field_versionTag">Version Tag</label>
+                        <input type="text" class="form-control" name="versionTag" id="field_versionTag"
+                               ng-model="vm.release.versionTag"
+                               required/>
+                        <div ng-show="editForm.versionTag.$invalid">
+                            <p class="help-block"
+                               ng-show="editForm.versionTag.$error.required">
+                                This field is required.
+                            </p>
+                        </div>
+                    </div>
+                    </div>
+                <div class="col-sm-5">
+                    <div class="form-group">
+                        <label class="control-label" for="field_dueDate">Due Date</label>
+                        <div class="input-group">
+                            <input id="field_dueDate" type="text" class="form-control" name="dueDate" datetime-picker="{{dateformat}}"
+                                   ng-model="vm.release.dueDate"
+                                   is-open="vm.datePickerOpenStatus.dueDate"
+                            />
+                            <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="vm.openCalendar('dueDate')"><i
+                            class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                        <label class="control-label" for="field_isCurrentRelease">Is Current Release</label>
+                        <input type="checkbox" class="form-control" name="isCurrentRelease" id="field_isCurrentRelease"
+                               ng-model="vm.release.isCurrentRelease"
+                        />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label" for="field_description">Description</label>
+                <textarea class="form-control" rows="5" name="description" id="field_description" ng-model="vm.release.description"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span>Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span>Save</span>
+        </button>
+    </div>
+</form>

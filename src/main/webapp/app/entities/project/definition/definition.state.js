@@ -65,9 +65,6 @@
                             definition: function () {
                                 return definition;
                             },
-                            defaultRelease: function () {
-                                return {};
-                            },
                             projectReleases: function () {
                                 return projectReleases;
                             }
@@ -85,8 +82,8 @@
                 data: {
                     authorities: ['ROLE_USER']
                 },
-                onEnter: ['$stateParams', '$state', '$uibModal', 'defaultRelease', 'projectReleases',
-                    function ($stateParams, $state, $uibModal, defaultRelease, projectReleases) {
+                onEnter: ['$stateParams', '$state', '$uibModal', 'projectReleases',
+                    function ($stateParams, $state, $uibModal, projectReleases) {
                     $uibModal.open({
                         templateUrl: 'app/entities/project/definition/definition-dialog.html',
                         controller: 'ProjectDefinitionDialogController',
@@ -100,9 +97,6 @@
                                     originalText: null,
                                     id: null
                                 };
-                            },
-                            defaultRelease: function () {
-                                return defaultRelease;
                             },
                             projectReleases: function () {
                                 return projectReleases;
@@ -132,9 +126,6 @@
                             definition: ['Definition', function(Definition) {
                                 return Definition.get({id : $stateParams.definitionId}).$promise;
                             }],
-                            defaultRelease: function () {
-                                return {};
-                            },
                             projectReleases: function () {
                                 return projectReleases;
                             }

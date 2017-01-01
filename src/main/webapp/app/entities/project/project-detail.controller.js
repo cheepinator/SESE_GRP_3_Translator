@@ -24,6 +24,7 @@
         vm.roles = "No role assigned";
         vm.isOwner = isOwner;
         vm.isTranslator = isTranslator;
+        vm.isReleaseManager = isReleaseManager;
 
         var unsubscribe = $rootScope.$on('seseTranslatorApp:projectUpdate', function (event, result) {
             vm.project = result;
@@ -41,6 +42,10 @@
 
         function isTranslator() {
             return vm.roles && vm.roles.includes('TRANSLATOR');
+        }
+
+        function isReleaseManager() {
+            return vm.roles && vm.roles.includes('RELEASE_MANAGER')
         }
 
         function isOwner() {

@@ -1,0 +1,41 @@
+
+<div>
+    <h2><span>Release</span> {{vm.release.versionTag}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span>Release ID</span></dt>
+        <dd>
+            <span>{{vm.release.id}}</span>
+        </dd>
+        <dt><span>Description</span></dt>
+        <dd>
+            <span>{{vm.release.description}}</span>
+        </dd>
+        <dt><span>Is Current Release</span></dt>
+        <dd>
+            <span>{{vm.release.isCurrentRelease}}</span>
+        </dd>
+        <dt><span>Due Date</span></dt>
+        <dd>
+            <span>{{vm.release.dueDate | date:'medium'}}</span>
+        </dd>
+        <dt><span>Languages</span></dt>
+        <dd>
+            <span ng-repeat="languages in vm.release.languages">
+                <a ui-sref="language-detail({id: languages.id})">{{languages.id}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button" ui-sref="project-detail.release-detail.edit({id:vm.release.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm"> Edit</span>
+    </button>
+</div>

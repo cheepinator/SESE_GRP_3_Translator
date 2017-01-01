@@ -6,10 +6,10 @@
         .controller('ProjectDefinitionDialogController', ProjectDefinitionDialogController);
 
     ProjectDefinitionDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'DataUtils',
-        'definition', 'defaultRelease', 'projectReleases', 'Definition', 'Translation', 'Release'];
+        'definition', 'projectReleases', 'Definition', 'Translation', 'Release'];
 
     function ProjectDefinitionDialogController ($timeout, $scope, $stateParams, $uibModalInstance, DataUtils, definition,
-                                                defaultRelease, projectReleases, Definition, Translation, Release) {
+                                                 projectReleases, Definition, Translation, Release) {
         var vm = this;
 
         vm.definition = definition;
@@ -19,13 +19,16 @@
         vm.save = save;
         vm.translations = Translation.query();
         vm.releases = projectReleases;
-        vm.defaultRelease = defaultRelease;
-        if (vm.definition.id == null) {
-            vm.definition.releaseId = vm.defaultRelease.id;
-        }
-
+        vm.selectedRelease = vm.releases[0];
         vm.isEdit = vm.definition.id != null;
 
+        if (vm.isEdit) {
+            for(var i = 0; i < vm.releases.length; i++){
+                if(vm.releases[i].id == vm.definition.releaseId){
+                    vm.selectedRelease = vm.releases[i];
+                }
+            }
+        }
         $timeout(function (){
             if (vm.isEdit) {
                 angular.element('.form-group:eq(1)>textarea').focus();
@@ -40,6 +43,7 @@
 
         function save () {
             vm.isSaving = true;
+            vm.definition.releaseId = vm.selectedRelease.id;
             if (vm.definition.id !== null) {
                 Definition.update(vm.definition, onSaveSuccess, onSaveError);
             } else {
@@ -56,7 +60,5 @@
         function onSaveError () {
             vm.isSaving = false;
         }
-
-
     }
 })();

@@ -3,34 +3,41 @@
     <div class="container-fluid">
         <div class="row">
             <div class="no-padding-left">
-                <button ng-if="vm.isDeveloper()" class="btn btn-primary" ui-sref="project-detail.new-definition" >
+                <button ng-disabled="vm.releases.length == 0" ng-if="vm.isDeveloper()" class="btn btn-primary" ui-sref="project-detail.new-definition">
                     <span class="glyphicon glyphicon-plus"></span>
-                    <span >
+                    <span>
                         Create new Definition
                     </span>
                 </button>
-                <a ng-if="vm.isDeveloper()" class="btn btn-default" ng-href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/release/null/language/null" >
+                <a ng-if="vm.isDeveloper()" class="btn btn-default" ng-href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/release/null/language/null">
                     <span class="glyphicon glyphicon-download"></span>
                     <span class="hidden-xs">Download</span>
                 </a>
+                <a class="dropdown">
+                    <select class="btn btn-default" ng-model="vm.selectedRelease"
+                            data-ng-options="release.versionTag for release in vm.releases" ng-change="vm.setSelectedRelease(vm.selectedRelease)">
+                        <option value="">All Releases</option>
+                    </select>
+                </a>
             </div>
         </div>
-    </div>
-    <br/>
-    <div class="table-responsive">
-        <table class="jh-table table table-striped">
-            <thead>
+        <br/>
+        <div class="table-responsive">
+            <table class="jh-table table table-striped">
+                <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
                     <!--<th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>-->
-                    <th jh-sort-by="code"><span>Code</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="originalText"><span>Original Text</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th><span>Available in</span></th>
-                    <!--<th jh-sort-by="release.id"><span>Release</span> <span class="glyphicon glyphicon-sort"></span></th>-->
+                    <th>Code</th>
+                    <th>Original Text</th>
+                    <th>Available in</th>
+                    <th>Release</th>
                     <th></th>
+                    <!--<th jh-sort-by="release.id"><span>Release</span> <span class="glyphicon glyphicon-sort"></span></th>-->
+
                 </tr>
-            </thead>
-            <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
-                <tr ng-repeat="definition in vm.definitions track by definition.id">
+                </thead>
+                <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
+                <tr ng-repeat="definition in vm.definitions | filter:vm.filterBy track by definition.id">
                     <!--<td>{{definition.id}}</td>-->
                     <td><a ui-sref="project-detail.definition-detail({definitionId:definition.id})">{{definition.code}}</a></td>
                     <td>{{definition.originalText}}</td>
@@ -41,10 +48,13 @@
                         </span>
                     </td>
                     <td>
+                        {{vm.getReleaseName(definition.releaseId)}}
+                    </td>
+                    <td>
                         <!--<a ui-sref="release-detail({id:definition.releaseId})">-->
-                            <!--<span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(definition.release)}}">-->
-                                <!--{{definition.release.versionTag}}-->
-                            <!--</span>-->
+                        <!--<span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(definition.release)}}">-->
+                        <!--{{definition.release.versionTag}}-->
+                        <!--</span>-->
                         <!--</a>-->
                     </td>
                     <td class="text-right">
@@ -70,7 +80,7 @@
                         </div>
                     </td>
                 </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>

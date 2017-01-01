@@ -49,9 +49,6 @@
                 project: ['$stateParams', 'Project', function($stateParams, Project) {
                     return Project.get({id : $stateParams.projectId}).$promise;
                 }],
-                defaultRelease: ['$stateParams', 'DefaultRelease', function($stateParams, DefaultRelease) {
-                    return DefaultRelease.get({projectId : $stateParams.projectId}).$promise;
-                }],
                 projectReleases: ['$stateParams', 'ProjectReleases', function ($stateParams, ProjectReleases) {
                     return ProjectReleases.query({projectId: $stateParams.projectId}).$promise;
                 }],
