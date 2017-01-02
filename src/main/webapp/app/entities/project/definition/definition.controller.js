@@ -39,6 +39,16 @@
         vm.getReleaseName = getReleaseName;
         loadAll();
         getAccount();
+        setCurrentRelease();
+
+        function setCurrentRelease() {
+            for (var i = 0; i < vm.releases.length; i++) {
+                if (vm.releases[i].isCurrentRelease == true) {
+                    vm.selectedRelease = vm.releases[i];
+                    setSelectedRelease();
+                }
+            }
+        }
 
         function getAccount() {
             Principal.identity().then(function (account) {
@@ -54,7 +64,7 @@
             return vm.roles && vm.roles.includes('DEVELOPER');
         }
 
-        function setSelectedRelease(release) {
+        function setSelectedRelease() {
             if (vm.selectedRelease != null) {
                 vm.filterBy = vm.selectedRelease.versionTag;
             } else {

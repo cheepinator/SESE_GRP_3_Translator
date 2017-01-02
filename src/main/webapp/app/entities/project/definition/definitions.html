@@ -13,10 +13,9 @@
                     <span class="glyphicon glyphicon-download"></span>
                     <span class="hidden-xs">Download</span>
                 </button>
-                <a class="dropdown">
+                <a  ng-if="vm.definitions.length > 0" class="dropdown">
                     <select class="btn btn-default" ng-model="vm.selectedRelease"
-                            data-ng-options="release.versionTag for release in vm.releases" ng-change="vm.setSelectedRelease(vm.selectedRelease)">
-                        <option value="">All Releases</option>
+                            data-ng-options="release.versionTag for release in vm.releases" ng-change="vm.setSelectedRelease()">
                     </select>
                 </a>
             </div>
