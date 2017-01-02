@@ -9,10 +9,10 @@
                         Create new Definition
                     </span>
                 </button>
-                <a ng-if="vm.isDeveloper()" class="btn btn-default" ng-href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/release/null/language/null">
+                <button ng-disabled="vm.definitions.length == 0" ng-if="vm.isDeveloper()" class="btn btn-default" ng-href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/release/null/language/null">
                     <span class="glyphicon glyphicon-download"></span>
                     <span class="hidden-xs">Download</span>
-                </a>
+                </button>
                 <a class="dropdown">
                     <select class="btn btn-default" ng-model="vm.selectedRelease"
                             data-ng-options="release.versionTag for release in vm.releases" ng-change="vm.setSelectedRelease(vm.selectedRelease)">

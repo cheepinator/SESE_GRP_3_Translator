@@ -5,9 +5,9 @@
         .module('seseTranslatorApp')
         .controller('ReleaseController', ReleaseController);
 
-    ReleaseController.$inject = ['$scope', '$state', '$stateParams', 'Release', 'previousState', 'ReleaseProject'];
+    ReleaseController.$inject = ['$scope', '$state', '$stateParams', 'Release', 'previousState', 'ReleaseProject', 'Project'];
 
-    function ReleaseController ($scope, $state, $stateParams, Release, previousState, ReleaseProject) {
+    function ReleaseController ($scope, $state, $stateParams, Release, previousState, ReleaseProject, Project) {
         var vm = this;
 
         vm.releases = [];
@@ -15,6 +15,7 @@
         vm.previousState = previousState.name;
         vm.isCurrentRelease = isCurrentRelease;
         vm.projectId = $stateParams.projectId;
+        vm.project = [];
         loadAll();
 
         function loadAll() {
@@ -23,6 +24,10 @@
                 vm.releases = result;
             });
         }
+
+        Project.get({id : vm.projectId}, function(result) {
+            vm.project = result;
+        });
 
         function isCurrentRelease (isActive) {
             if(isActive) {

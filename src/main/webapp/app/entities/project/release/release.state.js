@@ -68,7 +68,7 @@
 
                     }
                 }).result.then(function () {
-                    $state.go('project-detail.release', null, {reload: 'project-detail.release'});
+                    $state.go('project-detail.release', null, {reload: 'project-detail.release' && 'project-detail'});
                 }, function () {
                     $state.go('project-detail.release');
                 });
@@ -92,7 +92,7 @@
                             }]
                         }
                     }).result.then(function () {
-                        $state.go('project-detail.release', null, {reload: 'project-detail.release'});
+                        $state.go('project-detail.release', null, {reload: 'project-detail.release' && 'project-detail'});
                     }, function () {
                         $state.go('^');
                     });
@@ -148,7 +148,7 @@
                             }]
                         }
                     }).result.then(function () {
-                        $state.go('project-detail.release', null, {reload: 'project-detail.release'});
+                        $state.go('project-detail.release', null, {reload: 'project-detail.release' && 'project-detail'});
                     }, function () {
                         $state.go('project-detail.release');
                     });
@@ -173,7 +173,7 @@
                             }]
                         }
                     }).result.then(function () {
-                        $state.go('project-detail.release', null, {reload: 'project-detail.release'});
+                        $state.go('project-detail.release', null, {reload: 'project-detail.release' && 'project-detail'});
                     }, function () {
                         $state.go('project-detail.release');
                     });
