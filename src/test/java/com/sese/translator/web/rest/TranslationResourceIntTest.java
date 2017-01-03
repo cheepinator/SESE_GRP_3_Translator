@@ -42,7 +42,7 @@ public class TranslationResourceIntTest {
     private static final String DEFAULT_TRANSLATED_TEXT = "AAAAAAAAAA";
     private static final String UPDATED_TRANSLATED_TEXT = "BBBBBBBBBB";
 
-    private static final Boolean DEFAULT_UPDATE_NEEDED = false;
+    private static final Boolean DEFAULT_UPDATE_NEEDED = true;
     private static final Boolean UPDATED_UPDATE_NEEDED = true;
 
     @Inject
@@ -122,8 +122,16 @@ public class TranslationResourceIntTest {
     public void createTranslation() throws Exception {
         int databaseSizeBeforeCreate = translationRepository.findAll().size();
 
+        Project aProject = new Project().name("aProject");
+        projectRepository.saveAndFlush(aProject);
+
+        Release aRelease = new Release().versionTag("aRelease").project(aProject);
+        releaseRepository.saveAndFlush(aRelease);
+
         translation.setDefinition(definition);
+        definition.setRelease(aRelease);
         translation.setLanguage(language);
+        translation.setUpdateNeeded(true);
         // Create the Translation
         TranslationDTO translationDTO = translationMapper.translationToTranslationDTO(translation);
 
@@ -268,8 +276,17 @@ public class TranslationResourceIntTest {
     @WithMockUser
     public void updateTranslation() throws Exception {
         // Initialize the database
+
+        Project aProject = new Project().name("aProject");
+        projectRepository.saveAndFlush(aProject);
+
+        Release aRelease = new Release().versionTag("aRelease").project(aProject);
+        releaseRepository.saveAndFlush(aRelease);
+        definition.setRelease(aRelease);
+
         translation.setDefinition(definition);
         translation.setLanguage(language);
+        translation.setUpdateNeeded(true);
         translationRepository.saveAndFlush(translation);
         int databaseSizeBeforeUpdate = translationRepository.findAll().size();
 
