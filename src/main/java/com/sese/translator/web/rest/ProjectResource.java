@@ -61,7 +61,7 @@ public class ProjectResource {
         }
         ProjectDTO result = projectService.save(projectDTO);
         // create default release
-        //releaseService.createDefaultRelease(result);
+        releaseService.createDefaultRelease(result);
         return ResponseEntity.created(new URI("/api/projects/" + result.getId()))
                              .headers(HeaderUtil.createEntityCreationAlert("project", result.getId().toString()))
                              .body(result);

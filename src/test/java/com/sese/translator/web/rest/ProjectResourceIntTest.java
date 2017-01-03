@@ -15,6 +15,9 @@ import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.web.rest.util.HeaderUtil;
+import java.util.List;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,15 +33,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the ProjectResource REST controller.
@@ -93,8 +98,8 @@ public class ProjectResourceIntTest {
         ReflectionTestUtils.setField(projectResource, "projectService", projectService);
         ReflectionTestUtils.setField(projectResource, "releaseService", releaseService);
         this.restProjectMockMvc = MockMvcBuilders.standaloneSetup(projectResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setMessageConverters(jacksonMessageConverter).build();
+                                                 .setCustomArgumentResolvers(pageableArgumentResolver)
+                                                 .setMessageConverters(jacksonMessageConverter).build();
     }
 
     /**
@@ -129,9 +134,9 @@ public class ProjectResourceIntTest {
         ProjectDTO projectDTO = projectMapper.projectToProjectDTO(project);
 
         restProjectMockMvc.perform(post("/api/projects")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
-                .andExpect(status().isCreated());
+                                       .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                       .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
+                          .andExpect(status().isCreated());
 
         // Validate the Project in the database
         List<Project> projects = projectRepository.findAll();
@@ -141,7 +146,7 @@ public class ProjectResourceIntTest {
         assertThat(testProject.getOwner().getLogin()).isEqualTo("user"); // 'user' is the default mocked username
 
         // Assert a default release was created for the project
-       /* List<Release> releases = releaseRepository.findAll();
+        List<Release> releases = releaseRepository.findAll();
         assertThat(releases).hasSize(releasesBeforeCreate + 1);
         Release defaultRelease = releases.get(releases.size() - 1);
         assertThat(defaultRelease.getProject()).isEqualTo(testProject);
@@ -150,7 +155,7 @@ public class ProjectResourceIntTest {
 
         // Assert a default language was created for the release
         assertThat(defaultRelease.getLanguages()).hasSize(1);
-        assertThat(defaultRelease.getLanguages().iterator().next().getCode()).isEqualTo(Language.DEFAULT_LANGUAGE);*/
+        assertThat(defaultRelease.getLanguages().iterator().next().getCode()).isEqualTo(Language.DEFAULT_LANGUAGE);
     }
 
     @Test
@@ -164,9 +169,9 @@ public class ProjectResourceIntTest {
         ProjectDTO projectDTO = projectMapper.projectToProjectDTO(project);
 
         restProjectMockMvc.perform(post("/api/projects")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
-                .andExpect(status().isBadRequest());
+                                       .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                       .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
+                          .andExpect(status().isBadRequest());
 
         List<Project> projects = projectRepository.findAll();
         assertThat(projects).hasSize(databaseSizeBeforeTest);
@@ -181,8 +186,8 @@ public class ProjectResourceIntTest {
         ProjectDTO projectDTO = projectMapper.projectToProjectDTO(project);
 
         restProjectMockMvc.perform(post("/api/projects")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
+                                       .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                       .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
                           .andExpect(status().isBadRequest())
                           .andExpect(header().string(HeaderUtil.X_SESE_TRANSLATOR_APP_ERROR, "A new project cannot already have an Owner"));
 
@@ -201,8 +206,8 @@ public class ProjectResourceIntTest {
         ProjectDTO projectDTO = projectMapper.projectToProjectDTO(project);
 
         restProjectMockMvc.perform(post("/api/projects")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
+                                       .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                       .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
                           .andExpect(status().isBadRequest())
                           .andExpect(header().string(HeaderUtil.X_SESE_TRANSLATOR_APP_ERROR, "A new project cannot already have an ID"));
 
@@ -281,10 +286,10 @@ public class ProjectResourceIntTest {
 
         // Get the project
         restProjectMockMvc.perform(get("/api/projects/{id}", project.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(project.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
+                          .andExpect(status().isOk())
+                          .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                          .andExpect(jsonPath("$.id").value(project.getId().intValue()))
+                          .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
     }
 
     @Test
@@ -293,7 +298,7 @@ public class ProjectResourceIntTest {
     public void getNonExistingProject() throws Exception {
         // Get the project
         restProjectMockMvc.perform(get("/api/projects/{id}", Long.MAX_VALUE))
-                .andExpect(status().isForbidden());
+                          .andExpect(status().isForbidden());
     }
 
     @WithMockUser
@@ -310,8 +315,8 @@ public class ProjectResourceIntTest {
         ProjectDTO projectDTO = projectMapper.projectToProjectDTO(updatedProject);
 
         restProjectMockMvc.perform(put("/api/projects")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
+                                       .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                       .content(TestUtil.convertObjectToJsonBytes(projectDTO)))
                           .andExpect(status().isOk());
 
         // Validate the Project in the database
@@ -330,8 +335,8 @@ public class ProjectResourceIntTest {
 
         // Get the project
         restProjectMockMvc.perform(delete("/api/projects/{id}", project.getId())
-                .accept(TestUtil.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
+                                       .accept(TestUtil.APPLICATION_JSON_UTF8))
+                          .andExpect(status().isOk());
 
         // Validate the database is empty
         List<Project> projects = projectRepository.findAll();
