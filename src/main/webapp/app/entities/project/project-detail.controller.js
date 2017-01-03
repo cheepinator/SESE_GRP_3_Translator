@@ -75,7 +75,7 @@
         }
 
         function goToTranslate() {
-            $state.go('project-detail.translation', {curReleaseId: vm.currentRelease.id.toString(), languageId: vm.currentRelease.languages[0].id});//todo send language id
+            $state.go('project-detail.open-translation');
         }
 
     }

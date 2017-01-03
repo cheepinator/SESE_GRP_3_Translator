@@ -154,6 +154,10 @@ public class TranslationServiceImpl implements TranslationService {
     @Override
     @Transactional
     public List<TranslationDTO> getNextOpenTranslation(NextTranslationDTO dto) {
-        return translationMapper.translationsToTranslationDTOs(translationRepository.findOpenTranslationsByReleaseAndLanguage(dto.getReleaseId(), dto.getLanguageId()));
+        if (dto.getReleaseId() == null) {
+            return translationMapper.translationsToTranslationDTOs(translationRepository.findOpenTranslationsByLanguage(dto.getLanguageId()));
+        } else {
+            return translationMapper.translationsToTranslationDTOs(translationRepository.findOpenTranslationsByReleaseAndLanguage(dto.getReleaseId(), dto.getLanguageId()));
+        }
     }
 }

@@ -17,6 +17,7 @@ public interface TranslationMapper {
     @Mapping(source = "definition.id", target = "definitionId")
     @Mapping(source = "definition.originalText", target = "originalText")
     @Mapping(source = "definition.code", target = "definitionCode")
+    @Mapping(source = "definition.release.versionTag", target = "release")
     TranslationDTO translationToTranslationDTO(Translation translation);
 
     List<TranslationDTO> translationsToTranslationDTOs(List<Translation> translations);

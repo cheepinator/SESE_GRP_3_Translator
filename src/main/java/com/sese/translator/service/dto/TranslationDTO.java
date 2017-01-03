@@ -34,6 +34,9 @@ public class TranslationDTO implements Serializable {
     @NotNull
     private String originalText;
 
+    @NotNull
+    private String release;
+
     public Long getId() {
         return id;
     }
@@ -94,6 +97,14 @@ public class TranslationDTO implements Serializable {
 
     public void setOriginalText(String originalText) {
         this.originalText = originalText;
+    }
+
+    public String getRelease() {
+        return release;
+    }
+
+    public void setRelease(String release) {
+        this.release = release;
     }
 
     @Override

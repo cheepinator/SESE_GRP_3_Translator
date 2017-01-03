@@ -14,7 +14,7 @@
             {{vm.language.code}}
         </dd>
     </dl>
-    <div align="column" ng-if="!vm.nextTranslations">
+    <div align="column" ng-if="!vm.nextTranslations.length">
         <h4>All definitions have been translated for the Release and Language.</h4>
         <button type="button"
                 ui-sref="{{ vm.previousState }}"
@@ -22,12 +22,12 @@
             <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
         </button>
     </div>
-    <div align="column" ng-if="vm.nextTranslations">
+    <div align="column" ng-if="vm.nextTranslations.length">
 
         <div ng-repeat="translation in vm.nextTranslations track by translation.id">
             <div align="column" class="dl-horizontal jh-entity-details">
                 <span class="label label-success">Code: {{translation.definitionCode}}</span>
-                <span class="label label-warning">PLACEHOLDER FOR RELEASE</span>
+                <span class="label label-warning">Release: {{translation.release}}</span>
                 <div align="row">
                     <div style="width: 49%; float: left; ">{{translation.originalText}}</div>
                     <div style="float: left;" ng-include="'content/images/ic_play_arrow_black_36px.svg'">f</div>

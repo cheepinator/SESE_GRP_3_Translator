@@ -9,7 +9,6 @@ import java.io.Serializable;
  */
 public class NextTranslationDTO implements Serializable {
 
-    @NotNull
     private Long releaseId;
 
     @NotNull

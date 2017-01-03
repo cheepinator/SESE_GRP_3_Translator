@@ -167,7 +167,34 @@
                     $state.go('^');
                 });
             }]
-        });
+        }).state('project-detail.open-translation', {
+                parent: 'project-detail',
+                url: '/start-translating',
+                data: {
+                    authorities: ['ROLE_USER']
+                },
+                onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
+                    $uibModal.open({
+                        templateUrl: 'app/entities/project/project-translation-dialog.html',
+                        controller: 'ProjectTranslationDialogController',
+                        controllerAs: 'vm',
+                        backdrop: 'static',
+                        size: 'sm',
+                        windowClass: 'app-modal-window',
+                        resolve: {
+                            releases: ['Release', function(Release) {
+                                return Release.query({projectId : $stateParams.projectId}).$promise;
+                            }],
+                            languages: ['Language', function(Language) {
+                                return Language.query().$promise;
+                            }]
+                        }
+                    }).result.then(function() {
+                    }, function() {
+                        $state.go('^');
+                    });
+                }]
+            });
     }
 
 })();

@@ -16,6 +16,7 @@
                 <a  ng-if="vm.definitions.length > 0" class="dropdown">
                     <select class="btn btn-default" ng-model="vm.selectedRelease"
                             data-ng-options="release.versionTag for release in vm.releases" ng-change="vm.setSelectedRelease()">
+                        <option value="">NONE</option>
                     </select>
                 </a>
             </div>
@@ -83,3 +84,4 @@
             </table>
         </div>
     </div>
+</div>

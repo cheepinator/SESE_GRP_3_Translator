@@ -32,7 +32,12 @@
                         return Project.get({id : $stateParams.projectId}).$promise;
                     }],
                     currentRelease: ['$stateParams', 'Release', function ($stateParams, Release) {
-                        return Release.get({id: $stateParams.curReleaseId}).$promise;
+                        if($stateParams.curReleaseId){
+                            return Release.get({id: $stateParams.curReleaseId}).$promise;
+                        }
+                        else{
+                            return "";
+                        }
                     }],
                     language:['$stateParams', 'Language', function ($stateParams, Language) {
                         return Language.get({id: $stateParams.languageId}).$promise;
