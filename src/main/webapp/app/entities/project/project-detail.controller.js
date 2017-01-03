@@ -7,10 +7,10 @@
 
 
     ProjectDetailController.$inject = ['$state', '$scope', '$rootScope', '$stateParams', 'previousState', 'project',
-        'projectReleases', 'Project', 'Release', 'User', 'ProjectRoles', 'Principal', 'UserName', 'ProjectProgress'];
+        'projectReleases', 'Project', 'Release', 'User', 'ProjectRoles', 'Principal', 'UserName'];
 
     function ProjectDetailController($state, $scope, $rootScope, $stateParams, previousState, project, projectReleases,
-                                     Project, Release, User, ProjectRoles, Principal, UserName, ProjectProgress) {
+                                     Project, Release, User, ProjectRoles, Principal, UserName) {
 
         var vm = this;
 
@@ -22,7 +22,7 @@
         vm.releases = projectReleases;
         vm.currentRelease = null;
         vm.roles = "No role assigned";
-        vm.progress = 0.0;
+      //  vm.progress = 0.0;
         vm.isOwner = isOwner;
         vm.isTranslator = isTranslator;
         vm.isReleaseManager = isReleaseManager;
@@ -34,10 +34,6 @@
 
         getAccount();
         activate();
-
-        function getProjectProgress() {
-
-        }
 
         function getAccount() {
             Principal.identity().then(function (account) {
@@ -65,11 +61,11 @@
                 vm.roles = response;
             }
 
-            ProjectProgress.query({id: vm.project.id}, onQuerySuccess);
+            //ProjectProgress.query({id: vm.project.id}, onQuerySuccess);
 
-            function onQuerySuccess(response) {
-                vm.progress = response;
-            }
+          //  function onQuerySuccess(response) {
+          //      vm.progress = response;
+         //   }
 
             for (var x in vm.releases) {
                 if (vm.releases[x].isCurrentRelease) {
