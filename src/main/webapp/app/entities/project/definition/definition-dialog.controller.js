@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular
@@ -8,8 +8,8 @@
     ProjectDefinitionDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'DataUtils',
         'definition', 'projectReleases', 'Definition', 'Translation', 'Release'];
 
-    function ProjectDefinitionDialogController ($timeout, $scope, $stateParams, $uibModalInstance, DataUtils, definition,
-                                                 projectReleases, Definition, Translation, Release) {
+    function ProjectDefinitionDialogController($timeout, $scope, $stateParams, $uibModalInstance, DataUtils, definition,
+                                               projectReleases, Definition, Translation, Release) {
         var vm = this;
 
         vm.definition = definition;
@@ -19,17 +19,23 @@
         vm.save = save;
         vm.translations = Translation.query();
         vm.releases = projectReleases;
-        vm.selectedRelease = vm.releases[0];
+        vm.selectedRelease = [];
         vm.isEdit = vm.definition.id != null;
 
         if (vm.isEdit) {
-            for(var i = 0; i < vm.releases.length; i++){
-                if(vm.releases[i].id == vm.definition.releaseId){
+            for (var i = 0; i < vm.releases.length; i++) {
+                if (vm.releases[i].id == vm.definition.releaseId) {
+                    vm.selectedRelease = vm.releases[i];
+                }
+            }
+        } else {
+            for (var i = 0; i < vm.releases.length; i++) {
+                if (vm.releases[i].isCurrentRelease == true) {
                     vm.selectedRelease = vm.releases[i];
                 }
             }
         }
-        $timeout(function (){
+        $timeout(function () {
             if (vm.isEdit) {
                 angular.element('.form-group:eq(1)>textarea').focus();
             } else {
@@ -37,11 +43,11 @@
             }
         });
 
-        function clear () {
+        function clear() {
             $uibModalInstance.dismiss('cancel');
         }
 
-        function save () {
+        function save() {
             vm.isSaving = true;
             vm.definition.releaseId = vm.selectedRelease.id;
             if (vm.definition.id !== null) {
@@ -51,13 +57,13 @@
             }
         }
 
-        function onSaveSuccess (result) {
+        function onSaveSuccess(result) {
             $scope.$emit('seseTranslatorApp:definitionUpdate', result);
             $uibModalInstance.close(result);
             vm.isSaving = false;
         }
 
-        function onSaveError () {
+        function onSaveError() {
             vm.isSaving = false;
         }
     }

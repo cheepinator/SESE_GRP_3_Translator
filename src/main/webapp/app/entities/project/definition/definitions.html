@@ -37,7 +37,7 @@
                 </tr>
                 </thead>
                 <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
-                <tr ng-repeat="definition in vm.definitions | filter:vm.filterBy track by definition.id">
+                <tr ng-repeat="definition in vm.definitions | filter: vm.filterByVersionTagFunction()">
                     <!--<td>{{definition.id}}</td>-->
                     <td><a ui-sref="project-detail.definition-detail({definitionId:definition.id})">{{definition.code}}</a></td>
                     <td>{{definition.originalText}}</td>

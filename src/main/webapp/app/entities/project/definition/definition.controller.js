@@ -37,6 +37,7 @@
         vm.isDeveloper = isDeveloper;
         vm.setSelectedRelease = setSelectedRelease;
         vm.getReleaseName = getReleaseName;
+        vm.filterByVersionTagFunction = filterByVersionTagFunction;
         loadAll();
         getAccount();
         setInitialFilteringRelease();
@@ -44,6 +45,16 @@
         function setInitialFilteringRelease() {
             vm.selectedRelease = "";
             setSelectedRelease();
+        }
+
+        function filterByVersionTagFunction() {
+            return function( item ) {
+                var result = true;
+                if(vm.filterBy != ''){
+                    result = vm.getReleaseName(item.releaseId) === vm.filterBy;
+                }
+                return result;
+            };
         }
 
         function getAccount() {
@@ -61,7 +72,7 @@
         }
 
         function setSelectedRelease() {
-            if (vm.selectedRelease != null) {
+            if (vm.selectedRelease != null && vm.selectedRelease.versionTag != null) {
                 vm.filterBy = vm.selectedRelease.versionTag;
             } else {
                 vm.filterBy = '';
