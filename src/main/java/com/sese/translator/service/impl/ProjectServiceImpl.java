@@ -1,12 +1,15 @@
 package com.sese.translator.service.impl;
 
+import com.sese.translator.domain.Language;
 import com.sese.translator.domain.Project;
 import com.sese.translator.repository.ProjectRepository;
 import com.sese.translator.repository.ProjectassignmentRepository;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.UserService;
+import com.sese.translator.service.dto.LanguageDTO;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.dto.ProjectassignmentDTO;
+import com.sese.translator.service.mapper.LanguageMapper;
 import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ProjectassignmentMapper;
 import org.slf4j.Logger;
@@ -46,6 +49,9 @@ public class ProjectServiceImpl implements ProjectService {
     private ProjectMapper projectMapper;
 
     @Inject
+    private LanguageMapper languageMapper;
+
+    @Inject
     private ProjectassignmentMapper projectassignmentMapper;
 
     /**
@@ -68,6 +74,26 @@ public class ProjectServiceImpl implements ProjectService {
         project = projectRepository.save(project);
         ProjectDTO result = projectMapper.projectToProjectDTO(project);
         return result;
+    }
+
+    @Override
+    @Transactional
+    public LanguageDTO addLanguageToProject(ProjectDTO projectDTO, LanguageDTO languageDTO) {
+        Project project = projectMapper.projectDTOToProject(projectDTO);
+        Language language = languageMapper.languageDTOToLanguage(languageDTO);
+        project.addLanguages(language);
+        projectRepository.save(project);
+        return languageMapper.languageToLanguageDTO(language);
+    }
+
+    @Override
+    @Transactional
+    public LanguageDTO removeLanguageFromProject(ProjectDTO projectDTO, LanguageDTO languageDTO) {
+        Project project = projectMapper.projectDTOToProject(projectDTO);
+        Language language = languageMapper.languageDTOToLanguage(languageDTO);
+        project.removeLanguages(language);
+        projectRepository.save(project);
+        return languageMapper.languageToLanguageDTO(language);
     }
 
     /**
@@ -104,7 +130,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public ProjectDTO findOne(Long id) {
         log.debug("Request to get Project : {}", id);
-        Project project = projectRepository.findOne(id);
+        Project project = projectRepository.findOneWithEagerRelationships(id);
         ProjectDTO projectDTO = projectMapper.projectToProjectDTO(project);
         return projectDTO;
     }

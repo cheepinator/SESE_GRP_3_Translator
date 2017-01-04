@@ -1,8 +1,10 @@
 package com.sese.translator.repository;
 
 import com.sese.translator.domain.Project;
-
-import org.springframework.data.jpa.repository.*;
+import com.sese.translator.domain.Release;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -12,8 +14,11 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface ProjectRepository extends JpaRepository<Project,Long> {
 
-    @Query("select project from Project project where project.owner.login = ?#{principal.username}")
+    @Query("select distinct project from Project project left join fetch project.languages where project.owner.login = ?#{principal.username}")
     List<Project> findByOwnerIsCurrentUser();
+
+    @Query("select project from Project project left join fetch project.languages where project.id =:id")
+    Project findOneWithEagerRelationships(@Param("id") Long id);
 
 
 }

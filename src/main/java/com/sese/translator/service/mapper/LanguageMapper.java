@@ -16,7 +16,7 @@ public interface LanguageMapper {
 
     List<LanguageDTO> languagesToLanguageDTOs(List<Language> languages);
 
-    @Mapping(target = "releases", ignore = true)
+    @Mapping(target = "projects", ignore = true)
     Language languageDTOToLanguage(LanguageDTO languageDTO);
 
     List<Language> languageDTOsToLanguages(List<LanguageDTO> languageDTOs);

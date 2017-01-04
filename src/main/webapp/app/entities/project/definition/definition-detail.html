@@ -24,7 +24,7 @@
     <!--todo adapt-->
     <h3>Translations</h3>
 
-    <div ng-repeat="language in vm.release.languages track by language.id">
+    <div ng-repeat="language in vm.project.languages track by language.id">
         <dl class="dl-horizontal">
             <dt><span>{{language.code}}</span></dt>
             {{::vm.getTranslation(language.id)}}

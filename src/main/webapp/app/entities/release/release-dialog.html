@@ -55,10 +55,6 @@
         </div>
 
         <div class="form-group">
-            <label for="field_languages">Languages</label>
-            <select class="form-control" id="field_languages" multiple name="languages" ng-model="vm.release.languages" ng-options="language as language.id for language in vm.languages track by language.id"></select>
-        </div>
-        <div class="form-group">
             <label for="field_project">Project</label>
             <select class="form-control" id="field_project" name="project" ng-model="vm.release.projectId" ng-options="project.id as project.id for project in vm.projects" required>
                 <option value=""></option>

@@ -91,6 +91,59 @@
                 });
             }]
         })
+        .state('project-detail.new-language', {
+            parent: 'project-detail',
+            url: '/new-language',
+            data: {
+                authorities: ['ROLE_USER']
+            },
+            onEnter: ['$stateParams', '$state', '$uibModal', 'project',
+                function ($stateParams, $state, $uibModal, project) {
+                    $uibModal.open({
+                        templateUrl: 'app/entities/project/language-dialog.html',
+                        controller: 'ProjectLanguageDialogController',
+                        controllerAs: 'vm',
+                        backdrop: 'static',
+                        size: 'lg',
+                        resolve: {
+                            project: function () {
+                                return project;
+                            }
+                        }
+                    }).result.then(function () {
+                        $state.go('project-detail', null, {reload: 'project-detail'});
+                    }, function () {
+                        $state.go('project-detail');
+                    });
+                }]
+        })
+        .state('project-detail.delete-language', {
+            parent: 'project-detail',
+            url: '/delete-language/{languageId}',
+            data: {
+                authorities: ['ROLE_USER']
+            },
+            onEnter: ['$stateParams', '$state', '$uibModal', 'project', function ($stateParams, $state, $uibModal, project) {
+                $uibModal.open({
+                    templateUrl: 'app/entities/project/language-delete-dialog.html',
+                    controller: 'ProjectLanguageDeleteController',
+                    controllerAs: 'vm',
+                    size: 'md',
+                    resolve: {
+                        language: ['Language', function (Language) {
+                            return Language.get({id: $stateParams.languageId}).$promise;
+                        }],
+                        project: function () {
+                            return project;
+                        }
+                    }
+                }).result.then(function () {
+                        $state.go('project-detail', null, {reload: 'project-detail'});
+                    }, function () {
+                        $state.go('project-detail');
+                    });
+                }]
+            })
         .state('project.new', {
             parent: 'project',
             url: '/new',

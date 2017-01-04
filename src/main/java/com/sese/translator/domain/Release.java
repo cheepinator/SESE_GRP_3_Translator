@@ -51,13 +51,6 @@ public class Release implements Serializable {
     @Cascade(CascadeType.DELETE)
     private Set<Definition> definitions = new HashSet<>();
 
-    @ManyToMany
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @JoinTable(name = "release_languages",
-        joinColumns = @JoinColumn(name = "releases_id", referencedColumnName = "ID"),
-        inverseJoinColumns = @JoinColumn(name = "languages_id", referencedColumnName = "ID"))
-    private Set<Language> languages = new HashSet<>();
-
     @NotNull
     @ManyToOne
     private Project project;
@@ -145,31 +138,6 @@ public class Release implements Serializable {
 
     public void setDefinitions(Set<Definition> definitions) {
         this.definitions = definitions;
-    }
-
-    public Set<Language> getLanguages() {
-        return languages;
-    }
-
-    public Release languages(Set<Language> languages) {
-        this.languages = languages;
-        return this;
-    }
-
-    public Release addLanguages(Language language) {
-        languages.add(language);
-        language.getReleases().add(this);
-        return this;
-    }
-
-    public Release removeLanguages(Language language) {
-        languages.remove(language);
-        language.getReleases().remove(this);
-        return this;
-    }
-
-    public void setLanguages(Set<Language> languages) {
-        this.languages = languages;
     }
 
     public Project getProject() {

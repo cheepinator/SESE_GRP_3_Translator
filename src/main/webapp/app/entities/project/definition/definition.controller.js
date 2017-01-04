@@ -6,10 +6,11 @@
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
     ProjectDefinitionController.$inject = ['$scope', '$state', '$location', 'project', 'projectReleases', 'DataUtils',
-        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles'];
+        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles', 'ProjectProgress'];
 
     function ProjectDefinitionController($scope, $state, $location, project, projectReleases, DataUtils, ProjectDefinition,
-                                         ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations, Principal, ProjectRoles) {
+                                         ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations, Principal, ProjectRoles,
+                                         ProjectProgress) {
         var vm = this;
 
         vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
@@ -32,7 +33,6 @@
         vm.byteSize = DataUtils.byteSize;
 
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
-        vm.getLanguageCode = getLanguageCode;
         vm.getTranslations = getTranslations;
         vm.isDeveloper = isDeveloper;
         vm.setSelectedRelease = setSelectedRelease;
@@ -66,6 +66,8 @@
         ProjectRoles.query({projectId: vm.project.id}, function (response) {
             vm.roles = response;
         });
+
+        vm.progress = ProjectProgress.query({projectId: vm.project.id});
 
         function isDeveloper() {
             return vm.roles && vm.roles.includes('DEVELOPER');
@@ -123,22 +125,29 @@
 
         }
 
-        function getLanguageCode(definition, languageId) {
-            if (definition.release) {
-                var language = definition.release.languages.find(function (language) {
-                    return language.id == languageId;
-                });
-                if (language) {
-                    return language.code;
-                }
-            }
-            return "";
-        }
-
         function getTranslations(definition) {
             return vm.translations.filter(function (translation) {
                 return translation.definitionId == definition.id;
             });
+        }
+
+        vm.getProgressValue = getProgressValue;
+        function getProgressValue(language) {
+            var progress = vm.progress.find(function (progress) {
+                return progress.language.id == language.id;
+            });
+            if (progress) {
+                return progress.current;
+            }
+            return 0;
+        }
+
+        vm.getMaxProgressValue = getMaxProgressValue;
+        function getMaxProgressValue() {
+            if (vm.progress.length > 0) {
+                return vm.progress[0].max;
+            }
+            return 0;
         }
 
         function reset() {

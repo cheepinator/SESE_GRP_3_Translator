@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Mapper for the entity Project and its DTO ProjectDTO.
  */
-@Mapper(componentModel = "spring", uses = {UserMapper.class, })
+@Mapper(componentModel = "spring", uses = {UserMapper.class, LanguageMapper.class })
 public interface ProjectMapper {
 
     @Mapping(source = "owner.id", target = "ownerId")
@@ -23,4 +23,13 @@ public interface ProjectMapper {
     Project projectDTOToProject(ProjectDTO projectDTO);
 
     List<Project> projectDTOsToProjects(List<ProjectDTO> projectDTOs);
+
+    default Language languageFromId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        Language language = new Language();
+        language.setId(id);
+        return language;
+    }
 }

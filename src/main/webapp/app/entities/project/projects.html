@@ -20,8 +20,8 @@
                 <tr>
                     <th><span>Owner / Name</span></th>
                     <th><span>Roles</span></th>
-                    <!--<th><span>Upcoming Release</span></th>-->
-                    <!--<th><span>Progress</span></th>-->
+                    <th><span>Upcoming Release</span></th>
+                    <th><span>Progress</span></th>
                     <th><span>Languages</span></th>
                     <th></th>
                 </tr>
@@ -38,20 +38,18 @@
                         </span>
                     </td>
 
-                    <!--<td>-->
-                    <!--<a ui-sref="release-detail({id:currentRelease.id})">-->
-                            <!--<span class="badge" uib-tooltip="{{vm.getReleaseTooltip(currentRelease)}}">{{currentRelease.versionTag}}</span>-->
-                        <!--</a>-->
-                    <!--</td>-->
-                    <!--<td>-->
-                        <!--&lt;!&ndash;{{getCountOfTranslationsByReleaseID(currentRelease.id) }}-->
-                       <!--{{countOfTranslations}}&ndash;&gt;-->
-                        <!--leer-->
-                    <!--</td>-->
                     <td>
-                        {{getCurrentReleaseByProjectID(project.id)}}
-                        <span ng-repeat="languages in currentRelease.languages">
-
+                    <a ui-sref="release-detail({id:currentRelease.id})">
+                            <span class="badge" uib-tooltip="{{vm.getReleaseTooltip(currentRelease)}}">{{currentRelease.versionTag}}</span>
+                        </a>
+                    </td>
+                    <td>
+                        <!--{{getCountOfTranslationsByReleaseID(currentRelease.id) }}
+                       {{countOfTranslations}}-->
+                        leer
+                    </td>
+                    <td>
+                        <span ng-repeat="languages in project.languages">
                             <!--<a class="form-control-static" ui-sref="language-detail({id: languages.id})">-->
                                 {{languages.code}}{{$last ? '' : ', '}}
                             <!--</a>-->

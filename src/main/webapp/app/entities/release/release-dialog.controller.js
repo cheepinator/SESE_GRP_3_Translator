@@ -5,9 +5,9 @@
         .module('seseTranslatorApp')
         .controller('ReleaseDialogController', ReleaseDialogController);
 
-    ReleaseDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Release', 'Definition', 'Language', 'Project'];
+    ReleaseDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Release', 'Definition', 'Project'];
 
-    function ReleaseDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Release, Definition, Language, Project) {
+    function ReleaseDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Release, Definition, Project) {
         var vm = this;
 
         vm.release = entity;
@@ -16,7 +16,6 @@
         vm.openCalendar = openCalendar;
         vm.save = save;
         vm.definitions = Definition.query();
-        vm.languages = Language.query();
         vm.projects = Project.query();
 
         $timeout(function (){

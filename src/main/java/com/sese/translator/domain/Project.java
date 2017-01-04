@@ -38,6 +38,13 @@ public class Project implements Serializable {
     @Cascade(CascadeType.DELETE)
     private Set<Release> releases = new HashSet<>();
 
+    @ManyToMany
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JoinTable(name = "project_languages",
+        joinColumns = @JoinColumn(name = "projects_id", referencedColumnName = "ID"),
+        inverseJoinColumns = @JoinColumn(name = "languages_id", referencedColumnName = "ID"))
+    private Set<Language> languages = new HashSet<>();
+
     @ManyToOne
     private User owner;
 
@@ -98,6 +105,32 @@ public class Project implements Serializable {
 
     public void setOwner(User user) {
         this.owner = user;
+    }
+
+
+    public Set<Language> getLanguages() {
+        return languages;
+    }
+
+    public Project languages(Set<Language> languages) {
+        this.languages = languages;
+        return this;
+    }
+
+    public Project addLanguages(Language language) {
+        languages.add(language);
+        language.getProjects().add(this);
+        return this;
+    }
+
+    public Project removeLanguages(Language language) {
+        languages.remove(language);
+        language.getProjects().remove(this);
+        return this;
+    }
+
+    public void setLanguages(Set<Language> languages) {
+        this.languages = languages;
     }
 
     @Override
