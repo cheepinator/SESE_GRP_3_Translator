@@ -159,12 +159,12 @@ public class TranslationServiceImpl implements TranslationService {
 
     @Override
     @Transactional
-    public void addMissingTranslationsForProjectAndLanguage(ProjectDTO projectDTO, LanguageDTO languageDTO) {
-        log.debug("Adding missing translations for project with id {} and new language {}", projectDTO.getId(),
-            languageDTO.getCode());
-        Language language = languageMapper.languageDTOToLanguage(languageDTO);
+    public void addMissingTranslationsForProject(ProjectDTO projectDTO) {
+        log.debug("Adding missing translations for project with id {}", projectDTO.getId());
         Page<Definition> projectDefinitions = definitionRepository.findByProjectId(projectDTO.getId(), null);
-        projectDefinitions.getContent().forEach(definition -> addMissingTranslationsToDefinition(definition, language));
+        List<Definition> definitions = projectDefinitions.getContent();
+        definitions.forEach(this::addMissingTranslationsToDefinition);
+        definitionRepository.save(definitions);
     }
 
     @Override
@@ -177,8 +177,8 @@ public class TranslationServiceImpl implements TranslationService {
             if (!alreadyTranslatedLanguages.contains(projectLanguage)) {
                 Translation translation = new Translation()
                     .updateNeeded(true)
-                    .language(projectLanguage)
-                    .definition(definition);
+                    .language(projectLanguage);
+                definition.addTranslations(translation);
                 translationRepository.save(translation);
                 log.debug("Added new empty translation for definition with id {} and language {}", definition.getId(),
                     projectLanguage.getCode());
@@ -190,24 +190,6 @@ public class TranslationServiceImpl implements TranslationService {
         return definition.getTranslations().stream()
                          .map(Translation::getLanguage)
                          .collect(Collectors.toSet());
-    }
-
-    private void addMissingTranslationsToDefinition(Definition definition, Language newLanguage) {
-        if (isNotAlreadyTranslated(definition, newLanguage)) {
-            Translation translation = new Translation()
-                .updateNeeded(true)
-                .language(newLanguage)
-                .definition(definition);
-            translationRepository.save(translation);
-            log.debug("Added new empty translation for definition with id {} and language {}", definition.getId(),
-                newLanguage.getCode());
-        }
-    }
-
-    private boolean isNotAlreadyTranslated(Definition definition, Language newLanguage) {
-        return definition.getTranslations().stream()
-                         .map(Translation::getLanguage)
-                         .noneMatch(availableLanguage -> availableLanguage.equals(newLanguage));
     }
 
     @Override
@@ -222,6 +204,8 @@ public class TranslationServiceImpl implements TranslationService {
             long count = definitions.stream()
                                     .flatMap(definition -> definition.getTranslations().stream())
                                     .filter(translation -> !translation.isUpdateNeeded())
+                                    .filter(translation -> translation.getTranslatedText() != null
+                                        && !translation.getTranslatedText().isEmpty())
                                     .map(Translation::getLanguage)
                                     .filter(Predicate.isEqual(language))
                                     .count();

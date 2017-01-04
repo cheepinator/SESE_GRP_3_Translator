@@ -102,14 +102,13 @@ public class LanguageResource {
         if (projectDTO == null) {
             return ResponseEntity.notFound().build();
         }
-        languageDTO = languageService.save(languageDTO); // make sure to initially save the language in the db
-        LanguageDTO updatedLanguage = projectService.addLanguageToProject(projectDTO, languageDTO);
-        updatedLanguage = languageService.save(updatedLanguage);
-        translationService.addMissingTranslationsForProjectAndLanguage(projectDTO, updatedLanguage);
+        languageDTO = languageService.save(languageDTO);
+        projectService.addLanguageToProject(projectDTO, languageDTO);
+        translationService.addMissingTranslationsForProject(projectDTO);
 
-        return ResponseEntity.created(new URI("/api/languages/" + updatedLanguage.getId()))
-                             .headers(HeaderUtil.createEntityCreationAlert("language", updatedLanguage.getId().toString()))
-                             .body(updatedLanguage);
+        return ResponseEntity.created(new URI("/api/languages/" + languageDTO.getId()))
+                             .headers(HeaderUtil.createEntityCreationAlert("language", languageDTO.getId().toString()))
+                             .body(languageDTO);
     }
 
     /**

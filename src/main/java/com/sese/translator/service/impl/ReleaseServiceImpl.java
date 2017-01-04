@@ -12,14 +12,15 @@ import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.service.mapper.LanguageMapper;
 import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ReleaseMapper;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing Release.
@@ -49,7 +50,6 @@ public class ReleaseServiceImpl implements ReleaseService {
     public ReleaseDTO save(ReleaseDTO releaseDTO) {
         log.debug("Request to save Release : {}", releaseDTO);
         Release release = releaseMapper.releaseDTOToRelease(releaseDTO);
-        release.addLanguages(getDefaultLanguage());
         release = releaseRepository.save(release);
         ReleaseDTO result = releaseMapper.releaseToReleaseDTO(release);
         return result;
