@@ -42,6 +42,11 @@ public class DefinitionServiceImpl implements DefinitionService{
     public DefinitionDTO save(DefinitionDTO definitionDTO) {
         log.debug("Request to save Definition : {}", definitionDTO);
         Definition definition = definitionMapper.definitionDTOToDefinition(definitionDTO);
+        if (definitionDTO.getId() != null) {
+            // workaround for bug that resets all translations when updating definitions
+            Definition originalDefinition = definitionRepository.findOne(definitionDTO.getId());
+            definition.setTranslations(originalDefinition.getTranslations());
+        }
         //new definition with release
         definition = definitionRepository.save(definition);
         if (definition.getRelease() != null) {
