@@ -107,8 +107,8 @@ public class LanguageResource {
         translationService.addMissingTranslationsForProject(projectDTO);
 
         return ResponseEntity.created(new URI("/api/languages/" + languageDTO.getId()))
-                             .headers(HeaderUtil.createEntityCreationAlert("language", languageDTO.getId().toString()))
-                             .body(languageDTO);
+            .headers(HeaderUtil.createEntityCreationAlert("language", languageDTO.getId().toString()))
+            .body(languageDTO);
     }
 
     /**
@@ -133,6 +133,23 @@ public class LanguageResource {
         languageService.delete(languageId);
 
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("language", languageId.toString())).build();
+    }
+
+    /**
+     * GET  /projects/{projectId}/languages : Get all Languages associated with a project
+     *
+     * @return the ResponseEntity with status 201 (Created) and with body the new languageDTO,
+     * or with status 400 (Bad Request) if the language has already an ID
+     * or with status 404 (Not Found) if the project with the given ID does not exist
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+    @GetMapping("/projects/{projectId}/languages")
+    @Timed
+    public ResponseEntity<?> createLanguageForProject(@PathVariable Long projectId) throws URISyntaxException {
+        log.debug("REST request to get Languages for project with id {}", projectId);
+        List<LanguageDTO> languages = languageService.findByProjectId(projectId);
+
+        return new ResponseEntity<>(languages, HttpStatus.OK);
     }
 
     /**

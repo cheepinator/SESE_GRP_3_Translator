@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class LanguageServiceImpl implements LanguageService{
 
     private final Logger log = LoggerFactory.getLogger(LanguageServiceImpl.class);
-    
+
     @Inject
     private LanguageRepository languageRepository;
 
@@ -46,10 +46,10 @@ public class LanguageServiceImpl implements LanguageService{
 
     /**
      *  Get all the languages.
-     *  
+     *
      *  @return the list of entities
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public List<LanguageDTO> findAll() {
         log.debug("Request to get all Languages");
         List<LanguageDTO> result = languageRepository.findAll().stream()
@@ -59,13 +59,20 @@ public class LanguageServiceImpl implements LanguageService{
         return result;
     }
 
+    @Override
+    public List<LanguageDTO> findByProjectId(Long id) {
+        return languageRepository.findByProjectId(id).stream()
+            .map(languageMapper::languageToLanguageDTO)
+            .collect(Collectors.toList());
+    }
+
     /**
      *  Get one language by id.
      *
      *  @param id the id of the entity
      *  @return the entity
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public LanguageDTO findOne(Long id) {
         log.debug("Request to get Language : {}", id);
         Language language = languageRepository.findOne(id);

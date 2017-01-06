@@ -235,11 +235,11 @@
                         size: 'sm',
                         windowClass: 'app-modal-window',
                         resolve: {
-                            releases: ['Release', function(Release) {
-                                return Release.query({projectId : $stateParams.projectId}).$promise;
+                            releases: ['ReleaseProject', function(ReleaseProject) {
+                                return ReleaseProject.query({projectId : $stateParams.projectId}).$promise;
                             }],
-                            languages: ['Language', function(Language) {
-                                return Language.query().$promise;
+                            languages: ['NewProjectLanguage', function(NewProjectLanguage) {
+                                return NewProjectLanguage.query({projectId : $stateParams.projectId}).$promise;
                             }]
                         }
                     }).result.then(function() {

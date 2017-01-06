@@ -172,7 +172,9 @@
     function NewProjectLanguage ($resource) {
         var resourceUrl =  'api/projects/:projectId/languages/:languageId';
 
-        return $resource(resourceUrl, {}, {});
+        return $resource(resourceUrl, {}, {
+            'query': { method: 'GET', isArray: true}
+        });
     }
 
     function ProjectProgress ($resource) {

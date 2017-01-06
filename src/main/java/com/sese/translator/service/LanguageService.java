@@ -2,7 +2,6 @@ package com.sese.translator.service;
 
 import com.sese.translator.service.dto.LanguageDTO;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,10 +19,18 @@ public interface LanguageService {
 
     /**
      *  Get all the languages.
-     *  
+     *
      *  @return the list of entities
      */
     List<LanguageDTO> findAll();
+
+    /**
+     * Find by ProjectID.
+     *
+     * @param id the id of the project
+     * @return the persisted entity
+     */
+    List<LanguageDTO> findByProjectId(Long id);
 
     /**
      *  Get the "id" language.

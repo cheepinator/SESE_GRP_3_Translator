@@ -135,7 +135,9 @@ public class ReleaseResource {
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
         }
-        else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
     /**
