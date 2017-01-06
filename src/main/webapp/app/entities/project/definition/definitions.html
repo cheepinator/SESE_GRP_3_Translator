@@ -31,16 +31,19 @@
                 <span class="glyphicon glyphicon-plus"></span>
                 <span>New</span>
             </button>
-            <a ng-if="vm.isDeveloper() && vm.definitions.length > 0" class="btn btn-default btn-sm"
-               ng-href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/release/null/language/null">
-                <span class="glyphicon glyphicon-download"></span>
-                <span class="hidden-xs">Download</span>
-            </a>
-            <a  ng-if="vm.definitions.length > 0" class="dropdown">
+            <a ng-if="vm.definitions.length > 0" class="dropdown">
                 <select class="btn btn-default" ng-model="vm.selectedRelease"
                         data-ng-options="release.versionTag for release in vm.releases" ng-change="vm.setSelectedRelease()">
                     <option value="">NONE</option>
                 </select>
+            </a>
+            <a ng-if="vm.isDeveloper() && vm.definitions.length > 0" class="btn btn-default btn-sm"
+               ng-href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/export/{{selectedOption.name}}">
+                <span class="glyphicon glyphicon-download"></span>
+                <span class="hidden-xs">Download</span>
+            </a>
+            <a class="dropdown">
+                <select class="btn btn-default" data-ng-options="o.name for o in options" data-ng-model="selectedOption"></select>
             </a>
         </h3>
     </div>

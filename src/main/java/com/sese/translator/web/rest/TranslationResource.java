@@ -1,15 +1,14 @@
 package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.sese.translator.domain.Definition;
-import com.sese.translator.domain.Language;
-import com.sese.translator.domain.Release;
-import com.sese.translator.domain.Translation;
+import com.sese.translator.domain.*;
 import com.sese.translator.repository.DefinitionRepository;
 import com.sese.translator.repository.TranslationRepository;
+import com.sese.translator.service.LanguageService;
+import com.sese.translator.service.ProjectService;
+import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.TranslationService;
-import com.sese.translator.service.dto.NextTranslationDTO;
-import com.sese.translator.service.dto.TranslationDTO;
+import com.sese.translator.service.dto.*;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
@@ -47,6 +46,12 @@ public class TranslationResource {
 
     @Inject
     private TranslationService translationService;
+
+    @Inject
+    private ProjectService projectService;
+
+    @Inject
+    private ReleaseService releaseService;
 
     @Inject
     private TranslationRepository translationRepository;
@@ -194,39 +199,37 @@ public class TranslationResource {
      * GET  /projects/{projectId}/release/{versionTag}/language/{languageCode} : get all translations for the project
      *
      * @param projectId    the id of the project
-     * @param versionTag   the version of the translation
-     * @param languageCode the language of the translation
      * @return the ResponseEntity with status 200 (OK) and with body the definitionDTO, or with status 404 (Not Found)
      */
-    @GetMapping("/projects/{projectId}/release/{versionTag}/language/{languageCode}")
+    @GetMapping("/projects/{projectId}/export/{ex}")
     @ResponseBody
     @Transactional
-    public ResponseEntity downloadTranslations(@PathVariable Long projectId, @PathVariable String versionTag, @PathVariable String languageCode) {
-        log.debug("REST request to get all Translations for project with id: {} and release {} and language {}", projectId, versionTag, languageCode);
-        //todo: remove the default tags and language if implemented
+    public ResponseEntity downloadTranslations(@PathVariable Long projectId, @PathVariable String ex) {
+        log.debug("REST request to get all Translations for project with id: {}", projectId);
         //todo: also some security that only a developer of a project can do this
 
-        List<Translation> defaultTranslations = translationRepository.findByProjectIdLanguageIdReleaseId(projectId, Release.DEFAULT_TAG, Language.DEFAULT_LANGUAGE);
+        ProjectDTO project = projectService.findOne(projectId);
+        List<ReleaseDTO> releaseList = releaseService.findAllForProject(projectId);
+
         StringBuilder stringBuilder = new StringBuilder();
-        for (Translation t : defaultTranslations) {
-            stringBuilder.append("\"").append(t.getDefinition().getCode()).append("\" = \"").append(t.getTranslatedText()).append("\";\n");
-        }
-        byte[] german_file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
-
-        // append the english definitions
-        stringBuilder.setLength(0);
-        List<Definition> getDefinitionsFromRelease = definitionRepository.findByProjectIdAndVersionTag(projectId, Release.DEFAULT_TAG);
-        for (Definition d : getDefinitionsFromRelease) {
-            stringBuilder.append("\"").append(d.getCode()).append("\" = \"").append(d.getOriginalText()).append("\";\n");
-        }
-        byte[] definition_file = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
-
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream, StandardCharsets.UTF_8)) {
-            zipOutputStream.putNextEntry(new ZipEntry("german.strings"));
-            zipOutputStream.write(german_file);
-            zipOutputStream.putNextEntry(new ZipEntry("english.strings"));
-            zipOutputStream.write(definition_file);
+            for(ReleaseDTO releaseDTO : releaseList) {
+                for(LanguageDTO languageDTO : project.getLanguages()) {
+                    List<Translation> translationList = translationRepository.findByProjectIdLanguageIdReleaseId(projectId,
+                        releaseDTO.getVersionTag(), languageDTO.getCode());
+                    appendTranslation(stringBuilder, translationList, ex);
+                    zipOutputStream.putNextEntry(new ZipEntry(releaseDTO.getVersionTag() + "/" + languageDTO.getCode() + ".strings"));
+                    zipOutputStream.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
+                    stringBuilder.setLength(0);
+                }
+            List<Definition> getDefinitionsFromRelease = definitionRepository.findByProjectIdAndVersionTag(projectId, releaseDTO.getVersionTag());
+            appendDefinition(stringBuilder, getDefinitionsFromRelease, ex);
+            zipOutputStream.putNextEntry(new ZipEntry(releaseDTO.getVersionTag() + "/EN.strings"));
+            zipOutputStream.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
+            stringBuilder.setLength(0);
+            }
         } catch (IOException e) {
             log.error("Failed to generate zip file to download", e);
             return null;
@@ -240,6 +243,52 @@ public class TranslationResource {
         header.setContentLength(downloadFile.length);
 
         return new ResponseEntity<>(downloadFile, header, HttpStatus.OK);
+    }
+
+    private void appendTranslation(StringBuilder stringBuilder, List<Translation> translationList, String export) {
+        if(translationList.size() == 0) {
+            return;
+        }
+        if(export.equals("ios")) {
+            for (Translation t : translationList) {
+                stringBuilder.append("\"").append(t.getDefinition().getCode()).append("\" = \"").append(t.getTranslatedText()).append("\";\n");
+            }
+        } else if(export.equals("web")) {
+            stringBuilder.append("{\n\"").append(translationList.get(0).getLanguage().getCode()).append("\":\n{\n");
+            for (Translation t : translationList) {
+                stringBuilder.append("\"").append(t.getDefinition().getCode()).append("\":\n{\n\"").append(t.getTranslatedText()).append("\":\"").append(t.getTranslatedText()).append("\"\n},\n");
+            }
+            stringBuilder.append("}\n}");
+        } else if(export.equals("android")) {
+            stringBuilder.append("<ressources>\n");
+            for (Translation t : translationList) {
+                stringBuilder.append("<string name=\"").append(t.getDefinition().getCode()).append("\">").append(t.getTranslatedText()).append("</string>\n");
+            }
+            stringBuilder.append("</ressources>");
+        }
+    }
+
+    private void appendDefinition(StringBuilder stringBuilder, List<Definition> definitionList, String export) {
+        if(definitionList.size() == 0) {
+            return;
+        }
+        if(export.equals("ios")) {
+            for (Definition t : definitionList) {
+                stringBuilder.append("\"").append(t.getCode()).append("\" = \"").append(t.getOriginalText()).append("\";\n");
+            }
+        } else if(export.equals("web")) {
+            stringBuilder.append("{\n\"").append(definitionList.get(0).getCode()).append("\":\n{\n");
+            for (Definition t : definitionList) {
+                stringBuilder.append("\"").append(t.getCode()).append("\":\n{\n\"").append(t.getOriginalText()).append("\":\"").append(t.getOriginalText()).append("\"\n},\n");
+            }
+            stringBuilder.append("}\n}");
+        } else if(export.equals("android")) {
+            stringBuilder.append("<ressources>\n");
+            for (Definition t : definitionList) {
+                stringBuilder.append("<string name=\"").append(t.getCode()).append("\">").append(t.getOriginalText()).append("</string>\n");
+            }
+            stringBuilder.append("</ressources>");
+        }
     }
 
 }
