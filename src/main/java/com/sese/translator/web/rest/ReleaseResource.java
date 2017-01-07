@@ -4,21 +4,29 @@ import com.codahale.metrics.annotation.Timed;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.dto.ProjectDTO;
+import com.sese.translator.service.dto.ProjectDetails;
 import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.web.rest.util.HeaderUtil;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import javax.inject.Inject;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.inject.Inject;
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for managing Release.
@@ -35,6 +43,16 @@ public class ReleaseResource {
     @Inject
     private ProjectService projectService;
 
+    private static boolean containsId(List<ProjectDTO> list, long id) {
+        for (ProjectDTO proj : list) {
+            System.out.println("comparing proj" + proj.getId() + " with " + id);
+            if (proj.getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * POST  /releases : Create a new release.
      *
@@ -47,21 +65,21 @@ public class ReleaseResource {
     public ResponseEntity<ReleaseDTO> createRelease(@Valid @RequestBody ReleaseDTO releaseDTO) throws URISyntaxException {
         log.debug("REST request to save Release : {}", releaseDTO);
         if (releaseDTO.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("release", "idexists", "A new release cannot already have an ID")).body(null);
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("release", "idexists", "A new release cannot already have an ID")).body(
+                null);
         }
         ReleaseDTO result = releaseService.save(releaseDTO);
         return ResponseEntity.created(new URI("/api/releases/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("release", result.getId().toString()))
-            .body(result);
+                             .headers(HeaderUtil.createEntityCreationAlert("release", result.getId().toString()))
+                             .body(result);
     }
 
     /**
      * PUT  /releases : Updates an existing release.
      *
      * @param releaseDTO the releaseDTO to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated releaseDTO,
-     * or with status 400 (Bad Request) if the releaseDTO is not valid,
-     * or with status 500 (Internal Server Error) if the releaseDTO couldnt be updated
+     * @return the ResponseEntity with status 200 (OK) and with body the updated releaseDTO, or with status 400 (Bad Request) if the releaseDTO is not valid, or
+     * with status 500 (Internal Server Error) if the releaseDTO couldnt be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/releases")
@@ -73,8 +91,8 @@ public class ReleaseResource {
         }
         ReleaseDTO result = releaseService.save(releaseDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("release", releaseDTO.getId().toString()))
-            .body(result);
+                             .headers(HeaderUtil.createEntityUpdateAlert("release", releaseDTO.getId().toString()))
+                             .body(result);
     }
 
     /**
@@ -100,23 +118,14 @@ public class ReleaseResource {
     public ResponseEntity<ReleaseDTO> getDefaultRelease(@PathVariable Long projectId) {
         log.debug("REST request to get the default release for project {}", projectId);
 
-        if(containsId(projectService.findAllOfCurrentUser(),projectId)) {
+        if (containsId(projectService.findAllOfCurrentUser(), projectId)) {
             ReleaseDTO defaultReleaseForProject = releaseService.getDefaultReleaseForProject(projectId);
             return Optional.ofNullable(defaultReleaseForProject)
-                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-        }else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    }
-
-
-    private static boolean containsId(List<ProjectDTO> list, long id) {
-        for (ProjectDTO proj : list) {
-            System.out.println("comparing proj"+ proj.getId() + " with "+ id);
-            if (proj.getId() == id) {
-                return true;
-            }
+                           .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                           .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return false;
     }
 
     /**
@@ -129,13 +138,12 @@ public class ReleaseResource {
     @Timed
     public ResponseEntity<List<ReleaseDTO>> getAllReleasesForProject(@PathVariable Long projectId) {
         log.debug("REST request to get the default release for project {}", projectId);
-        if(containsId(projectService.findAllOfCurrentUser(),projectId)) {
+        if (containsId(projectService.findAllOfCurrentUser(), projectId)) {
             List<ReleaseDTO> releasesForProject = releaseService.findAllForProject(projectId);
             return Optional.ofNullable(releasesForProject)
-                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-        }
-        else {
+                           .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                           .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
@@ -151,16 +159,19 @@ public class ReleaseResource {
     public ResponseEntity<ReleaseDTO> getRelease(@PathVariable Long id) {
         log.debug("REST request to get Release : {}", id);
         ReleaseDTO releaseDTO = releaseService.findOne(id);
-        if(releaseDTO==null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        if(containsId(projectService.findAllOfCurrentUser(),releaseDTO.getProjectId())) {
-            return Optional.ofNullable(releaseDTO)
-                .map(result -> new ResponseEntity<>(
-                    result,
-                    HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        if (releaseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        if (containsId(projectService.findAllOfCurrentUser(), releaseDTO.getProjectId())) {
+            return Optional.ofNullable(releaseDTO)
+                           .map(result -> new ResponseEntity<>(
+                               result,
+                               HttpStatus.OK))
+                           .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
 
@@ -172,35 +183,36 @@ public class ReleaseResource {
      */
     @GetMapping("/releases/counttranslations/{id}")
     @Timed
-    public ResponseEntity<Pair<Integer,Integer>> getCountTranslationsForRelease(@PathVariable Long id) {
+    public ResponseEntity<Pair<Integer, Integer>> getCountTranslationsForRelease(@PathVariable Long id) {
         log.debug("REST request to get Count of Translations for Release : {}", id);
         Integer count = releaseService.countTranslations(id);
-        Pair<Integer,Integer> pair = Pair.of(count,1); //TODO zweite abfrage für die anzahl der definitionen
+        Pair<Integer, Integer> pair = Pair.of(count, 1); //TODO zweite abfrage für die anzahl der definitionen
         return Optional.ofNullable(pair)
-            .map(result -> new ResponseEntity<>(
-                result,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                       .map(result -> new ResponseEntity<>(
+                           result,
+                           HttpStatus.OK))
+                       .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-
     /**
-     * GET  /releases/project/:id : get the current release for project "id".
+     * Get the details(current release and project progress) of all projects
      *
-     * @param id the id of the Project to retrieve the current release for
-     * @return the ResponseEntity with status 200 (OK) and with body the releaseDTO, or with status 404 (Not Found)
+     * @return List of ProjectDetails
      */
-//    @GetMapping("/releases/project/{id}")
-//    @Timed
-//    public ResponseEntity<ReleaseDTO> getCurrentReleaseByProjectId(@PathVariable Long id) {
-//        log.debug("Rest Request to get current Release of Project : {}", id);
-//        ReleaseDTO releaseDTO = releaseService.findCurrentByProjectId(id);
-//        return Optional.ofNullable(releaseDTO)
-//            .map(result -> new ResponseEntity<>(
-//                result,
-//                HttpStatus.OK))
-//            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-//    }
+    @GetMapping("/releases/projects")
+    @Timed
+    public List<ProjectDetails> getAllDetailsOfAllProjects() {
+        List<ProjectDetails> projectDetails = new ArrayList<>();
+        for (ProjectDTO projectDTO : projectService.findAllOfCurrentUser()) {
+            ProjectDetails projectD = new ProjectDetails();
+            projectD.setProjectId(projectDTO.getId());
+            ReleaseDTO currentRelease = releaseService.findCurrentReleaseByProjectId(projectDTO.getId());
+            projectD.setCurrentRelease(currentRelease);
+            projectD.setProjectProgress(releaseService.getReleaseProgress(currentRelease.getId()));
+            projectDetails.add(projectD);
+        }
+        return projectDetails;
+    }
 
     /**
      * DELETE  /releases/:id : delete the "id" release.

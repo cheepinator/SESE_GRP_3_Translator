@@ -35,7 +35,6 @@
             ]
         },
         {
-            "fieldName": "isCurrentRelease",
             "fieldType": "Boolean",
             "fieldValidateRules": [
                 "required"

@@ -102,7 +102,7 @@
                 parent: 'project-detail.release',
                 url: '/release/{id}',
                 params: {
-                    projetcId: null
+                    projetcId: null,
                 },
                 data: {
                     authorities: ['ROLE_USER'],

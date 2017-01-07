@@ -21,7 +21,6 @@
                     <th><span>ID</span></th>
                     <th><span>Description</span></th>
                     <th><span>Version Tag</span></th>
-                    <th><span>Is Current Release</span></th>
                     <th><span>Due Date</span></th>
                     <th><span>Project</span></th>
                     <th></th>
@@ -32,7 +31,6 @@
                     <td><a ui-sref="release-detail({id:release.id})">{{release.id}}</a></td>
                     <td>{{release.description}}</td>
                     <td>{{release.versionTag}}</td>
-                    <td>{{release.isCurrentRelease}}</td>
                     <td>{{release.dueDate | date:'medium'}}</td>
                     <td>
                         <a ui-sref="project-detail({id:release.projectId})">{{release.projectId}}</a>

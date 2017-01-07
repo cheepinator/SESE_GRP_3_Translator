@@ -6,9 +6,9 @@
         .controller('ProjectController', ProjectController);
 
     ProjectController.$inject = ['$q', '$scope', '$state', 'Project', 'Language', 'Release', 'CountTranslations', 'dateFilter', 'Principal',
-        'ReleaseTooltips', '$location', 'ProjectRoles'];
+        'ReleaseTooltips', '$location', 'ProjectRoles', 'ProjectDetails'];
 
-    function ProjectController($q, $scope, $state, Project, Language, Release, CountTranslations, dateFilter, Principal, ReleaseTooltips, $location, ProjectRoles) {
+    function ProjectController($q, $scope, $state, Project, Language, Release, CountTranslations, dateFilter, Principal, ReleaseTooltips, $location, ProjectRoles, ProjectDetails) {
         var vm = this;
 
         vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
@@ -17,8 +17,12 @@
         vm.languages = [];
         vm.releases = [];
         vm.roles = [];
+        vm.proejctDetails = [];
+
+        vm.getCurrentReleaseProgress = getCurrentReleaseProgress;
         vm.isOwner = isOwner;
         vm.isDeveloper = isDeveloper;
+        vm.getCurrentReleaseByProjectId = getCurrentReleaseByProjectId;
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
 
         getAccount();
@@ -58,6 +62,26 @@
             Release.query(function (result) {
                 vm.releases = result
             });
+
+            ProjectDetails.query(function (result) {
+                vm.proejctDetails = result;
+            });
+        }
+
+        function getCurrentReleaseByProjectId(projectId) {
+            for (var i = 0; i < vm.proejctDetails.length; i++) {
+                if (vm.proejctDetails[i].projectId == projectId) {
+                    return vm.proejctDetails[i].currentRelease;
+                }
+            }
+        }
+
+        function getCurrentReleaseProgress(projectId) {
+            for (var i = 0; i < vm.proejctDetails.length; i++) {
+                if (vm.proejctDetails[i].projectId == projectId) {
+                    return vm.proejctDetails[i].projectProgress;
+                }
+            }
         }
 
         $scope.getReleaseLabel = getReleaseLabel;
@@ -73,16 +97,6 @@
                 }
             }
             return result;
-        }
-
-        $scope.getCurrentReleaseByProjectID = getCurrentReleaseByProjectID;
-        function getCurrentReleaseByProjectID(id) {
-            $scope.currentRelease = null;
-            vm.releases.forEach(function (entry) {
-                if (entry.projectId == id && entry.isCurrentRelease) {
-                    $scope.currentRelease = entry;
-                }
-            })
         }
 
         $scope.getCountOfTranslationsByReleaseID = getCountOfTranslationsByReleaseID;

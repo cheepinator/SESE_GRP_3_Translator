@@ -27,7 +27,7 @@
     </div>
     <div>
         <h3>Definitions
-            <button ng-disabled="vm.releases.length == 0" ng-if="vm.isDeveloper()" class="btn btn-primary btn-sm" ui-sref="project-detail.new-definition">
+            <button ng-disabled="vm.releases.length == 0" ng-if="vm.isDeveloper()" class="btn btn-primary btn-sm" ui-sref="project-detail.new-definition({releaseId:vm.activeReleaseId})">
                 <span class="glyphicon glyphicon-plus"></span>
                 <span>New</span>
             </button>

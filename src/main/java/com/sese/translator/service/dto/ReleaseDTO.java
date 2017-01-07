@@ -18,9 +18,6 @@ public class ReleaseDTO implements Serializable {
     @NotNull
     private String versionTag;
 
-    @NotNull
-    private Boolean isCurrentRelease;
-
     private ZonedDateTime dueDate;
 
     @NotNull
@@ -47,13 +44,7 @@ public class ReleaseDTO implements Serializable {
     public void setVersionTag(String versionTag) {
         this.versionTag = versionTag;
     }
-    public Boolean getIsCurrentRelease() {
-        return isCurrentRelease;
-    }
 
-    public void setIsCurrentRelease(Boolean isCurrentRelease) {
-        this.isCurrentRelease = isCurrentRelease;
-    }
     public ZonedDateTime getDueDate() {
         return dueDate;
     }
@@ -97,7 +88,6 @@ public class ReleaseDTO implements Serializable {
             "id=" + id +
             ", description='" + description + "'" +
             ", versionTag='" + versionTag + "'" +
-            ", isCurrentRelease='" + isCurrentRelease + "'" +
             ", dueDate='" + dueDate + "'" +
             '}';
     }

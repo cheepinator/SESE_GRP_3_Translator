@@ -24,19 +24,15 @@
             <column name="description" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            
+
             <column name="version_tag" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-            
-            <column name="is_current_release" type="bit">
-                <constraints nullable="false" />
-            </column>
-            
+
             <column name="due_date" type="timestamp">
                 <constraints nullable="true" />
             </column>
-            
+
             <column name="project_id" type="bigint">
                 <constraints nullable="true" />
             </column>
@@ -44,7 +40,7 @@
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
         <dropDefaultValue tableName="release" columnName="due_date" columnDataType="datetime"/>
-        
+
         <createTable tableName="release_languages">
             <column name="languages_id" type="bigint">
                 <constraints nullable="false"/>
@@ -55,6 +51,6 @@
         </createTable>
 
         <addPrimaryKey columnNames="releases_id, languages_id" tableName="release_languages"/>
-        
+
     </changeSet>
 </databaseChangeLog>

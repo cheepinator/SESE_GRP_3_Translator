@@ -13,7 +13,6 @@
         vm.releases = [];
         vm.release = [];
         vm.previousState = previousState.name;
-        vm.isCurrentRelease = isCurrentRelease;
         vm.projectId = $stateParams.projectId;
         vm.project = [];
         loadAll();
@@ -28,14 +27,6 @@
         Project.get({id : vm.projectId}, function(result) {
             vm.project = result;
         });
-
-        function isCurrentRelease (isActive) {
-            if(isActive) {
-                return 'glyphicon glyphicon-ok'
-            } else {
-                return 'glyphicon glyphicon-remove'
-            }
-        }
 
         function getProject(projectId) {
             for(var i = 0; i < vm.releases.length; i++){

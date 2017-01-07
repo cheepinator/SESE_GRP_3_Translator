@@ -67,11 +67,6 @@
           //      vm.progress = response;
          //   }
 
-            for (var x in vm.releases) {
-                if (vm.releases[x].isCurrentRelease) {
-                    vm.currentRelease = vm.releases[x];
-                }
-            }
         }
 
         function goToTranslate() {

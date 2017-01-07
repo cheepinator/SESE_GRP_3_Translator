@@ -2,17 +2,16 @@ package com.sese.translator.repository;
 
 import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Release;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 /**
  * Spring Data JPA repository for the Release entity.
  */
 @SuppressWarnings("unused")
-public interface ReleaseRepository extends JpaRepository<Release,Long> {
+public interface ReleaseRepository extends JpaRepository<Release, Long> {
 
     @Query("select release from Release release")
     List<Release> findAllWithEagerRelationships();
@@ -20,8 +19,8 @@ public interface ReleaseRepository extends JpaRepository<Release,Long> {
     @Query("select release from Release release where release.id =:id")
     Release findOneWithEagerRelationships(@Param("id") Long id);
 
-//    @Query("SELECT release FROM Release release where release.project_id = :id")
-//    Release findCurrentByProjectId(@Param("id") Long id);
+    @Query("SELECT release FROM Release release where release.project = project")
+    List<Release> findReleasesByProject(@Param("project") Project project);
 
     @Query("select count(*) from Translation translation where translation.definition.release.id = :id ")
     Integer countByReleaseId(@Param("id") Long id);

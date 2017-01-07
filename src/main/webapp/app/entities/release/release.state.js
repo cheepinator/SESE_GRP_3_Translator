@@ -97,7 +97,6 @@
                             return {
                                 description: null,
                                 versionTag: null,
-                                isCurrentRelease: false,
                                 dueDate: null,
                                 id: null
                             };

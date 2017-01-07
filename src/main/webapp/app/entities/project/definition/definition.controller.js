@@ -6,11 +6,11 @@
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
     ProjectDefinitionController.$inject = ['$scope', '$state', '$location', 'project', 'projectReleases', 'DataUtils',
-        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles', 'ProjectProgress'];
+        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles', 'ProjectProgress', 'ProjectDetails' ];
 
     function ProjectDefinitionController($scope, $state, $location, project, projectReleases, DataUtils, ProjectDefinition,
                                          ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations, Principal, ProjectRoles,
-                                         ProjectProgress) {
+                                         ProjectProgress, ProjectDetails) {
         var vm = this;
 
         vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
@@ -21,6 +21,7 @@
         vm.project = project;
         vm.releases = projectReleases;
         vm.selectedRelease = [];
+        vm.activeReleaseId = '';
         vm.filterBy = '';
         vm.definitions = [];
         vm.translations = [];
@@ -34,7 +35,7 @@
         vm.reverse = true;
         vm.openFile = DataUtils.openFile;
         vm.byteSize = DataUtils.byteSize;
-
+        vm.proejctDetails = [];
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
         vm.getTranslations = getTranslations;
         vm.isDeveloper = isDeveloper;
@@ -51,9 +52,9 @@
         }
 
         function filterByVersionTagFunction() {
-            return function( item ) {
+            return function (item) {
                 var result = true;
-                if(vm.filterBy != ''){
+                if (vm.filterBy != '') {
                     result = vm.getReleaseName(item.releaseId) === vm.filterBy;
                 }
                 return result;
@@ -117,6 +118,14 @@
                 AlertService.error(error.data.message);
             }
 
+            ProjectDetails.query(function (result) {
+                vm.proejctDetails = result;
+                for (var i = 0; i < vm.proejctDetails.length; i++) {
+                    if(vm.proejctDetails[i].projectId == vm.project.id){
+                        vm.activeReleaseId = vm.proejctDetails[i].currentRelease.id;
+                    }
+                }
+            });
 
             ProjectTranslations.query({projectId: vm.project.id}, onTranslationsSuccess, onError);
 

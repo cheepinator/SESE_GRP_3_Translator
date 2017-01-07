@@ -11,6 +11,14 @@ import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ReleaseMapper;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,19 +34,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the ReleaseResource REST controller.
@@ -55,63 +59,36 @@ public class ReleaseResourceIntTest {
     private static final String DEFAULT_VERSION_TAG = "AAAAAAAAAA";
     private static final String UPDATED_VERSION_TAG = "BBBBBBBBBB";
 
-    private static final Boolean DEFAULT_IS_CURRENT_RELEASE = false;
-    private static final Boolean UPDATED_IS_CURRENT_RELEASE = true;
-
     private static final ZonedDateTime DEFAULT_DUE_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_DUE_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
     private static final String DEFAULT_DUE_DATE_STR = DateTimeFormatter.ISO_INSTANT.format(DEFAULT_DUE_DATE);
-
+    private static Project testProject;
     @Inject
     private ReleaseRepository releaseRepository;
-
     @Inject
     private ProjectRepository projectRepository;
-
     @Inject
     private ReleaseMapper releaseMapper;
-
     @Inject
     private ProjectMapper projectMapper;
-
     @Inject
     private ReleaseService releaseService;
-
     @Inject
     private ProjectService projectService;
-
-
     @Inject
     private UserService userService;
-
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
     @Inject
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
-
     @Inject
     private EntityManager em;
-
     private MockMvc restReleaseMockMvc;
-
     private Release release;
-    private static Project testProject;
-
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        ReleaseResource releaseResource = new ReleaseResource();
-        ReflectionTestUtils.setField(releaseResource, "releaseService", releaseService);
-        ReflectionTestUtils.setField(releaseResource, "projectService", projectService);
-        this.restReleaseMockMvc = MockMvcBuilders.standaloneSetup(releaseResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setMessageConverters(jacksonMessageConverter).build();
-    }
 
     /**
      * Create an entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -121,10 +98,20 @@ public class ReleaseResourceIntTest {
         Release release = new Release()
             .description(DEFAULT_DESCRIPTION)
             .versionTag(DEFAULT_VERSION_TAG)
-            .isCurrentRelease(DEFAULT_IS_CURRENT_RELEASE)
             .dueDate(DEFAULT_DUE_DATE)
             .project(testProject);
         return release;
+    }
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        ReleaseResource releaseResource = new ReleaseResource();
+        ReflectionTestUtils.setField(releaseResource, "releaseService", releaseService);
+        ReflectionTestUtils.setField(releaseResource, "projectService", projectService);
+        this.restReleaseMockMvc = MockMvcBuilders.standaloneSetup(releaseResource)
+                                                 .setCustomArgumentResolvers(pageableArgumentResolver)
+                                                 .setMessageConverters(jacksonMessageConverter).build();
     }
 
     @Before
@@ -142,9 +129,9 @@ public class ReleaseResourceIntTest {
         ReleaseDTO releaseDTO = releaseMapper.releaseToReleaseDTO(release);
 
         restReleaseMockMvc.perform(post("/api/releases")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(releaseDTO)))
-                .andExpect(status().isCreated());
+                                       .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                       .content(TestUtil.convertObjectToJsonBytes(releaseDTO)))
+                          .andExpect(status().isCreated());
 
         // Validate the Release in the database
         List<Release> releases = releaseRepository.findAll();
@@ -152,7 +139,6 @@ public class ReleaseResourceIntTest {
         Release testRelease = releases.get(releases.size() - 1);
         assertThat(testRelease.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
         assertThat(testRelease.getVersionTag()).isEqualTo(DEFAULT_VERSION_TAG);
-        assertThat(testRelease.isIsCurrentRelease()).isEqualTo(DEFAULT_IS_CURRENT_RELEASE);
         assertThat(testRelease.getDueDate()).isEqualTo(DEFAULT_DUE_DATE);
     }
 
@@ -167,28 +153,9 @@ public class ReleaseResourceIntTest {
         ReleaseDTO releaseDTO = releaseMapper.releaseToReleaseDTO(release);
 
         restReleaseMockMvc.perform(post("/api/releases")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(releaseDTO)))
-                .andExpect(status().isBadRequest());
-
-        List<Release> releases = releaseRepository.findAll();
-        assertThat(releases).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    public void checkIsCurrentReleaseIsRequired() throws Exception {
-        int databaseSizeBeforeTest = releaseRepository.findAll().size();
-        // set the field null
-        release.setIsCurrentRelease(null);
-
-        // Create the Release, which fails.
-        ReleaseDTO releaseDTO = releaseMapper.releaseToReleaseDTO(release);
-
-        restReleaseMockMvc.perform(post("/api/releases")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(releaseDTO)))
-                .andExpect(status().isBadRequest());
+                                       .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                       .content(TestUtil.convertObjectToJsonBytes(releaseDTO)))
+                          .andExpect(status().isBadRequest());
 
         List<Release> releases = releaseRepository.findAll();
         assertThat(releases).hasSize(databaseSizeBeforeTest);
@@ -203,13 +170,12 @@ public class ReleaseResourceIntTest {
 
         // Get all the releases
         restReleaseMockMvc.perform(get("/api/releases?sort=id,desc"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.[*].id").value(hasItem(release.getId().intValue())))
-                .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
-                .andExpect(jsonPath("$.[*].versionTag").value(hasItem(DEFAULT_VERSION_TAG.toString())))
-                .andExpect(jsonPath("$.[*].isCurrentRelease").value(hasItem(DEFAULT_IS_CURRENT_RELEASE.booleanValue())))
-                .andExpect(jsonPath("$.[*].dueDate").value(hasItem(DEFAULT_DUE_DATE_STR)));
+                          .andExpect(status().isOk())
+                          .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                          .andExpect(jsonPath("$.[*].id").value(hasItem(release.getId().intValue())))
+                          .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
+                          .andExpect(jsonPath("$.[*].versionTag").value(hasItem(DEFAULT_VERSION_TAG.toString())))
+                          .andExpect(jsonPath("$.[*].dueDate").value(hasItem(DEFAULT_DUE_DATE_STR)));
     }
 
     @Test
@@ -221,13 +187,12 @@ public class ReleaseResourceIntTest {
         //projectRepository.saveAndFlush(testProject);
         // Get the release
         restReleaseMockMvc.perform(get("/api/releases/{id}", release.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(release.getId().intValue()))
-            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION.toString()))
-            .andExpect(jsonPath("$.versionTag").value(DEFAULT_VERSION_TAG.toString()))
-            .andExpect(jsonPath("$.isCurrentRelease").value(DEFAULT_IS_CURRENT_RELEASE.booleanValue()))
-            .andExpect(jsonPath("$.dueDate").value(DEFAULT_DUE_DATE_STR));
+                          .andExpect(status().isOk())
+                          .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                          .andExpect(jsonPath("$.id").value(release.getId().intValue()))
+                          .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION.toString()))
+                          .andExpect(jsonPath("$.versionTag").value(DEFAULT_VERSION_TAG.toString()))
+                          .andExpect(jsonPath("$.dueDate").value(DEFAULT_DUE_DATE_STR));
     }
 
     @Test
@@ -259,7 +224,6 @@ public class ReleaseResourceIntTest {
                           .andExpect(jsonPath("$.[*].id").value(hasItem(release.getId().intValue())))
                           .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
                           .andExpect(jsonPath("$.[*].versionTag").value(hasItem(DEFAULT_VERSION_TAG)))
-                          .andExpect(jsonPath("$.[*].isCurrentRelease").value(hasItem(DEFAULT_IS_CURRENT_RELEASE)))
                           .andExpect(jsonPath("$.[*].dueDate").value(hasItem(DEFAULT_DUE_DATE_STR)));
     }
 
@@ -269,7 +233,7 @@ public class ReleaseResourceIntTest {
     public void getNonExistingRelease() throws Exception {
         // Get the release
         restReleaseMockMvc.perform(get("/api/releases/{id}", Long.MAX_VALUE))
-                .andExpect(status().isNotFound());
+                          .andExpect(status().isNotFound());
     }
 
     @Test
@@ -282,16 +246,15 @@ public class ReleaseResourceIntTest {
         // Update the release
         Release updatedRelease = releaseRepository.findOne(release.getId());
         updatedRelease
-                .description(UPDATED_DESCRIPTION)
-                .versionTag(UPDATED_VERSION_TAG)
-                .isCurrentRelease(UPDATED_IS_CURRENT_RELEASE)
-                .dueDate(UPDATED_DUE_DATE);
+            .description(UPDATED_DESCRIPTION)
+            .versionTag(UPDATED_VERSION_TAG)
+            .dueDate(UPDATED_DUE_DATE);
         ReleaseDTO releaseDTO = releaseMapper.releaseToReleaseDTO(updatedRelease);
 
         restReleaseMockMvc.perform(put("/api/releases")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(releaseDTO)))
-                .andExpect(status().isOk());
+                                       .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                       .content(TestUtil.convertObjectToJsonBytes(releaseDTO)))
+                          .andExpect(status().isOk());
 
         // Validate the Release in the database
         List<Release> releases = releaseRepository.findAll();
@@ -299,7 +262,6 @@ public class ReleaseResourceIntTest {
         Release testRelease = releases.get(releases.size() - 1);
         assertThat(testRelease.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
         assertThat(testRelease.getVersionTag()).isEqualTo(UPDATED_VERSION_TAG);
-        assertThat(testRelease.isIsCurrentRelease()).isEqualTo(UPDATED_IS_CURRENT_RELEASE);
         assertThat(testRelease.getDueDate()).isEqualTo(UPDATED_DUE_DATE);
     }
 
@@ -312,8 +274,8 @@ public class ReleaseResourceIntTest {
 
         // Get the release
         restReleaseMockMvc.perform(delete("/api/releases/{id}", release.getId())
-                .accept(TestUtil.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
+                                       .accept(TestUtil.APPLICATION_JSON_UTF8))
+                          .andExpect(status().isOk());
 
         // Validate the database is empty
         List<Release> releases = releaseRepository.findAll();

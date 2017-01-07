@@ -24,12 +24,6 @@
         $timeout(function () {
             angular.element('.form-group:eq(1)>input').focus();
         });
-        setIsCurrentRelease();
-        function setIsCurrentRelease() {
-            if (vm.release.isCurrentRelease == null) {
-                vm.release.isCurrentRelease = false;
-            }
-        }
 
         function clear() {
             $uibModalInstance.dismiss('cancel');

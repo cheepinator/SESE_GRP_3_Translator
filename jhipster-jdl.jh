@@ -10,7 +10,6 @@ enum Projectrole{
 entity Release{
 	description String,
     versionTag String required,
-    isCurrentRelease Boolean required,
     dueDate ZonedDateTime
 }
 
@@ -36,12 +35,12 @@ entity Projectassignment{
 
 relationship ManyToMany {
     Release{languages} to Language{releases}
-    
+
 }
 
 // defining multiple OneToMany relationships with comments
 relationship OneToMany {
-	
+
 	Project{releases} to Release{project},
     Definition{translations} to Translation{definition},
 	Release{definitions} to Definition{release}

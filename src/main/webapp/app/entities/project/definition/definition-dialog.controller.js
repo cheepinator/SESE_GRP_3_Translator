@@ -20,6 +20,7 @@
         vm.translations = Translation.query();
         vm.releases = projectReleases;
         vm.selectedRelease = [];
+        vm.releaseId = $stateParams.releaseId;
         vm.isEdit = vm.definition.id != null;
 
         if (vm.isEdit) {
@@ -30,7 +31,7 @@
             }
         } else {
             for (var i = 0; i < vm.releases.length; i++) {
-                if (vm.releases[i].isCurrentRelease == true) {
+                if (vm.releases[i].id == vm.releaseId) {
                     vm.selectedRelease = vm.releases[i];
                 }
             }

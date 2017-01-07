@@ -67,7 +67,7 @@ class ReleaseGatlingTest extends Simulation {
             .exec(http("Create new release")
             .post("/api/releases")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "description":"SAMPLE_TEXT", "versionTag":"SAMPLE_TEXT", "isCurrentRelease":null, "dueDate":"2020-01-01T00:00:00.000Z"}""")).asJSON
+            .body(StringBody("""{"id":null, "description":"SAMPLE_TEXT", "versionTag":"SAMPLE_TEXT", "dueDate":"2020-01-01T00:00:00.000Z"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_release_url"))).exitHereIfFailed
             .pause(10)

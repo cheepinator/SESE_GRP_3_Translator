@@ -38,16 +38,12 @@ public class Release implements Serializable {
     @Column(name = "version_tag", nullable = false)
     private String versionTag;
 
-    @NotNull
-    @Column(name = "is_current_release", nullable = false)
-    private Boolean isCurrentRelease = Boolean.FALSE;
-
     @Column(name = "due_date")
     private ZonedDateTime dueDate;
 
     @OneToMany(mappedBy = "release")
     @JsonIgnore
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+  //  @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @Cascade(CascadeType.DELETE)
     private Set<Definition> definitions = new HashSet<>();
 
@@ -87,19 +83,6 @@ public class Release implements Serializable {
 
     public void setVersionTag(String versionTag) {
         this.versionTag = versionTag;
-    }
-
-    public Boolean isIsCurrentRelease() {
-        return isCurrentRelease;
-    }
-
-    public Release isCurrentRelease(Boolean isCurrentRelease) {
-        this.isCurrentRelease = isCurrentRelease;
-        return this;
-    }
-
-    public void setIsCurrentRelease(Boolean isCurrentRelease) {
-        this.isCurrentRelease = isCurrentRelease;
     }
 
     public ZonedDateTime getDueDate() {
@@ -179,7 +162,6 @@ public class Release implements Serializable {
             "id=" + id +
             ", description='" + description + "'" +
             ", versionTag='" + versionTag + "'" +
-            ", isCurrentRelease='" + isCurrentRelease + "'" +
             ", dueDate='" + dueDate + "'" +
             '}';
     }

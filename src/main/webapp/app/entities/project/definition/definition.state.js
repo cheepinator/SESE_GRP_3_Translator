@@ -79,6 +79,9 @@
             .state('project-detail.new-definition', {
                 parent: 'project-detail',
                 url: '/new-definition',
+                params: {
+                    releaseId: null
+                },
                 data: {
                     authorities: ['ROLE_USER']
                 },
