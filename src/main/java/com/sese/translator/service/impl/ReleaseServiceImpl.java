@@ -193,6 +193,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     public ReleaseDTO findCurrentReleaseByProjectId(Long projectId) {
         log.debug("Request to get current Release of Project : {}", projectId);
         final long now = System.currentTimeMillis();
+        Date nowDate = new Date();
         List<Date> dates = new ArrayList<>();
         ProjectDTO projectDTO = projectService.findOne(projectId);
         List<ReleaseDTO> releases = findAllForProject(projectDTO.getId());
@@ -204,7 +205,10 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         for (ReleaseDTO release : releases) {
             if (release.getDueDate() != null) {
-                dates.add(Date.from(release.getDueDate().toInstant()));
+                Date d = Date.from(release.getDueDate().toInstant());
+                if (d.after(nowDate)) {
+                    dates.add(d);
+                }
             }
         }
         Date closest = new Date();
