@@ -4,11 +4,13 @@
         .module('seseTranslatorApp')
         .factory('Release', Release)
         .factory('ReleaseTooltips', ReleaseTooltips)
-        .factory('ReleaseProject', ReleaseProject);
+        .factory('ReleaseProject', ReleaseProject)
+        .factory('CurrentRelease', CurrentRelease);
 
     Release.$inject = ['$resource', 'DateUtils'];
     ReleaseTooltips.$inject = ['dateFilter'];
     ReleaseProject.$inject = ['$resource'];
+    CurrentRelease.$inject = ['$resource'];
 
     function ReleaseProject ($resource) {
         var resourceUrl =  'api//projects/:projectId/releases';
@@ -21,6 +23,22 @@
                     if (data) {
                         data = angular.fromJson(data);
                         data.dueDate = DateUtils.convertDateTimeFromServer(data.dueDate);
+                    }
+                    return data;
+                }
+            }
+        });
+    }
+
+    function CurrentRelease ($resource) {
+        var resourceUrl =  'api/releases/project/:projectId';
+
+        return $resource(resourceUrl, {}, {
+            'get': {
+                method: 'GET',
+                transformResponse: function (data) {
+                    if (data) {
+                        data = angular.fromJson(data);
                     }
                     return data;
                 }

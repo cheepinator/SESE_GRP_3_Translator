@@ -195,6 +195,20 @@ public class ReleaseResource {
     }
 
     /**
+     * GET  /releases/project/:id : get the current release for project "id".
+     *
+     * @param id the id of the Project to retrieve the current release for
+     * @return the ResponseEntity with status 200 (OK) and with body the releaseDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/releases/project/{id}")
+    @Timed
+    public ReleaseDTO getCurrentReleaseByProjectId(@PathVariable Long id) {
+        log.debug("Rest Request to get current Release of Project : {}", id);
+        ReleaseDTO releaseDTO = releaseService.findCurrentReleaseByProjectId(id);
+        return releaseDTO;
+    }
+
+    /**
      * Get the details(current release and project progress) of all projects
      *
      * @return List of ProjectDetails

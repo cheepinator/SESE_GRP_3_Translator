@@ -25,7 +25,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="release in vm.releases | orderBy:'-dueDate'">
+                <tr ng-repeat="release in vm.releases | orderBy:'-dueDate'" ng-class="{ success: vm.isCurrentRelease(release)}">
                     <td>{{release.versionTag}}</td>
                     <td>{{release.description}}</td>
                     <td>{{release.dueDate | date:'medium'}}</td>

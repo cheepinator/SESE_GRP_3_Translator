@@ -6,11 +6,11 @@
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
     ProjectDefinitionController.$inject = ['$scope', '$state', '$location', 'project', 'projectReleases', 'DataUtils',
-        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles', 'ProjectProgress', 'ProjectDetails' ];
+        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles', 'ProjectProgress', 'CurrentRelease'];
 
     function ProjectDefinitionController($scope, $state, $location, project, projectReleases, DataUtils, ProjectDefinition,
                                          ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations, Principal, ProjectRoles,
-                                         ProjectProgress, ProjectDetails) {
+                                         ProjectProgress, CurrentRelease) {
         var vm = this;
 
         vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
@@ -118,13 +118,8 @@
                 AlertService.error(error.data.message);
             }
 
-            ProjectDetails.query(function (result) {
-                vm.proejctDetails = result;
-                for (var i = 0; i < vm.proejctDetails.length; i++) {
-                    if(vm.proejctDetails[i].projectId == vm.project.id){
-                        vm.activeReleaseId = vm.proejctDetails[i].currentRelease.id;
-                    }
-                }
+            CurrentRelease.get({projectId: vm.project.id}, function (result) {
+                vm.activeReleaseId = result.id;
             });
 
             ProjectTranslations.query({projectId: vm.project.id}, onTranslationsSuccess, onError);
