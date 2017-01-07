@@ -15,9 +15,6 @@
 
         vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
 
-        $scope.options = [{ name: "ios", id: 1 }, { name: "android", id: 2 }, { name: "web", id: 3 }];
-        $scope.selectedOption = $scope.options[1];
-
         vm.project = project;
         vm.releases = projectReleases;
         vm.selectedRelease = [];
