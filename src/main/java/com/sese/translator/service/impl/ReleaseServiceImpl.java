@@ -172,7 +172,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         for (Definition definition : definitions) {
             for (Translation translation : definition.getTranslations()) {
-                if (translation.getTranslatedText() != null) {
+                if (translation.getTranslatedText() != null && !translation.getTranslatedText().equals("") && !translation.isUpdateNeeded()) {
                     translatedDefinitions++;
                 }
             }
