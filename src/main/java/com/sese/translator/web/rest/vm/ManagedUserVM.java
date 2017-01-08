@@ -1,12 +1,11 @@
 package com.sese.translator.web.rest.vm;
 
-import java.time.ZonedDateTime;
-
-import java.util.Set;
-
 import com.sese.translator.domain.User;
 import com.sese.translator.service.dto.UserDTO;
+
 import javax.validation.constraints.Size;
+import java.time.ZonedDateTime;
+import java.util.Set;
 
 /**
  * View Model extending the UserDTO, which is meant to be used in the user management UI.

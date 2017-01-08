@@ -13,20 +13,15 @@ public class TranslationProtocolDTO extends AbstractAuditingDTO{
 
     private String translatedText;
 
-
     private Boolean updateNeeded;
 
-
     private Long translatorId;
-
 
     private Long languageId;
 
     private String languageCode;
 
-
     private Long definitionId;
-
 
     private String definitionCode;
 

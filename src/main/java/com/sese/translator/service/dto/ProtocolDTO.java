@@ -3,7 +3,7 @@ package com.sese.translator.service.dto;
 import com.sese.translator.service.dto.protocol.TranslationProtocolDTO;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -13,7 +13,7 @@ public class ProtocolDTO implements Serializable {
 
     private Long ProjectId;
 
-    private ArrayList<TranslationProtocolDTO> translations;
+    private List<TranslationProtocolDTO> translations;
 
     public Long getProjectId() {
         return ProjectId;
@@ -23,11 +23,11 @@ public class ProtocolDTO implements Serializable {
         ProjectId = projectId;
     }
 
-    public ArrayList<TranslationProtocolDTO> getTranslations() {
+    public List<TranslationProtocolDTO> getTranslations() {
         return translations;
     }
 
-    public void setTranslations(ArrayList<TranslationProtocolDTO> translations) {
+    public void setTranslations(List<TranslationProtocolDTO> translations) {
         this.translations = translations;
     }
 }
