@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+   <changeSet author="jobro (generated)" id="1483874257025-1">
+      <addColumn tableName="definition">
+         <column name="created_by" type="varchar(50)">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-2">
+      <addColumn tableName="language">
+         <column name="created_by" type="varchar(50)">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-3">
+      <addColumn tableName="project">
+         <column name="created_by" type="varchar(50)">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-4">
+      <addColumn tableName="projectassignment">
+         <column name="created_by" type="varchar(50)">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-5">
+      <addColumn tableName="release">
+         <column name="created_by" type="varchar(50)">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-6">
+      <addColumn tableName="translation">
+         <column name="created_by" type="varchar(50)">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-7">
+      <addColumn tableName="definition">
+         <column name="created_date" type="timestamp">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-8">
+      <addColumn tableName="language">
+         <column name="created_date" type="timestamp">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-9">
+      <addColumn tableName="project">
+         <column name="created_date" type="timestamp">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-10">
+      <addColumn tableName="projectassignment">
+         <column name="created_date" type="timestamp">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-11">
+      <addColumn tableName="release">
+         <column name="created_date" type="timestamp">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-12">
+      <addColumn tableName="translation">
+         <column name="created_date" type="timestamp">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-13">
+      <addColumn tableName="definition">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-14">
+      <addColumn tableName="language">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-15">
+      <addColumn tableName="project">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-16">
+      <addColumn tableName="projectassignment">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-17">
+      <addColumn tableName="release">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-18">
+      <addColumn tableName="translation">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-19">
+      <addColumn tableName="definition">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-20">
+      <addColumn tableName="language">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-21">
+      <addColumn tableName="project">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-22">
+      <addColumn tableName="projectassignment">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-23">
+      <addColumn tableName="release">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-24">
+      <addColumn tableName="translation">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-25">
+      <dropDefaultValue columnDataType="timestamp"
+                        columnName="created_date"
+                        tableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-26">
+      <dropDefaultValue columnDataType="timestamp"
+                        columnName="due_date"
+                        tableName="release"/>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483874257025-27">
+      <dropDefaultValue columnDataType="boolean"
+                        columnName="update_needed"
+                        tableName="translation"/>
+   </changeSet>
+</databaseChangeLog>

@@ -17,7 +17,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "language")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class Language implements Serializable {
+public class Language extends AbstractAuditingEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     public static final String DEFAULT_LANGUAGE = "De";

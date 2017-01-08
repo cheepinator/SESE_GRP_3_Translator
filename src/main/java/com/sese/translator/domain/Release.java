@@ -21,7 +21,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "release")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class Release implements Serializable {
+public class Release extends AbstractAuditingEntity implements Serializable {
 
     public static final String DEFAULT_TAG = "no release";
 
