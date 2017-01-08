@@ -53,7 +53,7 @@
                     </div>
                 </td>
                 <td>
-                        <span ng-repeat="languages in project.languages">
+                        <span ng-repeat="languages in project.languages | orderBy:'code'">
                             <!--<a class="form-control-static" ui-sref="language-detail({id: languages.id})">-->
                                 {{languages.code}}{{$last ? '' : ', '}}
                             <!--</a>-->
