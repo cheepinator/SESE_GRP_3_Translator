@@ -43,7 +43,7 @@
                              <span class="badge">{{vm.getCurrentReleaseByProjectId(project.id).versionTag}}</span>
                          </a>-->
 
-                    <span class="badge">{{vm.getCurrentReleaseByProjectId(project.id).versionTag}}</span>
+                    <span class="badge" uib-tooltip="{{vm.getReleaseTooltip(vm.getCurrentReleaseByProjectId(project.id))}}">{{vm.getCurrentReleaseByProjectId(project.id).versionTag}}</span>
                 </td>
                 <td>
                     <div class="progress m-b-sm" style="margin-bottom: 0;">

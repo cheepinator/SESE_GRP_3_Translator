@@ -76,7 +76,9 @@
                         </span>
                     </td>
                     <td>
+                        <span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(definition.release)}}">
                         {{vm.getReleaseName(definition.releaseId)}}
+                        </span>
                     </td>
                     <td>
                         <!--<a ui-sref="release-detail({id:definition.releaseId})">-->
