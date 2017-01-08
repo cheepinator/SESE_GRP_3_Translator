@@ -13,10 +13,13 @@ public class ProgressDTO implements Serializable {
 
     private Long current;
 
-    public ProgressDTO(LanguageDTO language, Long max, Long current) {
+    private Boolean hasUpdateNeeded;
+
+    public ProgressDTO(LanguageDTO language, Long max, Long current, Boolean hasUpdateNeeded) {
         this.language = language;
         this.max = max;
         this.current = current;
+        this.hasUpdateNeeded = hasUpdateNeeded;
     }
 
     public LanguageDTO getLanguage() {
@@ -43,6 +46,14 @@ public class ProgressDTO implements Serializable {
         this.current = current;
     }
 
+    public Boolean getHasUpdateNeeded() {
+        return hasUpdateNeeded;
+    }
+
+    public void setHasUpdateNeeded(Boolean hasUpdateNeeded) {
+        this.hasUpdateNeeded = hasUpdateNeeded;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,7 +63,8 @@ public class ProgressDTO implements Serializable {
 
         if (language != null ? !language.equals(that.language) : that.language != null) return false;
         if (max != null ? !max.equals(that.max) : that.max != null) return false;
-        return current != null ? current.equals(that.current) : that.current == null;
+        if (current != null ? !current.equals(that.current) : that.current != null) return false;
+        return hasUpdateNeeded != null ? hasUpdateNeeded.equals(that.hasUpdateNeeded) : that.hasUpdateNeeded == null;
     }
 
     @Override
@@ -60,6 +72,7 @@ public class ProgressDTO implements Serializable {
         int result = language != null ? language.hashCode() : 0;
         result = 31 * result + (max != null ? max.hashCode() : 0);
         result = 31 * result + (current != null ? current.hashCode() : 0);
+        result = 31 * result + (hasUpdateNeeded != null ? hasUpdateNeeded.hashCode() : 0);
         return result;
     }
 
@@ -69,6 +82,7 @@ public class ProgressDTO implements Serializable {
             "language=" + language +
             ", max=" + max +
             ", current=" + current +
+            ", hasUpdateNeeded=" + hasUpdateNeeded +
             '}';
     }
 }

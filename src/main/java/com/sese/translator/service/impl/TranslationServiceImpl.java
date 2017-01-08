@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -201,16 +200,14 @@ public class TranslationServiceImpl implements TranslationService {
         ArrayList<ProgressDTO> result = new ArrayList<>();
         for (Language language : project.getLanguages()) {
             LanguageDTO languageDTO = languageMapper.languageToLanguageDTO(language);
-            long count = definitions.stream()
-                                    .flatMap(definition -> definition.getTranslations().stream())
-                                    .filter(translation -> !translation.isUpdateNeeded())
-                                    .filter(translation -> translation.getTranslatedText() != null
-                                        && !translation.getTranslatedText().isEmpty())
-                                    .map(Translation::getLanguage)
-                                    .filter(Predicate.isEqual(language))
-                                    .count();
-
-            ProgressDTO progressDTO = new ProgressDTO(languageDTO, ((long) definitions.size()), count);
+            List<Translation> translations = definitions.stream()
+                                                   .flatMap(definition -> definition.getTranslations().stream())
+                                                   .filter(translation -> translation.getTranslatedText() != null
+                                                       && !translation.getTranslatedText().isEmpty())
+                                                   .filter(translation -> Objects.equals(translation.getLanguage(), language))
+                                                   .collect(Collectors.toList());
+            boolean hasUpdateNeeded = translations.stream().anyMatch(Translation::isUpdateNeeded);
+            ProgressDTO progressDTO = new ProgressDTO(languageDTO, ((long) definitions.size()), ((long) translations.size()), hasUpdateNeeded);
             result.add(progressDTO);
         }
         return result;

@@ -154,6 +154,17 @@
             return 0;
         }
 
+        vm.hasUpdateNeeded = hasUpdateNeeded;
+        function hasUpdateNeeded(language) {
+            var progress = vm.progress.find(function (progress) {
+                return progress.language.id == language.id;
+            });
+            if (progress) {
+                return progress.hasUpdateNeeded;
+            }
+            return false;
+        }
+
         function reset() {
             vm.page = 0;
             vm.definitions = [];
