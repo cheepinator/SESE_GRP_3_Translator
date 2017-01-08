@@ -4,7 +4,7 @@
             <h3 class="panel-title">Available languages</h3>
         </div>
         <div class="panel-body">
-            <div ng-repeat="language in vm.project.languages track by language.id" style="float:left;">
+            <div ng-repeat="language in vm.project.languages | orderBy:'code'" style="float:left;">
                 <div class="no-padding-left" style="/*background-color: rgb(157,157,157);*/ border-radius: 4px; padding: 3px 7px; display: inline-block">
                     <div style="float: left; height: 100%; /*color: white;*/">{{language.code}}:&nbsp</div>
                     <uib-progressbar value="vm.getProgressValue(language)" max="vm.getMaxProgressValue()" animate="false"
@@ -70,7 +70,7 @@
                     <td><a ui-sref="project-detail.definition-detail({definitionId:definition.id})">{{definition.code}}</a></td>
                     <td>{{definition.originalText}}</td>
                     <td>
-                        <span ng-repeat="translation in vm.getTranslations(definition) track by translation.id">
+                        <span ng-repeat="translation in vm.getTranslations(definition) | orderBy: 'languageCode'">
                             <span class="label" ng-class="translation.translatedText ? (translation.updateNeeded ? 'label-warning' : 'label-success') : 'label-default'">
                                 {{translation.languageCode}}</span>
                         </span>
