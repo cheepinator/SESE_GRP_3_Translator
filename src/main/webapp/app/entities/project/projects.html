@@ -43,12 +43,10 @@
                              <span class="badge">{{vm.getCurrentReleaseByProjectId(project.id).versionTag}}</span>
                          </a>-->
 
-                    <a>
-                        <span class="badge">{{vm.getCurrentReleaseByProjectId(project.id).versionTag}}</span>
-                    </a>
+                    <span class="badge">{{vm.getCurrentReleaseByProjectId(project.id).versionTag}}</span>
                 </td>
                 <td>
-                    <div class="progress m-b-sm">
+                    <div class="progress m-b-sm" style="margin-bottom: 0;">
                         <div style="width: {{vm.getCurrentReleaseProgress(project.id)}}%;"
                              class="progress-bar">{{vm.getCurrentReleaseProgress(project.id)}}%
                         </div>
