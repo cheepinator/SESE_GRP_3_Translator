@@ -53,16 +53,13 @@
     <div class="table-responsive">
         <table class="jh-table table table-striped">
             <thead>
-                <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
-                    <!--<th jh-sort-by="id"><span>ID</span> <span class="glyphicon glyphicon-sort"></span></th>-->
-                    <th>Code</th>
-                    <th>Original Text</th>
-                    <th>Translation Status</th>
-                    <th>Release</th>
-                    <th></th>
-                    <!--<th jh-sort-by="release.id"><span>Release</span> <span class="glyphicon glyphicon-sort"></span></th>-->
-
-                </tr>
+            <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
+                <th jh-sort-by="code"><span>Code</span> <span class="glyphicon glyphicon-sort"></span></th>
+                <th jh-sort-by="originalText"><span>Original Text</span> <span class="glyphicon glyphicon-sort"></span></th>
+                <th><span>Translation Status</span></span></th>
+                <th><span>Release</span></span></th>
+                <th></th>
+            </tr>
                 </thead>
                 <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
                 <tr ng-repeat="definition in vm.definitions | filter: vm.filterByVersionTagFunction()">
