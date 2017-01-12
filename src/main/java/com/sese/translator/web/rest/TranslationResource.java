@@ -13,12 +13,17 @@ import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.GsonBuilderUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -196,7 +201,53 @@ public class TranslationResource {
     }
 
     /**
-     * GET  /projects/{projectId}/release/{versionTag}/language/{languageCode} : get all translations for the project
+     * GET  /projects/{projectId}/release/{versionTag}/language/{languageCode} : get all translations from a specific version and language for the project
+     *
+     * @param projectId    the id of the project
+     * @param versionTag    the versionTag of the project
+     * @param languageCode    the languageCode of the project
+     * @return the ResponseEntity with status 200 (OK) and with body the definitionDTO, or with status 404 (Not Found)
+     */
+    @GetMapping("/projects/{projectId}/release/{versionTag}/language/{languageCode}")
+    @ResponseBody
+    @Transactional
+    public ResponseEntity downloadTranslations(@PathVariable Long projectId, @PathVariable String versionTag, @PathVariable String languageCode) {
+
+        //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        //String username = ((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername();
+
+        List<ProjectDTO> allOfCurrentUser = projectService.findAllOfCurrentUser();
+        boolean usersProject = false;
+        for (ProjectDTO projectDTO : allOfCurrentUser) {
+            if (projectDTO.getId().equals(projectId)) {
+                usersProject = true;
+            }
+        }
+        if (!usersProject) {
+            return new ResponseEntity<>("logged in user is not the project owner!", HttpStatus.BAD_REQUEST);
+        }
+
+        List<Translation> translationList = translationRepository.findByProjectIdLanguageIdReleaseId(projectId,
+            versionTag, languageCode);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("[");
+        for (Translation t : translationList) {
+            stringBuilder.append("{ \"translatedText\" : \"");
+            stringBuilder.append(t.getTranslatedText());
+            stringBuilder.append("\", \"code\" : \"");
+            stringBuilder.append(t.getDefinition().getCode());
+            stringBuilder.append("\", \"originalText\" : \"");
+            stringBuilder.append(t.getDefinition().getOriginalText());
+            stringBuilder.append("\" }");
+        }
+        stringBuilder.append("]");
+
+        return new ResponseEntity<>(stringBuilder.toString(), HttpStatus.OK);
+    }
+
+    /**
+     * GET  /projects/{projectId}/export/{ex} : download all translations for the project
      *
      * @param projectId    the id of the project
      * @return the ResponseEntity with status 200 (OK) and with body the definitionDTO, or with status 404 (Not Found)
