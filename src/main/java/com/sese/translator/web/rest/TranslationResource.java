@@ -220,13 +220,13 @@ public class TranslationResource {
                     List<Translation> translationList = translationRepository.findByProjectIdLanguageIdReleaseId(projectId,
                         releaseDTO.getVersionTag(), languageDTO.getCode());
                     appendTranslation(stringBuilder, translationList, ex);
-                    zipOutputStream.putNextEntry(new ZipEntry(releaseDTO.getVersionTag() + "/" + languageDTO.getCode() + ".strings"));
+                    zipOutputStream.putNextEntry(new ZipEntry(releaseDTO.getVersionTag() + "/" + languageDTO.getCode() + getFileEnding(ex)));
                     zipOutputStream.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
                     stringBuilder.setLength(0);
                 }
             List<Definition> getDefinitionsFromRelease = definitionRepository.findByProjectIdAndVersionTag(projectId, releaseDTO.getVersionTag());
             appendDefinition(stringBuilder, getDefinitionsFromRelease, ex);
-            zipOutputStream.putNextEntry(new ZipEntry(releaseDTO.getVersionTag() + "/EN.strings"));
+            zipOutputStream.putNextEntry(new ZipEntry(releaseDTO.getVersionTag() + "/EN" + getFileEnding(ex)));
             zipOutputStream.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
             stringBuilder.setLength(0);
             }
@@ -243,6 +243,17 @@ public class TranslationResource {
         header.setContentLength(downloadFile.length);
 
         return new ResponseEntity<>(downloadFile, header, HttpStatus.OK);
+    }
+
+    private String getFileEnding(String ex) {
+        if (ex.equals("ios")) {
+            return ".strings";
+        } else if (ex.equals("android")) {
+            return ".xml";
+        } else if (ex.equals("web")) {
+            return ".json";
+        }
+        return "";
     }
 
     private void appendTranslation(StringBuilder stringBuilder, List<Translation> translationList, String export) {
