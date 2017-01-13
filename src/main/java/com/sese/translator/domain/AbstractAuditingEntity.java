@@ -1,19 +1,19 @@
 package com.sese.translator.domain;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import java.time.ZonedDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
+import java.sql.Date;
+import java.time.Instant;
 
 /**
  * Base abstract class for entities which will hold definitions for created, last modified by and created,
@@ -34,7 +34,9 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @CreatedDate
     @Column(name = "created_date", nullable = false)
     @JsonIgnore
-    private ZonedDateTime createdDate = ZonedDateTime.now();
+   // @Convert(converter = JSR310PersistenceConverters.ZonedDateTimeConverter.class)
+//    private ZonedDateTime createdDate = ZonedDateTime.now();
+    private Date createdDate = (Date) Date.from(Instant.now());
 
     @LastModifiedBy
     @Column(name = "last_modified_by", length = 50)
@@ -44,7 +46,10 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @LastModifiedDate
     @Column(name = "last_modified_date")
     @JsonIgnore
-    private ZonedDateTime lastModifiedDate = ZonedDateTime.now();
+   // @Convert(converter = JSR310PersistenceConverters.ZonedDateTimeConverter.class)
+//    private ZonedDateTime lastModifiedDate = ZonedDateTime.now();
+    private Date lastModifiedDate = (Date) Date.from(Instant.now());
+
 
     public String getCreatedBy() {
         return createdBy;
@@ -54,11 +59,11 @@ public abstract class AbstractAuditingEntity implements Serializable {
         this.createdBy = createdBy;
     }
 
-    public ZonedDateTime getCreatedDate() {
+    public Date getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(ZonedDateTime createdDate) {
+    public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -70,11 +75,11 @@ public abstract class AbstractAuditingEntity implements Serializable {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public ZonedDateTime getLastModifiedDate() {
+    public Date getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(ZonedDateTime lastModifiedDate) {
+    public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 }

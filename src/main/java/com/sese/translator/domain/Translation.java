@@ -7,6 +7,7 @@ import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -16,7 +17,7 @@ import java.util.Objects;
 @Table(name = "translation")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Audited
-public class Translation extends AbstractAuditingEntity  { //implements Serializable
+public class Translation extends AbstractAuditingEntity implements Serializable { //
 
     private static final long serialVersionUID = 1L;
 

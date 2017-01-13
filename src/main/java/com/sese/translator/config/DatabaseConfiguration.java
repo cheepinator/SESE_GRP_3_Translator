@@ -1,7 +1,7 @@
 package com.sese.translator.config;
 
 
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 import com.sese.translator.config.liquibase.AsyncSpringLiquibase;
 import liquibase.integration.spring.SpringLiquibase;
 import org.h2.tools.Server;
@@ -63,7 +63,7 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public Hibernate5Module hibernate5Module() {
-        return new Hibernate5Module();
+    public Hibernate4Module hibernate5Module() {
+        return new Hibernate4Module();
     }
 }
