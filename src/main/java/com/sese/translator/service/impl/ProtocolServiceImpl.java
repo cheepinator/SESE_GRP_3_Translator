@@ -1,15 +1,11 @@
 package com.sese.translator.service.impl;
 
-import com.sese.translator.domain.Definition;
-import com.sese.translator.domain.Translation;
+import com.sese.translator.domain.*;
 import com.sese.translator.repository.*;
 import com.sese.translator.service.ProtocolService;
 import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProtocolDTO;
-import com.sese.translator.service.mapper.LanguageMapper;
-import com.sese.translator.service.mapper.ProjectMapper;
-import com.sese.translator.service.mapper.ProjectassignmentMapper;
-import com.sese.translator.service.mapper.TranslationProtocolMapper;
+import com.sese.translator.service.mapper.*;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
@@ -75,6 +71,20 @@ public class ProtocolServiceImpl implements ProtocolService {
     @Inject
     private TranslationProtocolMapper translationProtocolMapper;
 
+    @Inject
+    private DefinitionProtocolMapper definitionProtocolMapper;
+
+    @Inject
+    private LanguageProtocolMapper languageProtocolMapper;
+
+    @Inject
+    private ProjectassignmentProtocolMapper projectassignmentProtocolMapper;
+
+    @Inject
+    private ReleaseProtocolMapper releaseProtocolMapper;
+
+    @Inject
+    private UserProtocolMapper  userProtocolMapper;
 
 
 
@@ -118,7 +128,53 @@ public class ProtocolServiceImpl implements ProtocolService {
         List<Definition> resultListDefinition = new ArrayList<Definition>();
 
         revListDefinition.forEach(objects -> resultListDefinition.add((Definition) objects[0]));
-        result.setDefinitions(revListDefinition);
+        result.setDefinitions(definitionProtocolMapper.definitionsToDefinitionProtocolDTOs(resultListDefinition));
+
+
+
+        //--- Languages -----------
+        List<Language> relevantLanguages = languageRepository.findByProjectId(id);
+        List<Number> relevantLanguagesIDs = new ArrayList<>();
+
+        relevantLanguages.forEach(language -> relevantLanguagesIDs.add(language.getId()));
+
+        List<Object[]> revListLanguage = (List<Object[]>)reader.createQuery().forRevisionsOfEntity(Language.class, false, true)
+            .add(AuditEntity.id().in(relevantLanguagesIDs)).getResultList();
+        List<Language> resultListLanguage = new ArrayList<Language>();
+
+        revListLanguage.forEach(objects -> resultListLanguage.add((Language) objects[0]));
+        result.setLanguages(languageProtocolMapper.languagesToLanguageProtocolDTOs(resultListLanguage));
+
+
+// Auskommentiert wg. Usern, die nicht vom initial schema aus Audited sind
+//        //--- Projectassignments -----------
+//        List<Projectassignment> relevantProjectassignments = projectassignmentRepository.findByAssignedProjectId(id);
+//        List<Number> relevantProjectassignmentsIDs = new ArrayList<>();
+//
+//        relevantProjectassignments.forEach(projectassignment -> relevantProjectassignmentsIDs.add(projectassignment.getId()));
+//
+//        List<Object[]> revListProjectassignment = (List<Object[]>)reader.createQuery().forRevisionsOfEntity(Projectassignment.class, false, true)
+//            .add(AuditEntity.id().in(relevantProjectassignmentsIDs)).getResultList();
+//        List<Projectassignment> resultListProjectassignment = new ArrayList<Projectassignment>();
+//
+//        revListProjectassignment.forEach(objects -> resultListProjectassignment.add((Projectassignment) objects[0]));
+//        result.setProjectassignments(projectassignmentProtocolMapper.projectassignmentsToProjectassignmentProtocolDTOs(resultListProjectassignment));
+
+
+
+        //--- Releases -----------
+        List<Release> relevantReleases = releaseRepository.findByProjectIdWithEagerRelationships(id);
+        List<Number> relevantReleasesIDs = new ArrayList<>();
+
+        relevantReleases.forEach(release -> relevantReleasesIDs.add(release.getId()));
+
+        List<Object[]> revListRelease = (List<Object[]>)reader.createQuery().forRevisionsOfEntity(Release.class, false, true)
+            .add(AuditEntity.id().in(relevantReleasesIDs)).getResultList();
+        List<Release> resultListRelease = new ArrayList<Release>();
+
+        revListRelease.forEach(objects -> resultListRelease.add((Release) objects[0]));
+        result.setReleases(releaseProtocolMapper.releasesToReleaseProtocolDTOs(resultListRelease));
+
 
 
         result.setProjectId(id);

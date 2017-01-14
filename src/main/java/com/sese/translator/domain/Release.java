@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
@@ -21,6 +23,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "release")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Audited
 public class Release extends AbstractAuditingEntity implements Serializable {
 
     public static final String DEFAULT_TAG = "no release";
@@ -45,10 +48,12 @@ public class Release extends AbstractAuditingEntity implements Serializable {
     @JsonIgnore
   //  @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @Cascade(CascadeType.DELETE)
+    @NotAudited
     private Set<Definition> definitions = new HashSet<>();
 
     @NotNull
     @ManyToOne
+    @NotAudited
     private Project project;
 
     public Long getId() {

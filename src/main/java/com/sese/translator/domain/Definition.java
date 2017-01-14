@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
@@ -20,6 +21,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "definition")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Audited
 public class Definition extends AbstractAuditingEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

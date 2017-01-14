@@ -3,6 +3,8 @@ package com.sese.translator.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -17,6 +19,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "language")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Audited
 public class Language extends AbstractAuditingEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -33,6 +36,7 @@ public class Language extends AbstractAuditingEntity implements Serializable {
     @ManyToMany(mappedBy = "languages")
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @NotAudited
     private Set<Project> projects = new HashSet<>();
 
     public Long getId() {
