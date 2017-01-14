@@ -5,6 +5,7 @@ import com.sese.translator.repository.*;
 import com.sese.translator.service.ProtocolService;
 import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProtocolDTO;
+import com.sese.translator.service.dto.protocol.ProtocolEntryDTO;
 import com.sese.translator.service.mapper.*;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
@@ -90,6 +91,7 @@ public class ProtocolServiceImpl implements ProtocolService {
 
     /**
      * Get a Protocol for everything related to a single Project
+     *  Can be used, if we decide to show each Type of entry in a single Table
      *
      * @param id the id of the entity
      * @return the list of entities
@@ -178,6 +180,28 @@ public class ProtocolServiceImpl implements ProtocolService {
 
 
         result.setProjectId(id);
+
+        return result;
+    }
+
+    /**
+     * Get a Protocol for everything related to a single Project
+     *
+     * @param id the id of the entity
+     * @return the list of entities
+     */
+    @Override
+    public List<ProtocolEntryDTO> findAllOfProjectAsList(Long id) {
+        List<ProtocolEntryDTO> result= new ArrayList<>();
+
+        ProtocolDTO protocolDTO = this.findAllOfProject(id);
+
+        protocolDTO.getTranslations().forEach(translationProtocolDTO -> result.add(new ProtocolEntryDTO(translationProtocolDTO.toString(),translationProtocolDTO.getCreatedBy(),translationProtocolDTO.getCreatedDate(),translationProtocolDTO.getLastModifiedBy(),translationProtocolDTO.getLastModifiedDate())));
+        protocolDTO.getDefinitions().forEach(definitionProtocolDTO -> result.add(new ProtocolEntryDTO(definitionProtocolDTO.toString(),definitionProtocolDTO.getCreatedBy(),definitionProtocolDTO.getCreatedDate(),definitionProtocolDTO.getLastModifiedBy(),definitionProtocolDTO.getLastModifiedDate())));
+        protocolDTO.getLanguages().forEach(languageProtocolDTO -> result.add(new ProtocolEntryDTO(languageProtocolDTO.toString(),languageProtocolDTO.getCreatedBy(),languageProtocolDTO.getCreatedDate(),languageProtocolDTO.getLastModifiedBy(),languageProtocolDTO.getLastModifiedDate())));
+        //protocolDTO.getProjectassignments().forEach(projectassignmentProtocolDTO -> result.add(new ProtocolEntryDTO(projectassignmentProtocolDTO.toString(),projectassignmentProtocolDTO.getCreatedBy(),projectassignmentProtocolDTO.getCreatedDate(),projectassignmentProtocolDTO.getLastModifiedBy(),projectassignmentProtocolDTO.getLastModifiedDate())));
+        protocolDTO.getReleases().forEach(releaseProtocolDTO -> result.add(new ProtocolEntryDTO(releaseProtocolDTO.toString(),releaseProtocolDTO.getCreatedBy(),releaseProtocolDTO.getCreatedDate(),releaseProtocolDTO.getLastModifiedBy(),releaseProtocolDTO.getLastModifiedDate())));
+
 
         return result;
     }
