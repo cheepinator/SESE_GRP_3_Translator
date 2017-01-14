@@ -28,7 +28,7 @@ spring:
         open-in-view: false
         show-sql: true
         hibernate:
-            ddl-auto: none
+            ddl-auto: create-drop
             naming:
                 strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
         properties:
@@ -44,8 +44,9 @@ spring:
     thymeleaf:
         mode: XHTML
 
-liquibase:
-    contexts: test
+#liquibase:
+#    contexts: test
+#    enabled: false
 
 security:
     basic:
