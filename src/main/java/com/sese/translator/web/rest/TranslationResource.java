@@ -200,6 +200,34 @@ public class TranslationResource {
         return new ResponseEntity<>(translationDTOs, HttpStatus.OK);
     }
 
+//    /**
+//     * GET sdfjkasf
+//     *
+//     * @return with status 200 (OK)
+//     */
+//    @GetMapping("/project/{projectId}/file/{fileSome}")
+//    @Timed
+//    public ResponseEntity<Void> getNextOpenTranslations(@PathVariable Long projectId, @PathVariable String fileSome) {
+//        log.debug("GOT SOME FILE!!!!!!: {}", fileSome);
+//
+//        return ResponseEntity.ok().build();
+//    }
+
+    /**
+     * POST
+     *
+     * @return with status 200 (OK)
+     */
+    @PostMapping("/project/fileUpload")
+    @Timed
+    public ResponseEntity<Void> getNextOpenTranslations(@Valid @RequestBody String fileSome) {
+        log.debug("GOT SOME FILE VIA BODY !!!!!!: {}", fileSome);
+
+        //todo: insert parsing here
+
+        return ResponseEntity.ok().build();
+    }
+
     /**
      * GET  /projects/{projectId}/release/{versionTag}/language/{languageCode} : get all translations from a specific version and language for the project
      *

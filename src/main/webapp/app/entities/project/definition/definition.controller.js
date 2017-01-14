@@ -6,11 +6,11 @@
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
     ProjectDefinitionController.$inject = ['$scope', '$state', '$location', 'project', 'projectReleases', 'DataUtils',
-        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles', 'ProjectProgress', 'CurrentRelease'];
+        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles', 'ProjectProgress', 'CurrentRelease', 'FileUploadDefinition'];
 
     function ProjectDefinitionController($scope, $state, $location, project, projectReleases, DataUtils, ProjectDefinition,
                                          ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations, Principal, ProjectRoles,
-                                         ProjectProgress, CurrentRelease) {
+                                         ProjectProgress, CurrentRelease, FileUploadDefinition) {
         var vm = this;
 
         vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
@@ -36,12 +36,32 @@
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
         vm.getTranslations = getTranslations;
         vm.isDeveloper = isDeveloper;
+        vm.uploadThis = uploadThis;
         vm.setSelectedRelease = setSelectedRelease;
         vm.getReleaseName = getReleaseName;
         vm.filterByVersionTagFunction = filterByVersionTagFunction;
         loadAll();
         getAccount();
         setInitialFilteringRelease();
+
+        $scope.uploadFile = function(files) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                $scope.$apply(function() {
+                    $scope.theFileToImport = reader.result;
+                });
+            };
+            reader.readAsBinaryString(files[0]);
+        };
+
+        function uploadThis() {
+            $scope.theFileToImport =  $scope.theFileToImport.replace(/\r\n/g, '');
+            FileUploadDefinition.query({
+                projectId: vm.project.id,
+                fileUpL: $scope.theFileToImport
+            });
+        }
 
         function setInitialFilteringRelease() {
             vm.selectedRelease = "";
@@ -80,7 +100,6 @@
             } else {
                 vm.filterBy = '';
             }
-
         }
 
         function loadAll() {

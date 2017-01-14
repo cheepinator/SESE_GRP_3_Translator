@@ -48,6 +48,13 @@
                     <li role="menuitem"><a href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/export/web">Web</a></li>
                 </ul>
             </div>
+            <label class="btn btn-default btn-file btn-sm">
+                Select File <input type="file" name="file" class="hidden" onchange="angular.element(this).scope().uploadFile(this.files)"/>
+            </label>
+            <button class="btn btn-primary btn-sm" ng-click="vm.uploadThis()">
+                <span class="glyphicon glyphicon-plus"></span>
+                <span>Upload</span>
+            </button>
         </h3>
     </div>
     <div class="table-responsive">
