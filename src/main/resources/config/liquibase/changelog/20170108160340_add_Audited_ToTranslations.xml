@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+   <changeSet author="jobro (generated)" id="1483891424269-1">
+      <dropDefaultValue columnDataType="timestamp"
+                        columnName="created_date"
+                        tableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891424269-2">
+      <dropDefaultValue columnDataType="timestamp"
+                        columnName="due_date"
+                        tableName="release"/>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891424269-3">
+      <dropDefaultValue columnDataType="boolean"
+                        columnName="update_needed"
+                        tableName="translation"/>
+   </changeSet>
+</databaseChangeLog>

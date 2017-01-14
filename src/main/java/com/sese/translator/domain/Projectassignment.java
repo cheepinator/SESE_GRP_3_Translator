@@ -1,14 +1,15 @@
 package com.sese.translator.domain;
 
+import com.sese.translator.domain.enumeration.Projectrole;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
-
-import com.sese.translator.domain.enumeration.Projectrole;
 
 /**
  * A Projectassignment.
@@ -16,7 +17,8 @@ import com.sese.translator.domain.enumeration.Projectrole;
 @Entity
 @Table(name = "projectassignment")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class Projectassignment implements Serializable {
+@Audited
+public class Projectassignment extends AbstractAuditingEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,6 +37,7 @@ public class Projectassignment implements Serializable {
 
     @NotNull
     @ManyToOne
+    @NotAudited
     private Project assignedProject;
 
     public Long getId() {

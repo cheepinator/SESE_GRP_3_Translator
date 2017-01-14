@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+   <changeSet author="jobro (generated)" id="1483891853367-1">
+      <createTable tableName="revinfo">
+         <column autoIncrement="true" name="rev" type="INT">
+            <constraints primaryKey="true" primaryKeyName="revinfoPK"/>
+         </column>
+         <column name="revtstmp" type="BIGINT"/>
+      </createTable>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-2">
+      <createTable tableName="translation_aud">
+         <column name="id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="rev" type="INT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="revtype" type="TINYINT"/>
+         <column name="translated_text" type="CLOB"/>
+         <column name="update_needed" type="BOOLEAN"/>
+      </createTable>
+   </changeSet>
+
+
+
+   <changeSet author="jobro (generated)" id="1483891853367-9">
+      <addColumn tableName="release">
+         <column name="created_date" type="timestamp">
+            <constraints nullable="false"/>
+         </column>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-10">
+      <addColumn tableName="definition">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-11">
+      <addColumn tableName="language">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-12">
+      <addColumn tableName="project">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-13">
+      <addColumn tableName="projectassignment">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-14">
+      <addColumn tableName="release">
+         <column name="last_modified_by" type="varchar(50)"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-15">
+      <addColumn tableName="definition">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-16">
+      <addColumn tableName="language">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-17">
+      <addColumn tableName="project">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-18">
+      <addColumn tableName="projectassignment">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-19">
+      <addColumn tableName="release">
+         <column name="last_modified_date" type="timestamp"/>
+      </addColumn>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-20">
+      <addPrimaryKey columnNames="id, rev"
+                     constraintName="translation_audPK"
+                     tableName="translation_aud"/>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-21">
+      <addForeignKeyConstraint baseColumnNames="rev"
+                               baseTableName="translation_aud"
+                               constraintName="FK_co87ufudx3c3120lqcol6p1uj"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="rev"
+                               referencedTableName="revinfo"/>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-22">
+      <dropDefaultValue columnDataType="timestamp"
+                        columnName="created_date"
+                        tableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-23">
+      <dropDefaultValue columnDataType="timestamp"
+                        columnName="due_date"
+                        tableName="release"/>
+   </changeSet>
+   <changeSet author="jobro (generated)" id="1483891853367-24">
+      <dropDefaultValue columnDataType="boolean"
+                        columnName="update_needed"
+                        tableName="translation"/>
+   </changeSet>
+</databaseChangeLog>

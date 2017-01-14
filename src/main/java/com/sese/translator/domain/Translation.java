@@ -2,10 +2,11 @@ package com.sese.translator.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
-import java.io.Serializable;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -14,7 +15,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "translation")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class Translation implements Serializable {
+@Audited
+public class Translation extends AbstractAuditingEntity  { //implements Serializable
 
     private static final long serialVersionUID = 1L;
 
@@ -31,12 +33,15 @@ public class Translation implements Serializable {
     private Boolean updateNeeded = Boolean.FALSE;
 
     @ManyToOne
+    @NotAudited
     private User translator;
 
     @ManyToOne
+    @NotAudited
     private Language language;
 
     @ManyToOne
+    @NotAudited
     private Definition definition;
 
     public Long getId() {
