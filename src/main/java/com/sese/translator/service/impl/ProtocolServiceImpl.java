@@ -1,8 +1,8 @@
 package com.sese.translator.service.impl;
 
+import com.sese.translator.domain.Definition;
 import com.sese.translator.domain.Translation;
-import com.sese.translator.repository.ProjectassignmentRepository;
-import com.sese.translator.repository.TranslationRepository;
+import com.sese.translator.repository.*;
 import com.sese.translator.service.ProtocolService;
 import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProtocolDTO;
@@ -51,6 +51,24 @@ public class ProtocolServiceImpl implements ProtocolService {
     @Inject
     private TranslationRepository translationRepository;
 
+
+    @Inject
+    private DefinitionRepository definitionRepository;
+
+
+    @Inject
+    private LanguageRepository languageRepository;
+
+
+    @Inject
+    private ProjectassignmentRepository projectassignmentRepository;
+
+    @Inject
+    private ReleaseRepository releaseRepository;
+
+    @Inject
+    private UserRepository userRepository;
+
     @Inject
     private EntityManager entityManager;
 
@@ -69,23 +87,40 @@ public class ProtocolServiceImpl implements ProtocolService {
     @Override
     public ProtocolDTO findAllOfProject(Long id) {
         AuditReader reader = AuditReaderFactory.get(entityManager);
+
+
+
+        //--- Translations -----------
         List<Translation> relevantTranslations = translationRepository.translationsOfProject(id);
         List<Number> relevantTranslationsIDs = new ArrayList<>();
 
         relevantTranslations.forEach(translation -> relevantTranslationsIDs.add(translation.getId()));
 
-
-        List<Object[]> revList = (List<Object[]>)reader.createQuery().forRevisionsOfEntity(Translation.class, false, true)
+        List<Object[]> revListTranslation = (List<Object[]>)reader.createQuery().forRevisionsOfEntity(Translation.class, false, true)
             .add(AuditEntity.id().in(relevantTranslationsIDs)).getResultList();
-        List<Translation> resultList = new ArrayList<Translation>();
+        List<Translation> resultTranslationList = new ArrayList<Translation>();
 
 
-        revList.forEach(objects -> resultList.add((Translation) objects[0]));
+        revListTranslation.forEach(objects -> resultTranslationList.add((Translation) objects[0]));
 
         ProtocolDTO result = new ProtocolDTO();
-        result.setTranslations(translationProtocolMapper.translationsToTranslationDTOs(resultList));
+        result.setTranslations(translationProtocolMapper.translationsToTranslationDTOs(resultTranslationList));
 
-        //System.out.println(result.getTranslations().get(0).getCreatedBy());
+
+        //--- Definitions -----------
+        List<Definition> relevantDefinitions = definitionRepository.definitionsOfProject(id);
+        List<Number> relevantDefinitionsIDs = new ArrayList<>();
+
+        relevantDefinitions.forEach(definition -> relevantDefinitionsIDs.add(definition.getId()));
+
+        List<Object[]> revListDefinition = (List<Object[]>)reader.createQuery().forRevisionsOfEntity(Definition.class, false, true)
+            .add(AuditEntity.id().in(relevantDefinitionsIDs)).getResultList();
+        List<Definition> resultListDefinition = new ArrayList<Definition>();
+
+        revListDefinition.forEach(objects -> resultListDefinition.add((Definition) objects[0]));
+        result.setDefinitions(revListDefinition);
+
+
         result.setProjectId(id);
 
         return result;
