@@ -333,21 +333,24 @@ public class TranslationResource {
 
     private void updateOriginalText(Definition definition, String definitionText) {
         String oldOriginalText = definition.getOriginalText();
-        definition.setOriginalText(definitionText);
-        definitionRepository.save(definition);
         if (!oldOriginalText.equals(definitionText)) {
+            definition.setOriginalText(definitionText);
+            definitionRepository.save(definition);
             translationService.markAllTranslationsForDefinitionAsUpdateNeeded(definition.getId());
+            log.debug("Updated the original text of definition {}", definition.getId());
         }
-        log.debug("Updated the original text of definition {}", definition.getId());
     }
 
     private void updateTranslationIfFound(Definition definition, String languageCode, String definitionText) {
         Translation translation = translationRepository.findByDefinitionIdAndLanguageCode(definition.getId(), languageCode);
         if (translation != null) {
-            translation.setTranslatedText(definitionText);
-            translation.setUpdateNeeded(false);
-            translationRepository.save(translation);
-            log.debug("Updated translation for definition {} and language {}", definition.getId(), languageCode);
+            String oldTranslatedText = translation.getTranslatedText();
+            if (oldTranslatedText == null || !oldTranslatedText.equals(definitionText)) {
+                translation.setTranslatedText(definitionText);
+                translation.setUpdateNeeded(false);
+                translationRepository.save(translation);
+                log.debug("Updated translation for definition {} and language {}", definition.getId(), languageCode);
+            }
         }
     }
 
