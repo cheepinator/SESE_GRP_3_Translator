@@ -229,6 +229,7 @@
                 return;
             }
             console.log(files);
+
             if (files && files.length) {
                 for (var i = 0; i < files.length; i++) {
                     var path;
@@ -250,6 +251,7 @@
                     });
                 }
             }
+            setTimeout(reset, 2000)
         }
     }
 })();

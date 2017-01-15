@@ -16,6 +16,8 @@ import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.*;
+import com.sese.translator.web.rest.parsing.DefinitionExtraction;
+import com.sese.translator.web.rest.parsing.ElementHandler;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
 import org.apache.commons.io.FilenameUtils;
@@ -31,9 +33,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Reader;
@@ -57,6 +64,7 @@ import java.util.zip.ZipOutputStream;
 public class TranslationResource {
 
     public static final String DEFAULT_LANGUAGE_CODE_ENGLISH = "en";
+    public List<DefinitionExtraction> definitions;
     private final Logger log = LoggerFactory.getLogger(TranslationResource.class);
 
     @Inject
@@ -260,7 +268,7 @@ public class TranslationResource {
         return ResponseEntity.ok().build();
     }
 
-    private void parseUploadedFile(ProjectDTO project, Reader fileContentAsString, String originalFilename, String path) {
+    private void parseUploadedFile(ProjectDTO project, Reader fileContentAsString, String originalFilename, String path) throws IOException, SAXException, ParserConfigurationException {
         log.info("Got file upload for project {}: {}, {}", project.getId(), originalFilename, path);
         String languageCode;
         if (path != null && !path.isEmpty()) {
@@ -327,11 +335,32 @@ public class TranslationResource {
         return text.substring(1, text.length() - 1);
     }
 
-    private void parseAndroidFile(Reader fileContentAsString, String languageCode, ProjectDTO project) {
-        // todo: parse and use method below to write to db
+
+//    <?xml version="1.0" encoding="utf-8"?>
+//<resources>
+//    <string name="title">My Application</string>
+//    <string name="hello_world">Hello World!</string>
+//</resources>
+
+
+    private void parseAndroidFile(Reader fileContentAsString, String languageCode, ProjectDTO project) throws ParserConfigurationException, SAXException, IOException {
+
+
+        System.out.println("Here");
+
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setValidating(true);
+
+        SAXParser saxParser = factory.newSAXParser();
+//            XMLReader xmlReader = saxParser.getXMLReader();
+//            xmlReader.setContentHandler(new ElementHandler(this));
+//            xmlReader.parse(convertToFileURL(filename));
+
+        saxParser.parse(new InputSource(fileContentAsString), new ElementHandler(this));
+        this.definitions.forEach(definitionExtraction -> updateOrCreateDefinition(project, definitionExtraction.getCode(), definitionExtraction.getText(),languageCode));
     }
 
-    private void updateOrCreateDefinition(ProjectDTO project, String definitionCode, String definitionText, String languageCode) {
+    public void updateOrCreateDefinition(ProjectDTO project, String definitionCode, String definitionText, String languageCode) {
         List<Definition> definitions = definitionRepository.findByProjectIdAndDefinitionCode(project.getId(), definitionCode);
         if (!definitions.isEmpty()) {
             if (languageCode.equals(DEFAULT_LANGUAGE_CODE_ENGLISH)) {
