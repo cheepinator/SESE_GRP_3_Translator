@@ -415,8 +415,14 @@ public class TranslationResource {
             versionTag, languageCode);
 
         StringBuilder stringBuilder = new StringBuilder();
+        Boolean first = true;
         stringBuilder.append("[");
         for (Translation t : translationList) {
+            if(first) {
+                first = false;
+            } else {
+                stringBuilder.append(",");
+            }
             stringBuilder.append("{ \"translatedText\" : \"");
             stringBuilder.append(t.getTranslatedText().replace("\"", "\\\""));
             stringBuilder.append("\", \"code\" : \"");
