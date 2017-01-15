@@ -11,11 +11,11 @@
         $stateProvider
             .state('project-detail.translation', {
                 parent: 'project-detail',
-                url: '/translation',
-                params: {
-                    curReleaseId: null,
-                    languageId: null
-                },
+                url: '/translation/{languageId}/{curReleaseId}',
+                // params: {
+                //     curReleaseId: null,
+                //     languageId: null
+                // },
                 data: {
                     authorities: ['ROLE_USER'],
                     pageTitle: 'Translation'
