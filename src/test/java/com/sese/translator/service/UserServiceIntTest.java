@@ -1,15 +1,12 @@
 package com.sese.translator.service;
 
 import com.sese.translator.SeseTranslatorApp;
-import com.sese.translator.domain.Authority;
 import com.sese.translator.domain.PersistentToken;
 import com.sese.translator.domain.User;
 import com.sese.translator.repository.AuthorityRepository;
 import com.sese.translator.repository.PersistentTokenRepository;
 import com.sese.translator.repository.UserRepository;
-import com.sese.translator.security.AuthoritiesConstants;
 import com.sese.translator.service.util.RandomUtil;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,20 +44,9 @@ public class UserServiceIntTest {
     @Inject
     private AuthorityRepository authorityRepository;
 
-    @Before
-    public void setUp(){
-        Authority authority = new Authority();
-        authority.setName(AuthoritiesConstants.USER);
-        Authority authority2 = new Authority();
-        authority2.setName(AuthoritiesConstants.ADMIN);
-        authorityRepository.save(authority);
-        authorityRepository.save(authority2);
-        authorityRepository.flush();
-    }
 
     @Test
     public void testRemoveOldPersistentTokens() {
-        userService.createUser("admin","user","user","user","user@localhost.at","DE");
         User admin = userRepository.findOneByLogin("admin").get();
         int existingCount = persistentTokenRepository.findByUser(admin).size();
         generateUserToken(admin, "1111-1111", LocalDate.now());
@@ -73,7 +59,6 @@ public class UserServiceIntTest {
 
     @Test
     public void assertThatUserMustExistToResetPassword() {
-        userService.createUser("user","user","user","user","admin@localhost","DE");
         Optional<User> maybeUser = userService.requestPasswordReset("john.doe@localhost");
         assertThat(maybeUser.isPresent()).isFalse();
 
