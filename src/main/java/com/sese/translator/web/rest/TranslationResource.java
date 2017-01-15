@@ -4,9 +4,13 @@ import com.codahale.metrics.annotation.Timed;
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 import com.sese.translator.domain.Definition;
+import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Translation;
+import com.sese.translator.domain.User;
 import com.sese.translator.repository.DefinitionRepository;
+import com.sese.translator.repository.ProjectRepository;
 import com.sese.translator.repository.TranslationRepository;
+import com.sese.translator.repository.UserRepository;
 import com.sese.translator.service.DefinitionService;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
@@ -23,6 +27,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,6 +76,15 @@ public class TranslationResource {
 
     @Inject
     private DefinitionService definitionService;
+
+    @Inject
+    private UserRepository userRepository;
+
+    @Inject
+    private PasswordEncoder passwordEncoder;
+
+    @Inject
+    private ProjectRepository projectRepository;
 
     /**
      * POST  /translations : Create a new translation.
@@ -368,23 +382,28 @@ public class TranslationResource {
      * @param languageCode    the languageCode of the project
      * @return the ResponseEntity with status 200 (OK) and with body the definitionDTO, or with status 404 (Not Found)
      */
-    @GetMapping("/projects/{projectId}/release/{versionTag}/language/{languageCode}")
+    @GetMapping("/projects/{projectId}/release/{versionTag}/language/{languageCode}/user/{username}/pass/{password}")
     @ResponseBody
     @Transactional
-    public ResponseEntity downloadTranslations(@PathVariable Long projectId, @PathVariable String versionTag, @PathVariable String languageCode) {
+    public ResponseEntity exportApi(@PathVariable Long projectId, @PathVariable String versionTag, @PathVariable String languageCode,
+                                    @PathVariable String username, @PathVariable String password) {
 
-        //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        //String username = ((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername();
+        Optional<User> sdfsdf = userRepository.findOneByLogin(username);
+        if(sdfsdf.isPresent()) {
+            if(!passwordEncoder.matches(password, sdfsdf.get().getPassword())) {
+                return new ResponseEntity<>("username and password not correct!", HttpStatus.BAD_REQUEST);
+            }
+        }
 
-        List<ProjectDTO> allOfCurrentUser = projectService.findAllOfCurrentUser();
+        List<Project> allOfCurrentUser = projectRepository.findByOwnerIsUser(username);
         boolean usersProject = false;
-        for (ProjectDTO projectDTO : allOfCurrentUser) {
-            if (projectDTO.getId().equals(projectId)) {
+        for (Project project : allOfCurrentUser) {
+            if (project.getId().equals(projectId)) {
                 usersProject = true;
             }
         }
         if (!usersProject) {
-            return new ResponseEntity<>("logged in user is not the project owner!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("logged in user is not associated with the project!", HttpStatus.BAD_REQUEST);
         }
 
         List<Translation> translationList = translationRepository.findByProjectIdLanguageIdReleaseId(projectId,
@@ -394,11 +413,11 @@ public class TranslationResource {
         stringBuilder.append("[");
         for (Translation t : translationList) {
             stringBuilder.append("{ \"translatedText\" : \"");
-            stringBuilder.append(t.getTranslatedText());
+            stringBuilder.append(t.getTranslatedText().replace("\"", "\\\""));
             stringBuilder.append("\", \"code\" : \"");
-            stringBuilder.append(t.getDefinition().getCode());
+            stringBuilder.append(t.getDefinition().getCode().replace("\"", "\\\""));
             stringBuilder.append("\", \"originalText\" : \"");
-            stringBuilder.append(t.getDefinition().getOriginalText());
+            stringBuilder.append(t.getDefinition().getOriginalText().replace("\"", "\\\""));
             stringBuilder.append("\" }");
         }
         stringBuilder.append("]");
