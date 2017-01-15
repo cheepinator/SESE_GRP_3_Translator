@@ -110,10 +110,12 @@
                 sort: sort()
             }, onSuccess, onError);
             function sort() {
-                var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];
-                if (vm.predicate !== 'id') {
-                    result.push('id');
+                var result = [];
+                if (vm.predicate !== 'release.dueDate') {
+                    result.push('release.dueDate,desc');
                 }
+                result.push(vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc'));
+                result.push('id');
                 return result;
             }
 
@@ -141,6 +143,7 @@
             ProjectTranslations.query({projectId: vm.project.id}, onTranslationsSuccess, onError);
 
             function onTranslationsSuccess(data, headers) {
+                vm.translations = [];
                 for (var i = 0; i < data.length; i++) {
                     vm.translations.push(data[i]);
                 }
