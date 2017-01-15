@@ -5,18 +5,19 @@
         .module('seseTranslatorApp')
         .controller('ProtocolController', ProtocolController);
 
-    ProtocolController.$inject = ['$scope', '$state', 'Protocol'];
+    ProtocolController.$inject = ['$scope', '$state', '$stateParams', 'Protocol', 'project', 'previousState'];
 
-    function ProtocolController ($scope, $state, Protocol) {
+    function ProtocolController ($scope, $state, $stateParams, Protocol, project, previousState) {
         var vm = this;
 
         vm.protocols = [];
+        vm.project = project;
+        vm.previousState = previousState.name;
 
         loadAll();
 
         function loadAll() {
-            var str= window.location.toString();
-            Protocol.get({id:str.match(/project\/\d+/)[0].match(/\d+/)[0]},function(result) {
+            Protocol.get({id:$stateParams.projectId},function(result) {
                 vm.protocols = result;
             });
         }
