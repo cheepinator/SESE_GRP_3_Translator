@@ -30,7 +30,7 @@
                     var oldTranslation= vm.nextTranslations.find(function (translation) {
                         return translation.id == result.id;
                     });
-                    const oldIndex = vm.nextTranslations.indexOf(oldTranslation);
+                    var oldIndex = vm.nextTranslations.indexOf(oldTranslation);
                     if (oldIndex > -1) {
                         vm.nextTranslations[oldIndex] = result;
                     }

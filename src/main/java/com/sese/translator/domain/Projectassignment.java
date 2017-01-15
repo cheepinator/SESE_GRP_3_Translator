@@ -31,7 +31,6 @@ public class Projectassignment extends AbstractAuditingEntity implements Seriali
     @Column(name = "role", nullable = false)
     private Projectrole role;
 
-    @NotNull
     @ManyToOne
     private User assignedUser;
 

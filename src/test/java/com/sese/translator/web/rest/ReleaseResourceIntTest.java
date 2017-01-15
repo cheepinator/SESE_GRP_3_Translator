@@ -1,24 +1,19 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
+import com.sese.translator.domain.Authority;
 import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Release;
+import com.sese.translator.repository.AuthorityRepository;
 import com.sese.translator.repository.ProjectRepository;
 import com.sese.translator.repository.ReleaseRepository;
+import com.sese.translator.security.AuthoritiesConstants;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ReleaseMapper;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,15 +29,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the ReleaseResource REST controller.
@@ -83,6 +82,8 @@ public class ReleaseResourceIntTest {
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
     @Inject
     private EntityManager em;
+    @Inject
+    private AuthorityRepository authorityRepository;
     private MockMvc restReleaseMockMvc;
     private Release release;
 
@@ -116,6 +117,14 @@ public class ReleaseResourceIntTest {
 
     @Before
     public void initTest() {
+        Authority authority = new Authority();
+        authority.setName(AuthoritiesConstants.USER);
+        Authority authority2 = new Authority();
+        authority2.setName(AuthoritiesConstants.ADMIN);
+        authorityRepository.save(authority);
+        authorityRepository.save(authority2);
+        authorityRepository.flush();
+        userService.createUser("user","user","user","user","user@local.at","DE");
         release = createEntity(em);
         userService.getUserWithAuthoritiesByLogin("user").ifPresent(user -> testProject.setOwner(user));
     }

@@ -1,8 +1,11 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
+import com.sese.translator.domain.Authority;
 import com.sese.translator.domain.User;
+import com.sese.translator.repository.AuthorityRepository;
 import com.sese.translator.repository.UserRepository;
+import com.sese.translator.security.AuthoritiesConstants;
 import com.sese.translator.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
@@ -14,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -28,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SeseTranslatorApp.class)
+@Transactional
 public class UserResourceIntTest {
 
     @Inject
@@ -35,6 +40,9 @@ public class UserResourceIntTest {
 
     @Inject
     private UserService userService;
+
+    @Inject
+    private AuthorityRepository authorityRepository;
 
     private MockMvc restUserMockMvc;
 
@@ -60,6 +68,14 @@ public class UserResourceIntTest {
 
     @Before
     public void setup() {
+        Authority authority = new Authority();
+        authority.setName(AuthoritiesConstants.USER);
+        Authority authority2 = new Authority();
+        authority2.setName(AuthoritiesConstants.ADMIN);
+        authorityRepository.save(authority);
+        authorityRepository.save(authority2);
+        authorityRepository.flush();
+        userService.createUser("user","user","user","Administrator","Administrator@localhost.at","DE");
         UserResource userResource = new UserResource();
         ReflectionTestUtils.setField(userResource, "userRepository", userRepository);
         ReflectionTestUtils.setField(userResource, "userService", userService);
@@ -68,7 +84,8 @@ public class UserResourceIntTest {
 
     @Test
     public void testGetExistingUser() throws Exception {
-        restUserMockMvc.perform(get("/api/users/admin")
+
+        restUserMockMvc.perform(get("/api/users/user")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))

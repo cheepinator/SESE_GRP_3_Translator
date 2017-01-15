@@ -3,7 +3,9 @@ package com.sese.translator.web.rest;
 import com.sese.translator.SeseTranslatorApp;
 import com.sese.translator.domain.*;
 import com.sese.translator.repository.*;
+import com.sese.translator.security.AuthoritiesConstants;
 import com.sese.translator.service.TranslationService;
+import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.TranslationDTO;
 import com.sese.translator.service.mapper.TranslationMapper;
 import org.junit.Before;
@@ -65,6 +67,8 @@ public class TranslationResourceIntTest {
 
     @Inject
     private TranslationService translationService;
+    @Inject
+    private UserService userService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -74,6 +78,8 @@ public class TranslationResourceIntTest {
 
     @Inject
     private EntityManager em;
+    @Inject
+    private AuthorityRepository authorityRepository;
 
     private MockMvc restTranslationMockMvc;
 
@@ -84,6 +90,13 @@ public class TranslationResourceIntTest {
 
     @Before
     public void setup() {
+        Authority authority = new Authority();
+        authority.setName(AuthoritiesConstants.USER);
+        Authority authority2 = new Authority();
+        authority2.setName(AuthoritiesConstants.ADMIN);
+        authorityRepository.save(authority);
+        authorityRepository.save(authority2);
+        authorityRepository.flush();
         language = new Language();
         language.setCode("TEST");
         language = languageRepository.save(language);
@@ -277,6 +290,7 @@ public class TranslationResourceIntTest {
     public void updateTranslation() throws Exception {
         // Initialize the database
 
+        userService.createUser("user","user","user","user","user@localhost.at","DE");
         Project aProject = new Project().name("aProject");
         projectRepository.saveAndFlush(aProject);
 
