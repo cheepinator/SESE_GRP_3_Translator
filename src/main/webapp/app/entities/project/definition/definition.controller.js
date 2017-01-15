@@ -112,7 +112,7 @@
             function sort() {
                 var result = [];
                 if (vm.predicate !== 'release.dueDate') {
-                    result.push('release.dueDate,desc');
+                    result.push('release.dueDate');
                 }
                 result.push(vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc'));
                 result.push('id');

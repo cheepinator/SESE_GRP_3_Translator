@@ -25,12 +25,14 @@ public interface TranslationRepository extends JpaRepository<Translation,Long> {
     @Query("select translation from Translation translation where " +
         "translation.updateNeeded = true and " +
         "translation.definition.release.id = :releaseId and " +
-        "translation.language.id = :languageId")
+        "translation.language.id = :languageId" +
+        " order by translation.definition.release.dueDate")
     List<Translation> findOpenTranslationsByReleaseAndLanguage(@Param("releaseId") Long releaseId, @Param("languageId") Long languageId);
 
     @Query("select translation from Translation translation where " +
         "translation.updateNeeded = true and " +
-        "translation.language.id = :languageId")
+        "translation.language.id = :languageId" +
+        " order by translation.definition.release.dueDate")
     List<Translation> findOpenTranslationsByLanguage(@Param("languageId") Long languageId);
 
     @Query("select translation from Translation translation where translation.definition.release.project.id = :projectId " +

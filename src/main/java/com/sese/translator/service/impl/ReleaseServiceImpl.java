@@ -1,10 +1,6 @@
 package com.sese.translator.service.impl;
 
-import com.sese.translator.domain.Definition;
-import com.sese.translator.domain.Language;
-import com.sese.translator.domain.Project;
-import com.sese.translator.domain.Release;
-import com.sese.translator.domain.Translation;
+import com.sese.translator.domain.*;
 import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.service.LanguageService;
 import com.sese.translator.service.ProjectService;
@@ -15,24 +11,20 @@ import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.service.mapper.LanguageMapper;
 import com.sese.translator.service.mapper.ProjectMapper;
 import com.sese.translator.service.mapper.ReleaseMapper;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing Release.
@@ -73,7 +65,9 @@ public class ReleaseServiceImpl implements ReleaseService {
     public ReleaseDTO createDefaultRelease(ProjectDTO projectDTO) {
         log.debug("Creating default release for Project: {}", projectDTO);
         Project project = projectMapper.projectDTOToProject(projectDTO);
-        Release release = new Release().versionTag(Release.DEFAULT_TAG).project(project);
+        Release release = new Release().versionTag(Release.DEFAULT_TAG)
+                                       .dueDate(ZonedDateTime.ofInstant(Instant.ofEpochSecond(31556889864403199L / 1000), ZoneId.of("UTC")))
+                                       .project(project);
         release = releaseRepository.save(release);
         ReleaseDTO result = releaseMapper.releaseToReleaseDTO(release);
         log.debug("Default release: {}", result);

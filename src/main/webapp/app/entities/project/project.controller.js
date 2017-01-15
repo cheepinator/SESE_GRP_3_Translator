@@ -91,7 +91,7 @@
                 if (release.versionTag) {
                     result += release.versionTag;
                 }
-                if (release.dueDate) {
+                if (release.dueDate && release.versionTag !== 'no release') {
                     var formattedDate = dateFilter(release.dueDate, 'mediumDate');
                     result += ": " + formattedDate;
                 }
