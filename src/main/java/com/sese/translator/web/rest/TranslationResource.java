@@ -1,31 +1,30 @@
 package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.sese.translator.domain.*;
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
+import com.sese.translator.domain.Definition;
+import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.DefinitionRepository;
 import com.sese.translator.repository.TranslationRepository;
-import com.sese.translator.service.LanguageService;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.*;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.GsonBuilderUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -200,6 +199,49 @@ public class TranslationResource {
         return new ResponseEntity<>(translationDTOs, HttpStatus.OK);
     }
 
+//    /**
+//     * GET sdfjkasf
+//     *
+//     * @return with status 200 (OK)
+//     */
+//    @GetMapping("/project/{projectId}/file/{fileSome}")
+//    @Timed
+//    public ResponseEntity<Void> getNextOpenTranslations(@PathVariable Long projectId, @PathVariable String fileSome) {
+//        log.debug("GOT SOME FILE!!!!!!: {}", fileSome);
+//
+//        return ResponseEntity.ok().build();
+//    }
+
+    /**
+     * POST
+     *
+     * @return with status 200 (OK)
+     */
+    @PostMapping("/projects/{projectId}/fileUpload")
+    @Timed
+    @Transactional
+    public ResponseEntity<Void> uploadTranslations(@PathVariable Long projectId, @RequestParam("file") MultipartFile file) {
+        ProjectDTO project = projectService.findOne(projectId);
+        if (project == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (!file.isEmpty()) {
+            try {
+                CharsetMatch detect = new CharsetDetector().setText(file.getBytes()).detect();
+                parseUploadedFile(project, detect.getString(), file.getOriginalFilename());
+            } catch (IOException e) {
+                return ResponseEntity.badRequest().build();
+            }
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    private void parseUploadedFile(ProjectDTO projectId, String fileContentAsString, String originalFilename) {
+        // todo: parse
+
+
+    }
+
     /**
      * GET  /projects/{projectId}/release/{versionTag}/language/{languageCode} : get all translations from a specific version and language for the project
      *
@@ -297,12 +339,13 @@ public class TranslationResource {
     }
 
     private String getFileEnding(String ex) {
-        if (ex.equals("ios")) {
-            return ".strings";
-        } else if (ex.equals("android")) {
-            return ".xml";
-        } else if (ex.equals("web")) {
-            return ".json";
+        switch (ex) {
+            case "ios":
+                return ".strings";
+            case "android":
+                return ".xml";
+            case "web":
+                return ".json";
         }
         return "";
     }
@@ -311,22 +354,32 @@ public class TranslationResource {
         if(translationList.size() == 0) {
             return;
         }
-        if(export.equals("ios")) {
-            for (Translation t : translationList) {
-                stringBuilder.append("\"").append(t.getDefinition().getCode()).append("\" = \"").append(t.getTranslatedText()).append("\";\n");
-            }
-        } else if(export.equals("web")) {
-            stringBuilder.append("{\n\"").append(translationList.get(0).getLanguage().getCode()).append("\":\n{\n");
-            for (Translation t : translationList) {
-                stringBuilder.append("\"").append(t.getDefinition().getCode()).append("\":\n{\n\"").append(t.getTranslatedText()).append("\":\"").append(t.getTranslatedText()).append("\"\n},\n");
-            }
-            stringBuilder.append("}\n}");
-        } else if(export.equals("android")) {
-            stringBuilder.append("<ressources>\n");
-            for (Translation t : translationList) {
-                stringBuilder.append("<string name=\"").append(t.getDefinition().getCode()).append("\">").append(t.getTranslatedText()).append("</string>\n");
-            }
-            stringBuilder.append("</ressources>");
+        switch (export) {
+            case "ios":
+                for (Translation t : translationList) {
+                    buildIosString(stringBuilder, t.getDefinition().getCode(), t.getTranslatedText());
+                }
+                break;
+            case "web":
+                buildWebStringHeader(stringBuilder, translationList.get(0).getLanguage().getCode());
+                Boolean first = true;
+                for (Translation t : translationList) {
+                    if(first) {
+                        buildWebString(stringBuilder, t.getDefinition().getCode(), t.getTranslatedText(), true);
+                        first = false;
+                    } else {
+                        buildWebString(stringBuilder, t.getDefinition().getCode(), t.getTranslatedText(), false);
+                    }
+                }
+                buildWebStringFooter(stringBuilder);
+                break;
+            case "android":
+                buildAndroidHeader(stringBuilder);
+                for (Translation t : translationList) {
+                    buildAndroid(stringBuilder, t.getDefinition().getCode(), t.getTranslatedText());
+                }
+                buildAndroidFooter(stringBuilder);
+                break;
         }
     }
 
@@ -334,23 +387,71 @@ public class TranslationResource {
         if(definitionList.size() == 0) {
             return;
         }
-        if(export.equals("ios")) {
-            for (Definition t : definitionList) {
-                stringBuilder.append("\"").append(t.getCode()).append("\" = \"").append(t.getOriginalText()).append("\";\n");
-            }
-        } else if(export.equals("web")) {
-            stringBuilder.append("{\n\"").append(definitionList.get(0).getCode()).append("\":\n{\n");
-            for (Definition t : definitionList) {
-                stringBuilder.append("\"").append(t.getCode()).append("\":\n{\n\"").append(t.getOriginalText()).append("\":\"").append(t.getOriginalText()).append("\"\n},\n");
-            }
-            stringBuilder.append("}\n}");
-        } else if(export.equals("android")) {
-            stringBuilder.append("<ressources>\n");
-            for (Definition t : definitionList) {
-                stringBuilder.append("<string name=\"").append(t.getCode()).append("\">").append(t.getOriginalText()).append("</string>\n");
-            }
-            stringBuilder.append("</ressources>");
+        switch (export) {
+            case "ios":
+                for (Definition t : definitionList) {
+                    buildIosString(stringBuilder, t.getCode(), t.getOriginalText());
+                }
+                break;
+            case "web":
+                buildWebStringHeader(stringBuilder, "EN");
+                Boolean first = true;
+                for (Definition t : definitionList) {
+                    if(first) {
+                        buildWebString(stringBuilder, t.getCode(), t.getOriginalText(), true);
+                        first = false;
+                    } else {
+                        buildWebString(stringBuilder, t.getCode(), t.getOriginalText(), false);
+                    }
+                }
+                buildWebStringFooter(stringBuilder);
+                break;
+            case "android":
+                buildAndroidHeader(stringBuilder);
+                for (Definition t : definitionList) {
+                    buildAndroid(stringBuilder, t.getCode(), t.getOriginalText());
+                }
+                buildAndroidFooter(stringBuilder);
+                break;
         }
+    }
+
+    private void buildIosString(StringBuilder stringBuilder, String definitionCode, String translatedText) {
+        definitionCode = definitionCode.replace("\"", "\\\"");
+        translatedText = translatedText.replace("\"", "\\\"");
+        stringBuilder.append("\"").append(definitionCode).append("\" = \"").append(translatedText).append("\";\n");
+    }
+
+    private void buildWebString(StringBuilder stringBuilder, String definitionCode, String translatedText, Boolean first) {
+        definitionCode = definitionCode.replace("\"", "\\\"");
+        translatedText = translatedText.replace("\"", "\\\"");
+        if (!first) {
+            stringBuilder.append(",\n");
+        }
+        stringBuilder.append("\"").append(definitionCode).append("\":{\"").append(translatedText).append("\" : \"").append(translatedText).append("\"}");
+    }
+
+    private void buildWebStringHeader(StringBuilder stringBuilder, String languageCode) {
+        languageCode = languageCode.replace("\"", "\\\"");
+        stringBuilder.append("{\n\"").append(languageCode).append("\":\n{\n");
+    }
+
+    private void buildWebStringFooter(StringBuilder stringBuilder) {
+        stringBuilder.append("\n}\n}");
+    }
+
+    private void buildAndroidHeader(StringBuilder stringBuilder) {
+        stringBuilder.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<ressources>\n");
+    }
+
+    private void buildAndroidFooter(StringBuilder stringBuilder) {
+        stringBuilder.append("</ressources>");
+    }
+
+    private void buildAndroid(StringBuilder stringBuilder, String definitionCode, String translatedText) {
+        definitionCode = definitionCode.replace("\"", "\\\"");
+        translatedText = translatedText.replace("\"", "\\\"");
+        stringBuilder.append("<string name=\"").append(definitionCode).append("\">").append(translatedText).append("</string>\n");
     }
 
 }

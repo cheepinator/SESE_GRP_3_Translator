@@ -6,11 +6,12 @@
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
     ProjectDefinitionController.$inject = ['$scope', '$state', '$location', 'project', 'projectReleases', 'DataUtils',
-        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles', 'ProjectProgress', 'CurrentRelease'];
+        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles',
+        'ProjectProgress', 'CurrentRelease', 'FileUploadDefinition', 'Definition', 'Upload'];
 
     function ProjectDefinitionController($scope, $state, $location, project, projectReleases, DataUtils, ProjectDefinition,
                                          ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations, Principal, ProjectRoles,
-                                         ProjectProgress, CurrentRelease) {
+                                         ProjectProgress, CurrentRelease, FileUploadDefinition, Definition, Upload) {
         var vm = this;
 
         vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
@@ -36,12 +37,35 @@
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
         vm.getTranslations = getTranslations;
         vm.isDeveloper = isDeveloper;
+        vm.isReleaseManager = isReleaseManager;
+        vm.uploadThis = uploadThis;
         vm.setSelectedRelease = setSelectedRelease;
         vm.getReleaseName = getReleaseName;
         vm.filterByVersionTagFunction = filterByVersionTagFunction;
+        vm.saveDefinition = saveDefinition;
+        vm.droppedFile = droppedFile;
         loadAll();
         getAccount();
         setInitialFilteringRelease();
+
+        $scope.uploadFile = function(files) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                $scope.$apply(function() {
+                    $scope.theFileToImport = reader.result;
+                });
+            };
+            reader.readAsBinaryString(files[0]);
+        };
+
+        function uploadThis() {
+            $scope.theFileToImport =  $scope.theFileToImport.replace(/\r\n/g, '');
+            FileUploadDefinition.query({
+                projectId: vm.project.id,
+                fileUpL: $scope.theFileToImport
+            });
+        }
 
         function setInitialFilteringRelease() {
             vm.selectedRelease = "";
@@ -74,13 +98,16 @@
             return vm.roles && vm.roles.includes('DEVELOPER');
         }
 
+        function isReleaseManager() {
+            return vm.roles && vm.roles.includes('RELEASE_MANAGER');
+        }
+
         function setSelectedRelease() {
             if (vm.selectedRelease != null && vm.selectedRelease.versionTag != null) {
                 vm.filterBy = vm.selectedRelease.versionTag;
             } else {
                 vm.filterBy = '';
             }
-
         }
 
         function loadAll() {
@@ -91,10 +118,12 @@
                 sort: sort()
             }, onSuccess, onError);
             function sort() {
-                var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];
-                if (vm.predicate !== 'id') {
-                    result.push('id');
+                var result = [];
+                if (vm.predicate !== 'release.dueDate') {
+                    result.push('release.dueDate');
                 }
+                result.push(vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc'));
+                result.push('id');
                 return result;
             }
 
@@ -122,6 +151,7 @@
             ProjectTranslations.query({projectId: vm.project.id}, onTranslationsSuccess, onError);
 
             function onTranslationsSuccess(data, headers) {
+                vm.translations = [];
                 for (var i = 0; i < data.length; i++) {
                     vm.translations.push(data[i]);
                 }
@@ -178,14 +208,40 @@
         }
 
         function getReleaseName(releaseId) {
-            var result = '';
-            angular.forEach(vm.releases, function (value, key) {
-                if (value.id == releaseId) {
-                    result = value.versionTag;
-                }
+            var release = vm.releases.find(function (release) {
+                return release.id == releaseId;
             });
+            if (release) {
+                return release.versionTag;
+            } else {
+                return '';
+            }
+        }
 
-            return result;
+        function saveDefinition(definition) {
+            Definition.update(definition).$promise.then(function (result) {
+                console.log(result);
+            });
+        }
+
+        function droppedFile(file) {
+            if (!isDeveloper()) {
+                return;
+            }
+            console.log(file);
+            if (file) {
+                Upload.upload({
+                    url: 'api/projects/' + vm.project.id + '/fileUpload',
+                    data: {file: file}
+                }).then(function (resp) {
+                    console.log('Success ' + resp.config.data.file.name + ' uploaded. Response: ' + resp.data);
+                }, function (resp) {
+                    console.log('Error status: ' + resp.status);
+                }, function (evt) {
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                    console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+                });
+            }
         }
     }
 })();

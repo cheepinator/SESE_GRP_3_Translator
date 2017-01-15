@@ -2,11 +2,9 @@
     'use strict';
     angular
         .module('seseTranslatorApp')
-        .factory('Release', Release)
-        .factory('ReleaseTooltips', ReleaseTooltips);
+        .factory('Release', Release);
 
     Release.$inject = ['$resource', 'DateUtils'];
-    ReleaseTooltips.$inject = ['dateFilter'];
 
     function Release ($resource, DateUtils) {
         var resourceUrl =  'api/releases/:id';
@@ -25,20 +23,5 @@
             },
             'update': { method:'PUT' }
         });
-    }
-
-    function ReleaseTooltips(dateFilter) {
-        this.getReleaseTooltip = getReleaseTooltip;
-
-        function getReleaseTooltip(release) {
-            var result = "";
-            if (release && release.dueDate) {
-                var formattedDate = dateFilter(release.dueDate, 'mediumDate');
-                result += "Due: " + formattedDate;
-            }
-            return result;
-        }
-
-        return this;
     }
 })();

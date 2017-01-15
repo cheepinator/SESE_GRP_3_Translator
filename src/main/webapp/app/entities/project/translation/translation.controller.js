@@ -27,10 +27,16 @@
         function saveTranslation(translation) {
             if(translation.translatedText != null){
                 Translation.update(translation).$promise.then(function (result) {
+                    var oldTranslation= vm.nextTranslations.find(function (translation) {
+                        return translation.id == result.id;
+                    });
+                    var oldIndex = vm.nextTranslations.indexOf(oldTranslation);
+                    if (oldIndex > -1) {
+                        vm.nextTranslations[oldIndex] = result;
+                    }
                     console.log(result);
                 });
             }
-
         }
 
         function activate() {

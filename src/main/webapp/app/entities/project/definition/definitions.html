@@ -33,8 +33,8 @@
             </button>
             <a ng-if="vm.definitions.length > 0" class="dropdown">
                 <select class="btn btn-default" ng-model="vm.selectedRelease"
-                        data-ng-options="release.versionTag for release in vm.releases" ng-change="vm.setSelectedRelease()">
-                    <option value="">NONE</option>
+                        data-ng-options="release.versionTag for release in vm.releases | orderBy:'dueDate'" ng-change="vm.setSelectedRelease()">
+                    <option value="">&lt;all releases&gt;</option>
                 </select></a>
             <div ng-if="vm.isDeveloper() && vm.definitions.length > 0" class="btn-group" uib-dropdown is-open="status.isopen">
                 <button id="single-button" type="button" class="btn btn-default btn-sm" uib-dropdown-toggle ng-disabled="disabled">
@@ -48,41 +48,44 @@
                     <li role="menuitem"><a href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/export/web">Web</a></li>
                 </ul>
             </div>
+            <button ng-if="vm.isDeveloper()" class="btn btn-primary btn-sm" ngf-select="vm.droppedFile($file)"
+                    ngf-accept="'text/xml,application/json,.strings'"
+                    ngf-pattern="'.strings,.xml,.json'">
+                <span class="glyphicon glyphicon-open"></span>
+                <span>Import...</span>
+            </button>
         </h3>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive" ngf-drop="vm.droppedFile($file)" ngf-pattern="'.strings,text/xml,application/json'"
+         ngf-drag-over-class="'dragover'" ngf-drop-disabled="!vm.isDeveloper()">
         <table class="jh-table table table-striped">
             <thead>
             <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
                 <th jh-sort-by="code"><span>Code</span> <span class="glyphicon glyphicon-sort"></span></th>
                 <th jh-sort-by="originalText"><span>Original Text</span> <span class="glyphicon glyphicon-sort"></span></th>
-                <th><span>Translation Status</span></span></th>
-                <th><span>Release</span></span></th>
+                <th><span>Translation Status</span></th>
+                <th jh-sort-by="release.dueDate"><span>Release</span> <span class="glyphicon glyphicon-sort"></span></th>
                 <th></th>
             </tr>
-                </thead>
-                <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
-                <tr ng-repeat="definition in vm.definitions | filter: vm.filterByVersionTagFunction()">
+            </thead>
+            <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
+                <tr ng-repeat="definition in vm.definitions | filter: vm.filterByVersionTagFunction() track by definition.id">
                     <!--<td>{{definition.id}}</td>-->
                     <td><a ui-sref="project-detail.definition-detail({definitionId:definition.id})">{{definition.code}}</a></td>
                     <td>{{definition.originalText}}</td>
                     <td>
-                        <span ng-repeat="translation in vm.getTranslations(definition) | orderBy: 'languageCode'">
+                        <span ng-repeat="translation in vm.getTranslations(definition) | orderBy: 'languageCode' track by translation.id">
                             <span class="label" ng-class="translation.translatedText ? (translation.updateNeeded ? 'label-warning' : 'label-success') : 'label-default'">
                                 {{translation.languageCode}}</span>
                         </span>
                     </td>
                     <td>
-                        <span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(definition.release)}}">
-                        {{vm.getReleaseName(definition.releaseId)}}
-                        </span>
-                    </td>
-                    <td>
-                        <!--<a ui-sref="release-detail({id:definition.releaseId})">-->
-                        <!--<span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(definition.release)}}">-->
-                        <!--{{definition.release.versionTag}}-->
-                        <!--</span>-->
-                        <!--</a>-->
+                        <a ng-if="vm.isReleaseManager()" href="#" editable-select="definition.releaseId" style="border: 0;"
+                           e-ng-options="release.id as release.versionTag for release in vm.releases | orderBy:'dueDate'"
+                           buttons="no" onaftersave="vm.saveDefinition(definition)"><span class="badge" uib-tooltip="{{vm.getReleaseTooltip(definition.release)}}">
+                            {{vm.getReleaseName(definition.releaseId)}}</span></a>
+                        <span ng-if="!vm.isReleaseManager()" class="badge"
+                              uib-tooltip="{{vm.getReleaseTooltip(definition.release)}}">{{vm.getReleaseName(definition.releaseId)}}</span>
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
@@ -107,8 +110,7 @@
                         </div>
                     </td>
                 </tr>
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
     </div>
 </div>

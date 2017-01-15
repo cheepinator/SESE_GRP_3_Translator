@@ -71,7 +71,7 @@
 
         function getReleaseTooltip(release) {
             var result = "";
-            if (release && release.dueDate) {
+            if (release && release.dueDate && release.versionTag !== 'no release') {
                 var formattedDate = dateFilter(release.dueDate, 'mediumDate');
                 result += "Due: " + formattedDate;
             }
