@@ -1,10 +1,12 @@
 package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.sese.translator.domain.*;
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
+import com.sese.translator.domain.Definition;
+import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.DefinitionRepository;
 import com.sese.translator.repository.TranslationRepository;
-import com.sese.translator.service.LanguageService;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.TranslationService;
@@ -13,19 +15,15 @@ import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.GsonBuilderUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -218,14 +216,29 @@ public class TranslationResource {
      *
      * @return with status 200 (OK)
      */
-    @PostMapping("/project/fileUpload")
+    @PostMapping("/projects/{projectId}/fileUpload")
     @Timed
-    public ResponseEntity<Void> getNextOpenTranslations(@Valid @RequestBody String fileSome) {
-        log.debug("GOT SOME FILE VIA BODY !!!!!!: {}", fileSome);
-
-        //todo: insert parsing here
-
+    @Transactional
+    public ResponseEntity<Void> uploadTranslations(@PathVariable Long projectId, @RequestParam("file") MultipartFile file) {
+        ProjectDTO project = projectService.findOne(projectId);
+        if (project == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (!file.isEmpty()) {
+            try {
+                CharsetMatch detect = new CharsetDetector().setText(file.getBytes()).detect();
+                parseUploadedFile(project, detect.getString(), file.getOriginalFilename());
+            } catch (IOException e) {
+                return ResponseEntity.badRequest().build();
+            }
+        }
         return ResponseEntity.ok().build();
+    }
+
+    private void parseUploadedFile(ProjectDTO projectId, String fileContentAsString, String originalFilename) {
+        // todo: parse
+
+
     }
 
     /**

@@ -7,11 +7,11 @@
 
     ProjectDefinitionController.$inject = ['$scope', '$state', '$location', 'project', 'projectReleases', 'DataUtils',
         'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles',
-        'ProjectProgress', 'CurrentRelease', 'FileUploadDefinition', 'Definition'];
+        'ProjectProgress', 'CurrentRelease', 'FileUploadDefinition', 'Definition', 'Upload'];
 
     function ProjectDefinitionController($scope, $state, $location, project, projectReleases, DataUtils, ProjectDefinition,
                                          ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations, Principal, ProjectRoles,
-                                         ProjectProgress, CurrentRelease, FileUploadDefinition, Definition) {
+                                         ProjectProgress, CurrentRelease, FileUploadDefinition, Definition, Upload) {
         var vm = this;
 
         vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
@@ -43,6 +43,7 @@
         vm.getReleaseName = getReleaseName;
         vm.filterByVersionTagFunction = filterByVersionTagFunction;
         vm.saveDefinition = saveDefinition;
+        vm.droppedFile = droppedFile;
         loadAll();
         getAccount();
         setInitialFilteringRelease();
@@ -221,6 +222,26 @@
             Definition.update(definition).$promise.then(function (result) {
                 console.log(result);
             });
+        }
+
+        function droppedFile(file) {
+            if (!isDeveloper()) {
+                return;
+            }
+            console.log(file);
+            if (file) {
+                Upload.upload({
+                    url: 'api/projects/' + vm.project.id + '/fileUpload',
+                    data: {file: file}
+                }).then(function (resp) {
+                    console.log('Success ' + resp.config.data.file.name + ' uploaded. Response: ' + resp.data);
+                }, function (resp) {
+                    console.log('Error status: ' + resp.status);
+                }, function (evt) {
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                    console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+                });
+            }
         }
     }
 })();

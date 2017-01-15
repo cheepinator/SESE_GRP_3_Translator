@@ -48,16 +48,16 @@
                     <li role="menuitem"><a href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/export/web">Web</a></li>
                 </ul>
             </div>
-            <label class="btn btn-default btn-file btn-sm">
-                Select File <input type="file" name="file" class="hidden" onchange="angular.element(this).scope().uploadFile(this.files)"/>
-            </label>
-            <button class="btn btn-primary btn-sm" ng-click="vm.uploadThis()">
-                <span class="glyphicon glyphicon-plus"></span>
-                <span>Upload</span>
+            <button ng-if="vm.isDeveloper()" class="btn btn-primary btn-sm" ngf-select="vm.droppedFile($file)"
+                    ngf-accept="'text/xml,application/json,.strings'"
+                    ngf-pattern="'.strings,.xml,.json'">
+                <span class="glyphicon glyphicon-open"></span>
+                <span>Import...</span>
             </button>
         </h3>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive" ngf-drop="vm.droppedFile($file)" ngf-pattern="'.strings,text/xml,application/json'"
+         ngf-drag-over-class="'dragover'" ngf-drop-disabled="!vm.isDeveloper()">
         <table class="jh-table table table-striped">
             <thead>
             <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
@@ -67,8 +67,8 @@
                 <th jh-sort-by="release.dueDate"><span>Release</span> <span class="glyphicon glyphicon-sort"></span></th>
                 <th></th>
             </tr>
-                </thead>
-                <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
+            </thead>
+            <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
                 <tr ng-repeat="definition in vm.definitions | filter: vm.filterByVersionTagFunction() track by definition.id">
                     <!--<td>{{definition.id}}</td>-->
                     <td><a ui-sref="project-detail.definition-detail({definitionId:definition.id})">{{definition.code}}</a></td>
@@ -110,8 +110,7 @@
                         </div>
                     </td>
                 </tr>
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
     </div>
 </div>
