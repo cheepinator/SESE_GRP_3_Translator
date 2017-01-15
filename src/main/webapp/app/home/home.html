@@ -13,10 +13,12 @@
                 </div>
                 <div class="alert alert-info" ng-switch-when="true">
                     The api for automatic export is: <br>
-                    [address]:[port]/api/projects/[project_id]/release/[release_name]/language/[language_code].
+                    /api/projects/[project_id]/release/[release_name]/language/[language_code]/user/[username]/pass/[password].
                     <br>
                     <br>
-                    For Example: http://localhost:9000/api/projects/33/release/v1/language/AT
+                    This can only be used by the project owner. Here is an example:
+                    <br>
+                    http://localhost:9000/api/projects/1/release/v1/language/AT/user/user/pass/user
                 </div>
 
                 <div class="alert alert-warning" ng-switch-when="false">
