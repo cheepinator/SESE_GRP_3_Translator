@@ -231,6 +231,7 @@
             console.log(files);
 
             if (files && files.length) {
+                var promises = [];
                 for (var i = 0; i < files.length; i++) {
                     var path;
                     if (files[i].path) {
@@ -238,7 +239,7 @@
                     } else {
                         path = "";
                     }
-                    Upload.upload({
+                    promises.push(Upload.upload({
                         url: 'api/projects/' + vm.project.id + '/fileUpload',
                         data: {file: files[i], path: path}
                     }).then(function (resp) {
@@ -248,6 +249,10 @@
                     }, function (evt) {
                         var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
                         console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+                    }));
+                    Promise.all(promises).then(function (results) {
+                        console.log('upload finished, reload page');
+                        $state.go('project-detail', {}, { reload: true });
                     });
                 }
             }

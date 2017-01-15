@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -65,8 +64,9 @@ public class ReleaseServiceImpl implements ReleaseService {
     public ReleaseDTO createDefaultRelease(ProjectDTO projectDTO) {
         log.debug("Creating default release for Project: {}", projectDTO);
         Project project = projectMapper.projectDTOToProject(projectDTO);
+        ZonedDateTime farFuture = ZonedDateTime.of(4000, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
         Release release = new Release().versionTag(Release.DEFAULT_TAG)
-                                       .dueDate(ZonedDateTime.ofInstant(Instant.ofEpochSecond(31556889864403199L / 1000), ZoneId.of("UTC")))
+                                       .dueDate(farFuture)
                                        .project(project);
         release = releaseRepository.save(release);
         ReleaseDTO result = releaseMapper.releaseToReleaseDTO(release);

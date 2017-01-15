@@ -423,8 +423,10 @@ public class TranslationResource {
         Optional<User> sdfsdf = userRepository.findOneByLogin(username);
         if(sdfsdf.isPresent()) {
             if(!passwordEncoder.matches(password, sdfsdf.get().getPassword())) {
-                return new ResponseEntity<>("username and password not correct!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("username or password not correct!", HttpStatus.BAD_REQUEST);
             }
+        } else {
+            return new ResponseEntity<>("username or password not correct!", HttpStatus.BAD_REQUEST);
         }
 
         List<Project> allOfCurrentUser = projectRepository.findByOwnerIsUser(username);
@@ -442,8 +444,14 @@ public class TranslationResource {
             versionTag, languageCode);
 
         StringBuilder stringBuilder = new StringBuilder();
+        Boolean first = true;
         stringBuilder.append("[");
         for (Translation t : translationList) {
+            if(first) {
+                first = false;
+            } else {
+                stringBuilder.append(",");
+            }
             stringBuilder.append("{ \"translatedText\" : \"");
             stringBuilder.append(t.getTranslatedText().replace("\"", "\\\""));
             stringBuilder.append("\", \"code\" : \"");

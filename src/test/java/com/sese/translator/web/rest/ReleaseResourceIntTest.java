@@ -1,13 +1,11 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
-import com.sese.translator.domain.Authority;
 import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Release;
 import com.sese.translator.repository.AuthorityRepository;
 import com.sese.translator.repository.ProjectRepository;
 import com.sese.translator.repository.ReleaseRepository;
-import com.sese.translator.security.AuthoritiesConstants;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.UserService;
@@ -117,14 +115,6 @@ public class ReleaseResourceIntTest {
 
     @Before
     public void initTest() {
-        Authority authority = new Authority();
-        authority.setName(AuthoritiesConstants.USER);
-        Authority authority2 = new Authority();
-        authority2.setName(AuthoritiesConstants.ADMIN);
-        authorityRepository.save(authority);
-        authorityRepository.save(authority2);
-        authorityRepository.flush();
-        userService.createUser("user","user","user","user","user@local.at","DE");
         release = createEntity(em);
         userService.getUserWithAuthoritiesByLogin("user").ifPresent(user -> testProject.setOwner(user));
     }

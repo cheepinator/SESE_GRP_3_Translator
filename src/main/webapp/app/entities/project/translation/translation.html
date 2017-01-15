@@ -16,11 +16,6 @@
     </dl>
     <div align="column" ng-if="!vm.nextTranslations.length">
         <h4>All definitions have been translated for the Release and Language.</h4>
-        <button type="button"
-                ui-sref="{{ vm.previousState }}"
-                class="btn btn-info">
-            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
-        </button>
     </div>
     <div class="container-fluid" ng-if="vm.nextTranslations.length">
         <div ng-repeat="translation in vm.nextTranslations track by translation.id">
@@ -47,4 +42,9 @@
             <hr/>
         </div>
     </div>
+    <button type="button"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button> <span ng-if="vm.nextTranslations.length"><i>Changes are saved automatically</i></span>
 </div>
