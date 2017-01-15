@@ -17,6 +17,9 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
     @Query("select distinct project from Project project left join fetch project.languages where project.owner.login = ?#{principal.username}")
     List<Project> findByOwnerIsCurrentUser();
 
+    @Query("select distinct project from Project project left join fetch project.languages where project.owner.login = :username")
+    List<Project> findByOwnerIsUser(@Param("username") String username);
+
     @Query("select project from Project project left join fetch project.languages where project.id =:id")
     Project findOneWithEagerRelationships(@Param("id") Long id);
 
