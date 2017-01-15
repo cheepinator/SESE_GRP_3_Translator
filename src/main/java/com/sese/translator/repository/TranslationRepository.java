@@ -19,6 +19,9 @@ public interface TranslationRepository extends JpaRepository<Translation,Long> {
     @Query("select translation from Translation translation where translation.definition.id = :id")
     List<Translation> findByDefinitionId(@Param("id") Long id);
 
+    @Query("select translation from Translation translation where translation.definition.id = :definitionId and translation.language.code = :languageCode")
+    Translation findByDefinitionIdAndLanguageCode(@Param("definitionId") Long definitionId, @Param("languageCode") String languageCode);
+
     @Query("select translation from Translation translation where translation.definition.release.project.id = :id")
     List<Translation> findByProjectId(@Param("id") Long id);
 
