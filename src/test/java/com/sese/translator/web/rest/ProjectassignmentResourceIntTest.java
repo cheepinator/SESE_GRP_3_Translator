@@ -1,10 +1,13 @@
 package com.sese.translator.web.rest;
 
 import com.sese.translator.SeseTranslatorApp;
+import com.sese.translator.domain.Authority;
 import com.sese.translator.domain.Project;
 import com.sese.translator.domain.Projectassignment;
 import com.sese.translator.domain.enumeration.Projectrole;
+import com.sese.translator.repository.AuthorityRepository;
 import com.sese.translator.repository.ProjectassignmentRepository;
+import com.sese.translator.security.AuthoritiesConstants;
 import com.sese.translator.service.UserService;
 import com.sese.translator.service.dto.ProjectassignmentDTO;
 import com.sese.translator.service.mapper.ProjectassignmentMapper;
@@ -62,6 +65,9 @@ public class ProjectassignmentResourceIntTest {
     @Inject
     private EntityManager em;
 
+    @Inject
+    private AuthorityRepository authorityRepository;
+
     private MockMvc restProjectassignmentMockMvc;
 
     private Projectassignment projectassignment;
@@ -95,6 +101,14 @@ public class ProjectassignmentResourceIntTest {
 
     @Before
     public void initTest() {
+        Authority authority = new Authority();
+        authority.setName(AuthoritiesConstants.USER);
+        Authority authority2 = new Authority();
+        authority2.setName(AuthoritiesConstants.ADMIN);
+        authorityRepository.save(authority);
+        authorityRepository.save(authority2);
+        authorityRepository.flush();
+        userService.createUser("user","user","user","user","user@local.at","DE");
         projectassignment = createEntity(em);
         userService.getUserWithAuthoritiesByLogin("user").ifPresent(user -> {
             projectassignment.getAssignedProject().setOwner(user);
