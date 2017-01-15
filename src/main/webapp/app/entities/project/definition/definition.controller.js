@@ -224,23 +224,31 @@
             });
         }
 
-        function droppedFile(file) {
+        function droppedFile(files) {
             if (!isDeveloper()) {
                 return;
             }
-            console.log(file);
-            if (file) {
-                Upload.upload({
-                    url: 'api/projects/' + vm.project.id + '/fileUpload',
-                    data: {file: file}
-                }).then(function (resp) {
-                    console.log('Success ' + resp.config.data.file.name + ' uploaded. Response: ' + resp.data);
-                }, function (resp) {
-                    console.log('Error status: ' + resp.status);
-                }, function (evt) {
-                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                    console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
-                });
+            console.log(files);
+            if (files && files.length) {
+                for (var i = 0; i < files.length; i++) {
+                    var path;
+                    if (files[i].path) {
+                        path = files[i].path;
+                    } else {
+                        path = "";
+                    }
+                    Upload.upload({
+                        url: 'api/projects/' + vm.project.id + '/fileUpload',
+                        data: {file: files[i], path: path}
+                    }).then(function (resp) {
+                        console.log('Success ' + resp.config.data.file.name + ' uploaded. Response: ' + resp.data);
+                    }, function (resp) {
+                        console.log('Error status: ' + resp.status);
+                    }, function (evt) {
+                        var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                        console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+                    });
+                }
             }
         }
     }

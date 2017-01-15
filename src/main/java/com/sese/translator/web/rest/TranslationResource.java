@@ -7,13 +7,14 @@ import com.sese.translator.domain.Definition;
 import com.sese.translator.domain.Translation;
 import com.sese.translator.repository.DefinitionRepository;
 import com.sese.translator.repository.TranslationRepository;
+import com.sese.translator.service.DefinitionService;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
 import com.sese.translator.service.TranslationService;
 import com.sese.translator.service.dto.*;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -30,12 +31,16 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -46,6 +51,7 @@ import java.util.zip.ZipOutputStream;
 @RequestMapping("/api")
 public class TranslationResource {
 
+    public static final String DEFAULT_LANGUAGE_CODE_ENGLISH = "en";
     private final Logger log = LoggerFactory.getLogger(TranslationResource.class);
 
     @Inject
@@ -62,6 +68,9 @@ public class TranslationResource {
 
     @Inject
     private DefinitionRepository definitionRepository;
+
+    @Inject
+    private DefinitionService definitionService;
 
     /**
      * POST  /translations : Create a new translation.
@@ -220,7 +229,8 @@ public class TranslationResource {
     @PostMapping("/projects/{projectId}/fileUpload")
     @Timed
     @Transactional
-    public ResponseEntity<Void> uploadTranslations(@PathVariable Long projectId, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Void> uploadTranslations(@PathVariable Long projectId, @RequestParam("file") MultipartFile file,
+                                                   @RequestParam("path") String path) {
         ProjectDTO project = projectService.findOne(projectId);
         if (project == null) {
             return ResponseEntity.notFound().build();
@@ -228,18 +238,126 @@ public class TranslationResource {
         if (!file.isEmpty()) {
             try {
                 CharsetMatch detect = new CharsetDetector().setText(file.getBytes()).detect();
-                parseUploadedFile(project, detect.getString(), file.getOriginalFilename());
-            } catch (IOException e) {
+                parseUploadedFile(project, detect.getReader(), file.getOriginalFilename(), path);
+            } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
         }
         return ResponseEntity.ok().build();
     }
 
-    private void parseUploadedFile(ProjectDTO projectId, String fileContentAsString, String originalFilename) {
-        // todo: parse
+    private void parseUploadedFile(ProjectDTO project, Reader fileContentAsString, String originalFilename, String path) {
+        log.info("Got file upload for project {}: {}, {}", project.getId(), originalFilename, path);
+        String languageCode;
+        if (path != null && !path.isEmpty()) {
+            languageCode = detectLanguageCode(originalFilename, path);
+        } else {
+            languageCode = FilenameUtils.getBaseName(originalFilename);
+        }
+        log.info("Detected language code: {}. {}, {}", languageCode, originalFilename, path);
+        if (originalFilename.endsWith(".strings")) {
+            parseIOSFile(fileContentAsString, languageCode, project);
+        } else if (originalFilename.endsWith(".xml")) {
+            parseAndroidFile(fileContentAsString, languageCode, project);
+        } else if (originalFilename.endsWith(".json")) {
+            // todo: not supported
+        }
+    }
 
+    private String detectLanguageCode(String originalFilename, String path) {
+        Path filePath = Paths.get(path);
+        for (Path pathPart : filePath) {
+            String pathString = pathPart.toString();
+            if (originalFilename.endsWith(".strings")) {
+                if (pathString.endsWith(".lproj")) {
+                    return pathString.substring(0, pathString.indexOf(".lproj"));
+                }
+            } else if (originalFilename.endsWith(".xml")) {
+                if (pathString.startsWith("values-")) {
+                    return pathString.substring(pathString.indexOf("-") + 1);
+                } else if (pathString.equals("values")) {
+                    return DEFAULT_LANGUAGE_CODE_ENGLISH;
+                }
+            } else if (originalFilename.endsWith(".json")) {
+                // todo: not supported
+            }
+        }
+        return filePath.getFileName().toString();
+    }
 
+    private void parseIOSFile(Reader fileContentAsString, String languageCode, ProjectDTO project) {
+        Scanner scanner = new Scanner(fileContentAsString);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            if (!line.startsWith("\"") || !line.endsWith(";")) {
+                continue;
+            }
+            String[] parts = stripLineEndDelimiter(line).split("=");
+            if (parts.length != 2) {
+                continue;
+            }
+            String definitionCode = stripApostrophes(parts[0].trim());
+            String definitionText = stripApostrophes(parts[1].trim());
+
+            if (!definitionCode.isEmpty() && !definitionText.isEmpty()) {
+                updateOrCreateDefinition(project, definitionCode, definitionText, languageCode);
+            }
+        }
+    }
+
+    private String stripLineEndDelimiter(String line) {
+        return line.substring(0, line.length() -1);
+    }
+
+    private String stripApostrophes(String text) {
+        return text.substring(1, text.length() - 1);
+    }
+
+    private void parseAndroidFile(Reader fileContentAsString, String languageCode, ProjectDTO project) {
+        // todo: parse and use method below to write to db
+    }
+
+    private void updateOrCreateDefinition(ProjectDTO project, String definitionCode, String definitionText, String languageCode) {
+        List<Definition> definitions = definitionRepository.findByProjectIdAndDefinitionCode(project.getId(), definitionCode);
+        if (!definitions.isEmpty()) {
+            if (languageCode.equals(DEFAULT_LANGUAGE_CODE_ENGLISH)) {
+                // update original text
+                updateOriginalText(definitions.get(0), definitionText);
+            } else {
+                updateTranslationIfFound(definitions.get(0), languageCode, definitionText);
+            }
+        } else if (languageCode.equals(DEFAULT_LANGUAGE_CODE_ENGLISH)) {
+            createNewDefinition(project, definitionCode, definitionText);
+        }
+    }
+
+    private void updateOriginalText(Definition definition, String definitionText) {
+        String oldOriginalText = definition.getOriginalText();
+        definition.setOriginalText(definitionText);
+        definitionRepository.save(definition);
+        if (!oldOriginalText.equals(definitionText)) {
+            translationService.markAllTranslationsForDefinitionAsUpdateNeeded(definition.getId());
+        }
+        log.debug("Updated the original text of definition {}", definition.getId());
+    }
+
+    private void updateTranslationIfFound(Definition definition, String languageCode, String definitionText) {
+        Translation translation = translationRepository.findByDefinitionIdAndLanguageCode(definition.getId(), languageCode);
+        if (translation != null) {
+            translation.setTranslatedText(definitionText);
+            translation.setUpdateNeeded(false);
+            translationRepository.save(translation);
+            log.debug("Updated translation for definition {} and language {}", definition.getId(), languageCode);
+        }
+    }
+
+    private void createNewDefinition(ProjectDTO project, String definitionCode, String definitionText) {
+        DefinitionDTO definitionDTO = new DefinitionDTO();
+        definitionDTO.setCode(definitionCode);
+        definitionDTO.setOriginalText(definitionText);
+        definitionDTO.setReleaseId(releaseService.getDefaultReleaseForProject(project.getId()).getId());
+        DefinitionDTO newDefinition = definitionService.save(definitionDTO);
+        log.debug("Created new definition from import for project {}: {}", project.getId(), newDefinition);
     }
 
     /**
@@ -319,7 +437,7 @@ public class TranslationResource {
                 }
             List<Definition> getDefinitionsFromRelease = definitionRepository.findByProjectIdAndVersionTag(projectId, releaseDTO.getVersionTag());
             appendDefinition(stringBuilder, getDefinitionsFromRelease, ex);
-            zipOutputStream.putNextEntry(new ZipEntry(releaseDTO.getVersionTag() + "/EN" + getFileEnding(ex)));
+            zipOutputStream.putNextEntry(new ZipEntry(releaseDTO.getVersionTag() + "/" + DEFAULT_LANGUAGE_CODE_ENGLISH + getFileEnding(ex)));
             zipOutputStream.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
             stringBuilder.setLength(0);
             }
@@ -394,7 +512,7 @@ public class TranslationResource {
                 }
                 break;
             case "web":
-                buildWebStringHeader(stringBuilder, "EN");
+                buildWebStringHeader(stringBuilder, DEFAULT_LANGUAGE_CODE_ENGLISH);
                 Boolean first = true;
                 for (Definition t : definitionList) {
                     if(first) {

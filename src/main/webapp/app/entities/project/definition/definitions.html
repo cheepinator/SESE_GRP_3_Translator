@@ -48,16 +48,16 @@
                     <li role="menuitem"><a href="{{vm.baseUrl}}/api/projects/{{vm.project.id}}/export/web">Web</a></li>
                 </ul>
             </div>
-            <button ng-if="vm.isDeveloper()" class="btn btn-primary btn-sm" ngf-select="vm.droppedFile($file)"
+            <button ng-if="vm.isDeveloper()" class="btn btn-primary btn-sm" ngf-select="vm.droppedFile($files)"
                     ngf-accept="'text/xml,application/json,.strings'"
-                    ngf-pattern="'.strings,.xml,.json'">
+                    ngf-pattern="'.strings,.xml,.json'" ngf-multiple="true">
                 <span class="glyphicon glyphicon-open"></span>
                 <span>Import...</span>
             </button>
         </h3>
     </div>
-    <div class="table-responsive" ngf-drop="vm.droppedFile($file)" ngf-pattern="'.strings,text/xml,application/json'"
-         ngf-drag-over-class="'dragover'" ngf-drop-disabled="!vm.isDeveloper()">
+    <div class="table-responsive" ngf-drop="vm.droppedFile($files)" ngf-pattern="'.strings,text/xml,application/json'"
+         ngf-drag-over-class="'dragover'" ngf-drop-disabled="!vm.isDeveloper()" ngf-multiple="true">
         <table class="jh-table table table-striped">
             <thead>
             <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">

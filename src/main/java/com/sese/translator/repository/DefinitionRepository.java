@@ -1,7 +1,6 @@
 package com.sese.translator.repository;
 
 import com.sese.translator.domain.Definition;
-import com.sese.translator.domain.Translation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +17,9 @@ public interface DefinitionRepository extends JpaRepository<Definition, Long> {
 
     @Query("SELECT definition from Definition definition where definition.release.project.id = :id")
     Page<Definition> findByProjectId(@Param("id") Long id, Pageable pageable);
+
+    @Query("SELECT definition from Definition definition where definition.release.project.id = :id and definition.code = :code")
+    List<Definition> findByProjectIdAndDefinitionCode(@Param("id") Long id, @Param("code") String code);
 
     @Query("SELECT definition from Definition definition where definition.release.project.id = :id " +
         "and definition.release.versionTag = :versionTag")
