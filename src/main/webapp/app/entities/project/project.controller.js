@@ -18,6 +18,7 @@
         vm.releases = [];
         vm.roles = [];
         vm.proejctDetails = [];
+        //vm.protocol = [];
 
         vm.getCurrentReleaseProgress = getCurrentReleaseProgress;
         vm.isOwner = isOwner;
@@ -66,6 +67,10 @@
             ProjectDetails.query(function (result) {
                 vm.proejctDetails = result;
             });
+
+            // Protocol.query(function (result) {
+            //     vm.protocol = result;
+            // });
         }
 
         function getCurrentReleaseByProjectId(projectId) {

@@ -75,10 +75,9 @@ public class DefinitionProtocolDTO extends AbstractAuditingDTO implements Serial
 
     @Override
     public String toString() {
-        return "DefinitionDTO{" +
+        return "Definition: " +
             "id=" + id +
             ", code='" + code + "'" +
-            ", originalText='" + originalText + "'" +
-            '}';
+            ", originalText='" + originalText + "'";
     }
 }

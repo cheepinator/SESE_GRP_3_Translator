@@ -84,11 +84,10 @@ public class ReleaseProtocolDTO extends AbstractAuditingDTO implements Serializa
 
     @Override
     public String toString() {
-        return "ReleaseDTO{" +
+        return "Release: " +
             "id=" + id +
             ", description='" + description + "'" +
             ", versionTag='" + versionTag + "'" +
-            ", dueDate='" + dueDate + "'" +
-            '}';
+            ", dueDate='" + dueDate + "'" ;
     }
 }

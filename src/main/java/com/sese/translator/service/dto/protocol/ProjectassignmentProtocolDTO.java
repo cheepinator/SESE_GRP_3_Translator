@@ -76,9 +76,8 @@ public class ProjectassignmentProtocolDTO extends AbstractAuditingDTO implements
 
     @Override
     public String toString() {
-        return "ProjectassignmentDTO{" +
+        return "Projectassignment: " +
             "id=" + id +
-            ", role='" + role + "'" +
-            '}';
+            ", role='" + role + "'" ;
     }
 }

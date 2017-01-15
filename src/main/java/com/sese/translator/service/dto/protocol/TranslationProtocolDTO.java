@@ -133,10 +133,9 @@ public class TranslationProtocolDTO extends AbstractAuditingDTO{
 
     @Override
     public String toString() {
-        return "TranslationDTO{" +
+        return "Translation: " +
             "id=" + id +
             ", translatedText='" + translatedText + "'" +
-            ", updateNeeded='" + updateNeeded + "'" +
-            '}';
+            ", updateNeeded='" + updateNeeded + "'";
     }
 }
