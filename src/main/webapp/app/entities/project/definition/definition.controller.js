@@ -6,11 +6,12 @@
         .controller('ProjectDefinitionController', ProjectDefinitionController);
 
     ProjectDefinitionController.$inject = ['$scope', '$state', '$location', 'project', 'projectReleases', 'DataUtils',
-        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles', 'ProjectProgress', 'CurrentRelease', 'FileUploadDefinition'];
+        'ProjectDefinition', 'ParseLinks', 'AlertService', 'ReleaseTooltips', 'ProjectTranslations', 'Principal', 'ProjectRoles',
+        'ProjectProgress', 'CurrentRelease', 'FileUploadDefinition', 'Definition'];
 
     function ProjectDefinitionController($scope, $state, $location, project, projectReleases, DataUtils, ProjectDefinition,
                                          ParseLinks, AlertService, ReleaseTooltips, ProjectTranslations, Principal, ProjectRoles,
-                                         ProjectProgress, CurrentRelease, FileUploadDefinition) {
+                                         ProjectProgress, CurrentRelease, FileUploadDefinition, Definition) {
         var vm = this;
 
         vm.baseUrl = "http://" + $location.$$host + ":" + $location.$$port;
@@ -36,10 +37,12 @@
         vm.getReleaseTooltip = ReleaseTooltips.getReleaseTooltip;
         vm.getTranslations = getTranslations;
         vm.isDeveloper = isDeveloper;
+        vm.isReleaseManager = isReleaseManager;
         vm.uploadThis = uploadThis;
         vm.setSelectedRelease = setSelectedRelease;
         vm.getReleaseName = getReleaseName;
         vm.filterByVersionTagFunction = filterByVersionTagFunction;
+        vm.saveDefinition = saveDefinition;
         loadAll();
         getAccount();
         setInitialFilteringRelease();
@@ -92,6 +95,10 @@
 
         function isDeveloper() {
             return vm.roles && vm.roles.includes('DEVELOPER');
+        }
+
+        function isReleaseManager() {
+            return vm.roles && vm.roles.includes('RELEASE_MANAGER');
         }
 
         function setSelectedRelease() {
@@ -200,14 +207,20 @@
         }
 
         function getReleaseName(releaseId) {
-            var result = '';
-            angular.forEach(vm.releases, function (value, key) {
-                if (value.id == releaseId) {
-                    result = value.versionTag;
-                }
+            var release = vm.releases.find(function (release) {
+                return release.id == releaseId;
             });
+            if (release) {
+                return release.versionTag;
+            } else {
+                return '';
+            }
+        }
 
-            return result;
+        function saveDefinition(definition) {
+            Definition.update(definition).$promise.then(function (result) {
+                console.log(result);
+            });
         }
     }
 })();

@@ -13,7 +13,7 @@
         <!--ng-model="vm.definition.id" readonly />-->
         <!--</div>-->
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-12">
                 <div class="form-group">
                     <label class="control-label" for="field_code">Code</label>
                     <input type="text" class="form-control" name="code" id="field_code"
@@ -27,12 +27,16 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="row" ng-if="vm.isEdit || vm.isReleaseManager()">
             <div class="col-sm-4">
                 <div class="form-group">
                     <label class="control-label" for="releaseDropdown">Release</label>
                     <div class="dropdown">
                         <select class="btn btn-default dropdown-toggle" name="releaseDropdown" id="releaseDropdown" ng-model="vm.selectedRelease"
-                                data-ng-options="release.versionTag for release in vm.releases" ng-change="vm.setSelectedRelease(vm.selectedRelease)">
+                                data-ng-options="release.versionTag for release in vm.releases"
+                                ng-change="vm.setSelectedRelease(vm.selectedRelease)"
+                                ng-disabled="!vm.isReleaseManager()">
                         </select>
                     </div>
                 </div>

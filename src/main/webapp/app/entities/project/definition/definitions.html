@@ -33,7 +33,7 @@
             </button>
             <a ng-if="vm.definitions.length > 0" class="dropdown">
                 <select class="btn btn-default" ng-model="vm.selectedRelease"
-                        data-ng-options="release.versionTag for release in vm.releases | orderBy:'dueDate':true" ng-change="vm.setSelectedRelease()">
+                        data-ng-options="release.versionTag for release in vm.releases | orderBy:'dueDate'" ng-change="vm.setSelectedRelease()">
                     <option value="">&lt;all releases&gt;</option>
                 </select></a>
             <div ng-if="vm.isDeveloper() && vm.definitions.length > 0" class="btn-group" uib-dropdown is-open="status.isopen">
@@ -80,16 +80,12 @@
                         </span>
                     </td>
                     <td>
-                        <span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(definition.release)}}">
-                        {{vm.getReleaseName(definition.releaseId)}}
-                        </span>
-                    </td>
-                    <td>
-                        <!--<a ui-sref="release-detail({id:definition.releaseId})">-->
-                        <!--<span class="badge" uib-tooltip="{{::vm.getReleaseTooltip(definition.release)}}">-->
-                        <!--{{definition.release.versionTag}}-->
-                        <!--</span>-->
-                        <!--</a>-->
+                        <a ng-if="vm.isReleaseManager()" href="#" editable-select="definition.releaseId" style="border: 0;"
+                           e-ng-options="release.id as release.versionTag for release in vm.releases | orderBy:'dueDate'"
+                           buttons="no" onaftersave="vm.saveDefinition(definition)"><span class="badge" uib-tooltip="{{vm.getReleaseTooltip(definition.release)}}">
+                            {{vm.getReleaseName(definition.releaseId)}}</span></a>
+                        <span ng-if="!vm.isReleaseManager()" class="badge"
+                              uib-tooltip="{{vm.getReleaseTooltip(definition.release)}}">{{vm.getReleaseName(definition.releaseId)}}</span>
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">

@@ -6,13 +6,14 @@
         .controller('ProjectDefinitionDialogController', ProjectDefinitionDialogController);
 
     ProjectDefinitionDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'DataUtils',
-        'definition', 'projectReleases', 'Definition', 'Translation', 'Release'];
+        'definition', 'projectReleases', 'Definition', 'Translation', 'Release', 'ProjectRoles', 'project'];
 
     function ProjectDefinitionDialogController($timeout, $scope, $stateParams, $uibModalInstance, DataUtils, definition,
-                                               projectReleases, Definition, Translation, Release) {
+                                               projectReleases, Definition, Translation, Release, ProjectRoles, project) {
         var vm = this;
 
         vm.definition = definition;
+        vm.project = project;
         vm.clear = clear;
         vm.byteSize = DataUtils.byteSize;
         vm.openFile = DataUtils.openFile;
@@ -22,6 +23,8 @@
         vm.selectedRelease = [];
         vm.releaseId = $stateParams.releaseId;
         vm.isEdit = vm.definition.id != null;
+        vm.isDeveloper = isDeveloper;
+        vm.isReleaseManager = isReleaseManager;
 
         if (vm.isEdit) {
             for (var i = 0; i < vm.releases.length; i++) {
@@ -36,6 +39,11 @@
                 }
             }
         }
+
+        ProjectRoles.query({projectId: vm.project.id}, function (response) {
+            vm.roles = response;
+        });
+
         $timeout(function () {
             if (vm.isEdit) {
                 angular.element('.form-group:eq(1)>textarea').focus();
@@ -46,6 +54,14 @@
 
         function clear() {
             $uibModalInstance.dismiss('cancel');
+        }
+
+        function isDeveloper() {
+            return vm.roles && vm.roles.includes('DEVELOPER');
+        }
+
+        function isReleaseManager() {
+            return vm.roles && vm.roles.includes('RELEASE_MANAGER');
         }
 
         function save() {
