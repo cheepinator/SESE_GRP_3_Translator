@@ -12,6 +12,9 @@
         .state('project', {
             parent: 'entity',
             url: '/project',
+            params: {
+                id: null
+            },
             data: {
                 authorities: ['ROLE_USER'],
                 pageTitle: 'Projects'
@@ -220,7 +223,27 @@
                     $state.go('^');
                 });
             }]
-        }).state('project-detail.open-translation', {
+        })
+            .state('project-detail.protocol', {
+            parent: 'project-detail',
+            url: '/protocol',
+
+            data: {
+                authorities: ['ROLE_USER'],
+                pageTitle: 'Protocols'
+            },
+            views: {
+                'content@': {
+                    templateUrl: 'app/entities/protocols/protocols.html',
+                    controller: 'ProtocolController',
+                    controllerAs: 'vm'
+                }
+            },
+            resolve: {
+            }
+        })
+
+            .state('project-detail.open-translation', {
                 parent: 'project-detail',
                 url: '/start-translating',
                 data: {

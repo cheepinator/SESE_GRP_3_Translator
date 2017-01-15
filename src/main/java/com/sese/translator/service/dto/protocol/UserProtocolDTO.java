@@ -95,14 +95,13 @@ public class UserProtocolDTO extends AbstractAuditingDTO{
 
     @Override
     public String toString() {
-        return "UserDTO{" +
+        return "User: " +
             "login='" + login + '\'' +
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
             ", email='" + email + '\'' +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +
-            ", authorities=" + authorities +
-            "}";
+            ", authorities=" + authorities;
     }
 }

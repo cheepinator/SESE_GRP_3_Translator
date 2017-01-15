@@ -54,9 +54,8 @@ public class LanguageProtocolDTO extends AbstractAuditingDTO implements Serializ
 
     @Override
     public String toString() {
-        return "LanguageDTO{" +
+        return "Language: " +
             "id=" + id +
-            ", code='" + code + "'" +
-            '}';
+            ", code='" + code + "'";
     }
 }

@@ -15,7 +15,8 @@
         loadAll();
 
         function loadAll() {
-            Protocol.query(function(result) {
+            var str= window.location.toString();
+            Protocol.get({id:str.match(/project\/\d+/)[0].match(/\d+/)[0]},function(result) {
                 vm.protocols = result;
             });
         }

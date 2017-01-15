@@ -1,0 +1,24 @@
+<div>
+    <h2>Protocols</h2>
+    <jhi-alert></jhi-alert>
+    <br/>
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+                <tr>
+                    <th><span>Content</span></th>
+                    <th><span>Last edited at</span></th>
+                    <th><span>Last edited by</span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="protocol in vm.protocols | orderBy: 'lastModifiedDate':true">
+                    <td>{{protocol.content}}</td>
+                    <td>{{protocol.lastModifiedDate  | date:'medium'  }}</td>
+                    <td>{{protocol.lastModifiedBy }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -7,18 +7,18 @@
     Protocol.$inject = ['$resource', 'DateUtils'];
 
     function Protocol ($resource, DateUtils) {
-        var resourceUrl =  'api/protocollist/1'  // /:id';
+        var resourceUrl =  'api/protocollist/:id';
 
         return $resource(resourceUrl, {}, {
             'query': { method: 'GET', isArray: true},
             'get': {
-                method: 'GET',
-                transformResponse: function (data) {
-                    if (data) {
-                        data = angular.fromJson(data);
-                    }
-                    return data;
-                }
+                method: 'GET', isArray: true
+                // transformResponse: function (data) {
+                //     if (data) {
+                //         data = angular.fromJson(data);
+                //     }
+                //     return data;
+                //}
             },
             'update': { method:'PUT' }
         });
