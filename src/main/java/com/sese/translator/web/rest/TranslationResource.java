@@ -394,8 +394,10 @@ public class TranslationResource {
         Optional<User> sdfsdf = userRepository.findOneByLogin(username);
         if(sdfsdf.isPresent()) {
             if(!passwordEncoder.matches(password, sdfsdf.get().getPassword())) {
-                return new ResponseEntity<>("username and password not correct!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("username or password not correct!", HttpStatus.BAD_REQUEST);
             }
+        } else {
+            return new ResponseEntity<>("username or password not correct!", HttpStatus.BAD_REQUEST);
         }
 
         List<Project> allOfCurrentUser = projectRepository.findByOwnerIsUser(username);
