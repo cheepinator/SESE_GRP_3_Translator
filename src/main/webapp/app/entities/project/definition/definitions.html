@@ -75,8 +75,13 @@
                     <td>{{definition.originalText}}</td>
                     <td>
                         <span ng-repeat="translation in vm.getTranslations(definition) | orderBy: 'languageCode' track by translation.id">
-                            <span class="label" ng-class="translation.translatedText ? (translation.updateNeeded ? 'label-warning' : 'label-success') : 'label-default'">
-                                {{translation.languageCode}}</span>
+                            <a ng-if="vm.isTranslator()" ui-sref="project-detail.translation-edit({definitionId:definition.id,translationId:translation.id})"
+                            style="text-decoration: none;">
+                                <span class="label" ng-class="translation.translatedText ? (translation.updateNeeded ?
+                                 'label-warning' : 'label-success') : 'label-default'">{{translation.languageCode}}</span>
+                            </a>
+                            <span ng-if="!vm.isTranslator()" class="label" ng-class="translation.translatedText ? (translation.updateNeeded ?
+                                 'label-warning' : 'label-success') : 'label-default'">{{translation.languageCode}}</span>
                         </span>
                     </td>
                     <td>
