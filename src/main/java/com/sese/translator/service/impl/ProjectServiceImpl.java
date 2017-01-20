@@ -79,7 +79,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public LanguageDTO addLanguageToProject(ProjectDTO projectDTO, LanguageDTO languageDTO) {
-        Project project = projectMapper.projectDTOToProject(projectDTO);
+        Project project = projectRepository.findOne(projectDTO.getId());
         Language language = languageMapper.languageDTOToLanguage(languageDTO);
         project.addLanguages(language);
         projectRepository.save(project);
@@ -89,7 +89,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public LanguageDTO removeLanguageFromProject(ProjectDTO projectDTO, LanguageDTO languageDTO) {
-        Project project = projectMapper.projectDTOToProject(projectDTO);
+        Project project = projectRepository.findOne(projectDTO.getId());
         Language language = languageMapper.languageDTOToLanguage(languageDTO);
         project.removeLanguages(language);
         projectRepository.save(project);

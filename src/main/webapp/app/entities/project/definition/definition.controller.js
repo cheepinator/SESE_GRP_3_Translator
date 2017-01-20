@@ -38,7 +38,7 @@
         vm.getTranslations = getTranslations;
         vm.isDeveloper = isDeveloper;
         vm.isReleaseManager = isReleaseManager;
-        vm.uploadThis = uploadThis;
+        vm.isTranslator = isTranslator;
         vm.setSelectedRelease = setSelectedRelease;
         vm.getReleaseName = getReleaseName;
         vm.filterByVersionTagFunction = filterByVersionTagFunction;
@@ -47,25 +47,6 @@
         loadAll();
         getAccount();
         setInitialFilteringRelease();
-
-        $scope.uploadFile = function(files) {
-            var reader = new FileReader();
-
-            reader.onload = function(e) {
-                $scope.$apply(function() {
-                    $scope.theFileToImport = reader.result;
-                });
-            };
-            reader.readAsBinaryString(files[0]);
-        };
-
-        function uploadThis() {
-            $scope.theFileToImport =  $scope.theFileToImport.replace(/\r\n/g, '');
-            FileUploadDefinition.query({
-                projectId: vm.project.id,
-                fileUpL: $scope.theFileToImport
-            });
-        }
 
         function setInitialFilteringRelease() {
             vm.selectedRelease = "";
@@ -100,6 +81,10 @@
 
         function isReleaseManager() {
             return vm.roles && vm.roles.includes('RELEASE_MANAGER');
+        }
+
+        function isTranslator() {
+            return vm.roles && vm.roles.includes('TRANSLATOR');
         }
 
         function setSelectedRelease() {
@@ -225,36 +210,32 @@
         }
 
         function droppedFile(files) {
-            if (!isDeveloper()) {
+            if (!isDeveloper() && !isTranslator()) {
                 return;
             }
             console.log(files);
-
             if (files && files.length) {
-                var promises = [];
-                for (var i = 0; i < files.length; i++) {
-                    var path;
-                    if (files[i].path) {
-                        path = files[i].path;
+                var paths = files.map(function (file) {
+                    if (file.path) {
+                        return file.path;
                     } else {
-                        path = "";
+                        return "";
                     }
-                    promises.push(Upload.upload({
-                        url: 'api/projects/' + vm.project.id + '/fileUpload',
-                        data: {file: files[i], path: path}
-                    }).then(function (resp) {
-                        console.log('Success ' + resp.config.data.file.name + ' uploaded. Response: ' + resp.data);
-                    }, function (resp) {
-                        console.log('Error status: ' + resp.status);
-                    }, function (evt) {
-                        var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                        console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
-                    }));
-                    Promise.all(promises).then(function (results) {
-                        console.log('upload finished, reload page');
-                        $state.go('project-detail', {}, { reload: true });
-                    });
-                }
+                });
+                console.log(paths);
+                Upload.upload({
+                    url: 'api/projects/' + vm.project.id + '/fileUpload',
+                    data: {file: files, paths: paths}
+                }).then(function (resp) {
+                    console.log('Success ' + resp.config.data.file.name + ' uploaded. Response: ' + resp.data);
+                    $state.go('project-detail', {}, {reload: true});
+                }, function (resp) {
+                    console.log('Error status: ' + resp.status);
+                    AlertService.error(resp.status);
+                }, function (evt) {
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                    console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+                });
             }
         }
     }

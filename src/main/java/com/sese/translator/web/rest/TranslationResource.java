@@ -1,26 +1,15 @@
 package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.ibm.icu.text.CharsetDetector;
-import com.ibm.icu.text.CharsetMatch;
-import com.sese.translator.domain.Definition;
-import com.sese.translator.domain.Project;
-import com.sese.translator.domain.Translation;
-import com.sese.translator.domain.User;
-import com.sese.translator.repository.DefinitionRepository;
-import com.sese.translator.repository.ProjectRepository;
-import com.sese.translator.repository.TranslationRepository;
-import com.sese.translator.repository.UserRepository;
-import com.sese.translator.service.DefinitionService;
-import com.sese.translator.service.ProjectService;
-import com.sese.translator.service.ReleaseService;
-import com.sese.translator.service.TranslationService;
+import com.sese.translator.domain.*;
+import com.sese.translator.domain.enumeration.Projectrole;
+import com.sese.translator.repository.*;
+import com.sese.translator.service.*;
 import com.sese.translator.service.dto.*;
-import com.sese.translator.web.rest.parsing.DefinitionExtraction;
 import com.sese.translator.web.rest.parsing.ElementHandler;
+import com.sese.translator.web.rest.parsing.UploadedFile;
 import com.sese.translator.web.rest.util.HeaderUtil;
 import com.sese.translator.web.rest.util.PaginationUtil;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -33,26 +22,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartRequest;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -63,8 +50,6 @@ import java.util.zip.ZipOutputStream;
 @RequestMapping("/api")
 public class TranslationResource {
 
-    public static final String DEFAULT_LANGUAGE_CODE_ENGLISH = "en";
-    public List<DefinitionExtraction> definitions;
     private final Logger log = LoggerFactory.getLogger(TranslationResource.class);
 
     @Inject
@@ -74,6 +59,9 @@ public class TranslationResource {
     private ProjectService projectService;
 
     @Inject
+    private UserService userService;
+
+    @Inject
     private ReleaseService releaseService;
 
     @Inject
@@ -81,6 +69,12 @@ public class TranslationResource {
 
     @Inject
     private DefinitionRepository definitionRepository;
+
+    @Inject
+    private LanguageRepository languageRepository;
+
+    @Inject
+    private LanguageService languageService;
 
     @Inject
     private DefinitionService definitionService;
@@ -93,6 +87,9 @@ public class TranslationResource {
 
     @Inject
     private ProjectRepository projectRepository;
+
+    @Inject
+    private ProjectassignmentRepository projectassignmentRepository;
 
     /**
      * POST  /translations : Create a new translation.
@@ -230,19 +227,6 @@ public class TranslationResource {
         return new ResponseEntity<>(translationDTOs, HttpStatus.OK);
     }
 
-//    /**
-//     * GET sdfjkasf
-//     *
-//     * @return with status 200 (OK)
-//     */
-//    @GetMapping("/project/{projectId}/file/{fileSome}")
-//    @Timed
-//    public ResponseEntity<Void> getNextOpenTranslations(@PathVariable Long projectId, @PathVariable String fileSome) {
-//        log.debug("GOT SOME FILE!!!!!!: {}", fileSome);
-//
-//        return ResponseEntity.ok().build();
-//    }
-
     /**
      * POST
      *
@@ -251,16 +235,23 @@ public class TranslationResource {
     @PostMapping("/projects/{projectId}/fileUpload")
     @Timed
     @Transactional
-    public ResponseEntity<Void> uploadTranslations(@PathVariable Long projectId, @RequestParam("file") MultipartFile file,
-                                                   @RequestParam("path") String path) {
+    public ResponseEntity<Void> uploadTranslations(@PathVariable Long projectId, HttpServletRequest request) {
         ProjectDTO project = projectService.findOne(projectId);
         if (project == null) {
             return ResponseEntity.notFound().build();
         }
-        if (!file.isEmpty()) {
+        if (!(request instanceof MultipartRequest)) {
+            return ResponseEntity.badRequest().build();
+        }
+        boolean translatorOnly = isTranslatorOnly(projectId);
+        ArrayList<UploadedFile> uploadedFiles = getSortedUploadedFiles(request);
+        for (UploadedFile uploadedFile : uploadedFiles) {
+            if (translatorOnly && uploadedFile.isEnglishLanguageCode()) {
+                log.debug("Skip uploaded definition file as user is translator only and file contains new definitions: {}", uploadedFile);
+                continue;
+            }
             try {
-                CharsetMatch detect = new CharsetDetector().setText(file.getBytes()).detect();
-                parseUploadedFile(project, detect.getReader(), file.getOriginalFilename(), path);
+                parseUploadedFile(project, uploadedFile);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().build();
             }
@@ -268,47 +259,40 @@ public class TranslationResource {
         return ResponseEntity.ok().build();
     }
 
-    private void parseUploadedFile(ProjectDTO project, Reader fileContentAsString, String originalFilename, String path) throws IOException, SAXException, ParserConfigurationException {
-        log.info("Got file upload for project {}: {}, {}", project.getId(), originalFilename, path);
-        String languageCode;
-        if (path != null && !path.isEmpty()) {
-            languageCode = detectLanguageCode(originalFilename, path);
-        } else {
-            languageCode = FilenameUtils.getBaseName(originalFilename);
-        }
-        log.info("Detected language code: {}. {}, {}", languageCode, originalFilename, path);
-        if (originalFilename.endsWith(".strings")) {
-            parseIOSFile(fileContentAsString, languageCode, project);
-        } else if (originalFilename.endsWith(".xml")) {
-            parseAndroidFile(fileContentAsString, languageCode, project);
-        } else if (originalFilename.endsWith(".json")) {
-            // todo: not supported
-        }
+    private boolean isTranslatorOnly(Long projectId) {
+        List<Projectassignment> projectAssignments = projectassignmentRepository.findByAssignedUserAndAssignedProjectId(userService.getUserWithAuthorities(), projectId);
+        return getRoles(projectAssignments).anyMatch(Predicate.isEqual(Projectrole.TRANSLATOR))
+            && getRoles(projectAssignments).noneMatch(Predicate.isEqual(Projectrole.DEVELOPER));
     }
 
-    private String detectLanguageCode(String originalFilename, String path) {
-        Path filePath = Paths.get(path);
-        for (Path pathPart : filePath) {
-            String pathString = pathPart.toString();
-            if (originalFilename.endsWith(".strings")) {
-                if (pathString.endsWith(".lproj")) {
-                    return pathString.substring(0, pathString.indexOf(".lproj"));
-                }
-            } else if (originalFilename.endsWith(".xml")) {
-                if (pathString.startsWith("values-")) {
-                    return pathString.substring(pathString.indexOf("-") + 1);
-                } else if (pathString.equals("values")) {
-                    return DEFAULT_LANGUAGE_CODE_ENGLISH;
-                }
-            } else if (originalFilename.endsWith(".json")) {
-                // todo: not supported
+    private Stream<Projectrole> getRoles(List<Projectassignment> projectAssignments) {
+        return projectAssignments.stream().map(Projectassignment::getRole).distinct();
+    }
+
+    private ArrayList<UploadedFile> getSortedUploadedFiles(HttpServletRequest request) {
+        int counter = 0;
+        ArrayList<UploadedFile> uploadedFiles = new ArrayList<>();
+        for (MultipartFile multipartFile : ((MultipartRequest) request).getFileMap().values()) {
+            if (!multipartFile.isEmpty()) {
+                uploadedFiles.add(new UploadedFile(multipartFile, request.getParameter("paths[" + counter + "]")));
             }
+            counter++;
         }
-        return filePath.getFileName().toString();
+        uploadedFiles.sort(Comparator.comparing(UploadedFile::isEnglishLanguageCode).reversed());
+        return uploadedFiles;
     }
 
-    private void parseIOSFile(Reader fileContentAsString, String languageCode, ProjectDTO project) {
-        Scanner scanner = new Scanner(fileContentAsString);
+    private void parseUploadedFile(ProjectDTO project, UploadedFile uploadedFile) throws IOException, SAXException, ParserConfigurationException {
+        log.info("Got file upload for project {}: {}", project.getId(), uploadedFile);
+        if (uploadedFile.isIOSFile()) {
+            parseIOSFile(uploadedFile, project);
+        } else if (uploadedFile.isAndroidFile()) {
+            parseAndroidFile(uploadedFile, project);
+        }
+    }
+
+    private void parseIOSFile(UploadedFile uploadedFile, ProjectDTO project) throws IOException {
+        Scanner scanner = new Scanner(uploadedFile.getReader());
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             if (!line.startsWith("\"") || !line.endsWith(";")) {
@@ -322,54 +306,38 @@ public class TranslationResource {
             String definitionText = stripApostrophes(parts[1].trim());
 
             if (!definitionCode.isEmpty() && !definitionText.isEmpty()) {
-                updateOrCreateDefinition(project, definitionCode, definitionText, languageCode);
+                updateOrCreateDefinition(project, definitionCode, definitionText, uploadedFile);
             }
         }
     }
 
     private String stripLineEndDelimiter(String line) {
-        return line.substring(0, line.length() -1);
+        return line.substring(0, line.length() - 1);
     }
 
     private String stripApostrophes(String text) {
         return text.substring(1, text.length() - 1);
     }
 
-
-//    <?xml version="1.0" encoding="utf-8"?>
-//<resources>
-//    <string name="title">My Application</string>
-//    <string name="hello_world">Hello World!</string>
-//</resources>
-
-
-    private void parseAndroidFile(Reader fileContentAsString, String languageCode, ProjectDTO project) throws ParserConfigurationException, SAXException, IOException {
-
-
-        System.out.println("Here");
-
+    private void parseAndroidFile(UploadedFile uploadedFile, ProjectDTO project) throws ParserConfigurationException, SAXException, IOException {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         factory.setValidating(true);
-
         SAXParser saxParser = factory.newSAXParser();
-//            XMLReader xmlReader = saxParser.getXMLReader();
-//            xmlReader.setContentHandler(new ElementHandler(this));
-//            xmlReader.parse(convertToFileURL(filename));
-
-        saxParser.parse(new InputSource(fileContentAsString), new ElementHandler(this));
-        this.definitions.forEach(definitionExtraction -> updateOrCreateDefinition(project, definitionExtraction.getCode(), definitionExtraction.getText(),languageCode));
+        ElementHandler elementHandler = new ElementHandler();
+        saxParser.parse(new InputSource(uploadedFile.getReader()), elementHandler);
+        elementHandler.getDefinitions().forEach(definitionExtraction -> updateOrCreateDefinition(project, definitionExtraction.getCode(),
+            definitionExtraction.getText(), uploadedFile));
     }
 
-    public void updateOrCreateDefinition(ProjectDTO project, String definitionCode, String definitionText, String languageCode) {
+    private void updateOrCreateDefinition(ProjectDTO project, String definitionCode, String definitionText, UploadedFile uploadedFile) {
         List<Definition> definitions = definitionRepository.findByProjectIdAndDefinitionCode(project.getId(), definitionCode);
         if (!definitions.isEmpty()) {
-            if (languageCode.equals(DEFAULT_LANGUAGE_CODE_ENGLISH)) {
-                // update original text
+            if (uploadedFile.isEnglishLanguageCode()) {
                 updateOriginalText(definitions.get(0), definitionText);
             } else {
-                updateTranslationIfFound(definitions.get(0), languageCode, definitionText);
+                updateOrCreateTranslation(project, definitions.get(0), uploadedFile.getLanguageCode(), definitionText);
             }
-        } else if (languageCode.equals(DEFAULT_LANGUAGE_CODE_ENGLISH)) {
+        } else if (uploadedFile.isEnglishLanguageCode()) {
             createNewDefinition(project, definitionCode, definitionText);
         }
     }
@@ -384,16 +352,27 @@ public class TranslationResource {
         }
     }
 
-    private void updateTranslationIfFound(Definition definition, String languageCode, String definitionText) {
+    private void updateOrCreateTranslation(ProjectDTO project, Definition definition, String languageCode, String definitionText) {
+        createLanguageIfNotFound(project, languageCode);
         Translation translation = translationRepository.findByDefinitionIdAndLanguageCode(definition.getId(), languageCode);
         if (translation != null) {
             String oldTranslatedText = translation.getTranslatedText();
-            if (oldTranslatedText == null || !oldTranslatedText.equals(definitionText)) {
+            if (oldTranslatedText == null || !oldTranslatedText.equals(definitionText) || translation.isUpdateNeeded()) {
                 translation.setTranslatedText(definitionText);
                 translation.setUpdateNeeded(false);
                 translationRepository.save(translation);
                 log.debug("Updated translation for definition {} and language {}", definition.getId(), languageCode);
             }
+        }
+    }
+
+    private void createLanguageIfNotFound(ProjectDTO project, String languageCode) {
+        if (!languageService.languageCodeAlreadyExistsForProject(project.getId(), languageCode)) {
+            LanguageDTO languageDTO = new LanguageDTO();
+            languageDTO.setCode(languageCode);
+            languageDTO = languageService.save(languageDTO);
+            projectService.addLanguageToProject(project, languageDTO);
+            translationService.addMissingTranslationsForProject(project);
         }
     }
 
@@ -496,7 +475,7 @@ public class TranslationResource {
                 }
             List<Definition> getDefinitionsFromRelease = definitionRepository.findByProjectIdAndVersionTag(projectId, releaseDTO.getVersionTag());
             appendDefinition(stringBuilder, getDefinitionsFromRelease, ex);
-            zipOutputStream.putNextEntry(new ZipEntry(releaseDTO.getVersionTag() + "/" + DEFAULT_LANGUAGE_CODE_ENGLISH + getFileEnding(ex)));
+            zipOutputStream.putNextEntry(new ZipEntry(releaseDTO.getVersionTag() + "/" + Language.DEFAULT_LANGUAGE_CODE_ENGLISH + getFileEnding(ex)));
             zipOutputStream.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
             stringBuilder.setLength(0);
             }
@@ -571,7 +550,7 @@ public class TranslationResource {
                 }
                 break;
             case "web":
-                buildWebStringHeader(stringBuilder, DEFAULT_LANGUAGE_CODE_ENGLISH);
+                buildWebStringHeader(stringBuilder, Language.DEFAULT_LANGUAGE_CODE_ENGLISH);
                 Boolean first = true;
                 for (Definition t : definitionList) {
                     if(first) {
