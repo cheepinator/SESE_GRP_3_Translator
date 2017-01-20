@@ -1,6 +1,7 @@
 package com.sese.translator.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.neovisionaries.i18n.LocaleCode;
 import com.sese.translator.domain.*;
 import com.sese.translator.domain.enumeration.Projectrole;
 import com.sese.translator.repository.*;
@@ -367,13 +368,17 @@ public class TranslationResource {
     }
 
     private void createLanguageIfNotFound(ProjectDTO project, String languageCode) {
-        if (!languageService.languageCodeAlreadyExistsForProject(project.getId(), languageCode)) {
+        if (isValidLanguageCode(languageCode) && !languageService.languageCodeAlreadyExistsForProject(project.getId(), languageCode)) {
             LanguageDTO languageDTO = new LanguageDTO();
             languageDTO.setCode(languageCode);
             languageDTO = languageService.save(languageDTO);
             projectService.addLanguageToProject(project, languageDTO);
             translationService.addMissingTranslationsForProject(project);
         }
+    }
+
+    private boolean isValidLanguageCode(String languageCode) {
+        return LocaleCode.getByCodeIgnoreCase(languageCode) != null;
     }
 
     private void createNewDefinition(ProjectDTO project, String definitionCode, String definitionText) {
