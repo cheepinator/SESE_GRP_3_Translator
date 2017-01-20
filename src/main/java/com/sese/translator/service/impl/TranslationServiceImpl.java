@@ -82,8 +82,7 @@ public class TranslationServiceImpl implements TranslationService {
         com.sese.translator.domain.User user = userService.getUserWithAuthoritiesByLogin(username).orElseThrow(()
             -> new UsernameNotFoundException("User " + username + " was not found in the database"));
         translation.setTranslator(user);
-        if (translation.getTranslatedText() != null) {
-
+        if (translation.getTranslatedText() != null && !translation.getTranslatedText().isEmpty()) {
             translation.setUpdateNeeded(false);
         }
 
