@@ -19,7 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -140,12 +139,10 @@ public class ProjectassignmentResource {
     @GetMapping("/projects/{projectId}/userRoles")
     @Timed
     public List<String> getUserRolesForProject(@PathVariable Long projectId) {
-        List<Projectassignment> projectassignments = projectassignmentRepository.findByAssignedUser(userService.getUserWithAuthorities());
+        List<Projectassignment> projectassignments = projectassignmentRepository.findByAssignedUserAndAssignedProjectId(userService.getUserWithAuthorities(), projectId);
         List<String> result = new ArrayList<>();
         for (Projectassignment projectassignment : projectassignments) {
-            if (Objects.equals(projectassignment.getAssignedProject().getId(), projectId)) {
-                result.add(projectassignment.getRole().name());
-            }
+            result.add(projectassignment.getRole().name());
         }
         return result;
     }

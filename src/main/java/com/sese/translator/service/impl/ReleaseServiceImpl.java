@@ -5,7 +5,6 @@ import com.sese.translator.repository.ReleaseRepository;
 import com.sese.translator.service.LanguageService;
 import com.sese.translator.service.ProjectService;
 import com.sese.translator.service.ReleaseService;
-import com.sese.translator.service.dto.LanguageDTO;
 import com.sese.translator.service.dto.ProjectDTO;
 import com.sese.translator.service.dto.ReleaseDTO;
 import com.sese.translator.service.mapper.LanguageMapper;
@@ -241,24 +240,5 @@ public class ReleaseServiceImpl implements ReleaseService {
     public void delete(Long id) {
         log.debug("Request to delete Release : {}", id);
         releaseRepository.delete(id);
-    }
-
-    private Language getDefaultLanguage() { // todo: refactor to new logic
-        boolean hasGermanLanguage = false;
-        Long languageId = 0L;
-        for (LanguageDTO languageDTO : languageService.findAll()) {
-            if (languageDTO.getCode().equals(Language.DEFAULT_LANGUAGE)) {
-                hasGermanLanguage = true;
-                languageId = languageDTO.getId();
-            }
-        }
-
-        if (!hasGermanLanguage) {
-            LanguageDTO defaultLanguage = new LanguageDTO();
-            defaultLanguage.setCode(Language.DEFAULT_LANGUAGE);
-            languageId = languageService.save(defaultLanguage).getId();
-        }
-
-        return languageMapper.languageDTOToLanguage(languageService.findOne(languageId));
     }
 }

@@ -66,6 +66,11 @@ public class LanguageServiceImpl implements LanguageService{
             .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean languageCodeAlreadyExistsForProject(Long projectId, String languageCode) {
+        return languageRepository.findByProjectIdAndLanguageCode(projectId, languageCode) != null;
+    }
+
     /**
      *  Get one language by id.
      *

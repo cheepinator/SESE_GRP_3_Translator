@@ -29,7 +29,7 @@
 
         function save () {
             vm.isSaving = true;
-            vm.translation.updateNeeded = false;
+            vm.translation.updateNeeded = !vm.translation.translatedText; // sets updated needed again, if text is empty
             if (vm.translation.id !== null) {
                 Translation.update(vm.translation, onSaveSuccess, onSaveError);
             } else {

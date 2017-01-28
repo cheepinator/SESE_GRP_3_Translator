@@ -18,6 +18,7 @@
         <h4>All definitions have been translated for the Release and Language.</h4>
     </div>
     <div class="container-fluid" ng-if="vm.nextTranslations.length">
+        <p ng-if="vm.nextTranslations.length" class="text-center" style="font-size: small">Tip: Use Enter inside the text fields to automatically switch to the next one. Changes are saved automatically</p>
         <div ng-repeat="translation in vm.nextTranslations track by translation.id">
             <div class="row">
                 <div class="col-md-12">
@@ -31,10 +32,11 @@
                     <span>{{translation.originalText}}</span>
                 </div>
                 <div class="col-md-1" style="margin-top: 7px;"><span class="glyphicon glyphicon-chevron-right"></span></div>
-                <div class="col-md-6">
+                <div class="col-md-6" id="translation-{{translation.id}}">
                     <a href="#" submit-on-enter="true" blur="submit" buttons="no"
-                       onaftersave="vm.saveTranslation(translation)" editable-textarea="translation.translatedText"
-                       e-rows="2" e-cols="40">
+                       onaftersave="vm.saveTranslation(translation,$event)" editable-textarea="translation.translatedText"
+                       e-rows="2" e-cols="40" e-ng-keydown="$event.keyCode == 13 && !$event.altKey && !$event.shiftKey
+                        && !$event.ctrlKey && vm.selectNextTranslation(translation, $event)">
                         <pre style="white-space: pre-wrap;">{{ translation.translatedText|| ' ' }}</pre>
                     </a>
                 </div>
@@ -46,5 +48,5 @@
             ui-sref="{{ vm.previousState }}"
             class="btn btn-info">
         <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
-    </button> <span ng-if="vm.nextTranslations.length"><i>Changes are saved automatically</i></span>
+    </button>
 </div>

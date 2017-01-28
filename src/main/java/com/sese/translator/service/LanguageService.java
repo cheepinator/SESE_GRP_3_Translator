@@ -32,6 +32,8 @@ public interface LanguageService {
      */
     List<LanguageDTO> findByProjectId(Long id);
 
+    boolean languageCodeAlreadyExistsForProject(Long projectId, String languageCode);
+
     /**
      *  Get the "id" language.
      *

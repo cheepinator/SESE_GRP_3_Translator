@@ -102,6 +102,10 @@ public class LanguageResource {
         if (projectDTO == null) {
             return ResponseEntity.notFound().build();
         }
+        if (languageService.languageCodeAlreadyExistsForProject(projectId, languageDTO.getCode())) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("language", "codeexists",
+                "A language with the given code already exists for the project")).body(null);
+        }
         languageDTO = languageService.save(languageDTO);
         projectService.addLanguageToProject(projectDTO, languageDTO);
         translationService.addMissingTranslationsForProject(projectDTO);

@@ -16,5 +16,7 @@ public interface LanguageRepository extends JpaRepository<Language,Long> {
     @Query("SELECT l from Language l join l.projects project where project.id = ?1")
     List<Language> findByProjectId(Long id);
 
+    @Query("SELECT l from Language l join l.projects project where project.id = :projectId and l.code = :languageCode")
+    Language findByProjectIdAndLanguageCode(@Param("projectId") Long id, @Param("languageCode") String languageCode);
 
 }

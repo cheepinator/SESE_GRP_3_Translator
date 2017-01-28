@@ -22,8 +22,8 @@ import java.util.Objects;
 @Audited
 public class Language extends AbstractAuditingEntity implements Serializable {
 
+    public static final String DEFAULT_LANGUAGE_CODE_ENGLISH = "en";
     private static final long serialVersionUID = 1L;
-    public static final String DEFAULT_LANGUAGE = "De";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
